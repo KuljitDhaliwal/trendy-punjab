@@ -31,16 +31,22 @@ function Login() {
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
                   <Input item={item} />
                   {showPassword && EyeSlash ? (
-                    <EyeSlash
+                    <button
+                      type="button"
                       onClick={handleShowPassword}
-                      className="absolute text-[22px] top-1/2 right-2 -translate-y-1/2 cursor-pointer"
-                    />
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                    >
+                      <EyeSlash className="text-[22px]" />
+                    </button>
                   ) : (
                     Eye && (
-                      <Eye
+                      <button
+                        type="button"
                         onClick={handleShowPassword}
-                        className="absolute text-[22px] top-1/2 right-2 -translate-y-1/2 cursor-pointer"
-                      />
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                      >
+                        <Eye className="text-[22px]" />
+                      </button>
                     )
                   )}
                 </div>
