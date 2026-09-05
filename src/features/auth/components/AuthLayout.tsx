@@ -62,7 +62,7 @@ function AuthLayout({children}: Children) {
             {/* Right Side */}
             <div className="lg:p-8 rounded-r-2xl overflow-hidden md:p-6 p-4 z-1 grid gap-6 relative bg-white/70">
                 <div className="logo">
-                    <img src={Logo} alt="Logo" />
+                    <img src={Logo} alt="Logo" className='h-15 m-auto' />
                     <div className='flex gap-2 items-center'>
                         <div className='bg-linear-90 from-orange-light via-orange-dark to-orange-light
               h-px w-full'></div>

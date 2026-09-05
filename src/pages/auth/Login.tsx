@@ -6,10 +6,12 @@ import Google from '../../assets/images/google.webp'
 import { useState } from "react"
 import type { Data } from "../../static/LoginData"
 import type { IconType } from "react-icons"
+import { useNavigate } from "react-router-dom"
 
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
   const handleShowPassword = () => {
     setShowPassword(!showPassword)
   }
@@ -17,10 +19,11 @@ function Login() {
     <div>
       <AuthLayout children={(
         <div className='grid gap-4'>
-          <div className="grid gap-2">
-            <p className='text-bold text-secondary-text'>Sign in to Trendy Punjab</p>
+          <div className="grid">
+            <p className='text-bold text-2xl'>Signin to Your Account</p>
+            <p className="text-secondary-text">Join Trendy Punjab and enjoy shopping</p>
           </div>
-          <div className='grid gap-6'>
+          <div className='grid gap-4'>
             {LoginData.map((item: Data, key: number) => {
               const Icon: IconType = item.icon
               const Eye: IconType | undefined = item.eye
@@ -66,7 +69,7 @@ function Login() {
             )} className={`bg-linear-45 bg-white`} />
 
             <p className="text-secondary-text text-center flex gap-2 justify-center">Don't have an account?
-              <span className="text-orange-dark underline cursor-pointer">Sign Up</span></p>
+              <span className="text-orange-dark underline cursor-pointer" onClick={() => navigate('/signup')}>Sign Up</span></p>
           </div>
           <div>
           </div>

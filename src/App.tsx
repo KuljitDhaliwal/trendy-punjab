@@ -1,9 +1,9 @@
-import Login from "./pages/auth/Login"
+import Index from "./routes/Index"
 
 function App() {
   return (
     <div>
-      <Login/>
+      <Index/>
     </div>
   )
 }
