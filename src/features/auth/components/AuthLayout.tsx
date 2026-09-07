@@ -5,12 +5,12 @@ import { FiTruck } from "react-icons/fi";
 import { IoFlowerOutline } from "react-icons/io5";
 import { FaHeadset } from "react-icons/fa";
 import type { ReactNode } from 'react';
+import LineText from '../../../components/LineText';
 
 
 type Children = {
     children: ReactNode
 }
-
 
 function AuthLayout({children}: Children) {
     return (
@@ -63,13 +63,9 @@ function AuthLayout({children}: Children) {
             <div className="lg:p-8 rounded-r-2xl overflow-hidden md:p-6 p-4 z-1 grid gap-6 relative bg-white/70">
                 <div className="logo">
                     <img src={Logo} alt="Logo" className='h-15 m-auto' />
-                    <div className='flex gap-2 items-center'>
-                        <div className='bg-linear-90 from-orange-light via-orange-dark to-orange-light
-              h-px w-full'></div>
+                    <LineText lineText={
                         <p className='shrink-0 uppercase tracking-wider'>Style that speaks <span className='font-bold text-orange-dark'>PANJAB</span></p>
-                        <div className='bg-linear-90 from-orange-light via-orange-dark to-orange-light
-              h-px w-full'></div>
-                    </div>
+                    } lineColor={'bg-linear-90 from-orange-light via-orange-dark to-orange-light'}/>
                 </div>
                 {children}
             </div>
