@@ -16,6 +16,6 @@ export const Input = ({ value, item, className, onChange, type }:inputProps) => 
             name={item.name}
             placeholder={item.placeholder}
             onChange={onChange}
-            className={`w-full py-3 px-10 border rounded-md border-secondary-text/20 ${className}`} />
+            className={`w-full py-3 px-10 border rounded-md ${className}`} />
     )
 }

@@ -14,7 +14,7 @@ import LineText from "../../components/LineText"
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
-  const [isValid, setIsValid] = useState(false)
+  const [isValid, setIsValid] = useState<boolean | null>(null)
   const navigate = useNavigate()
   const { debounceFun } = useDebounceHook()
   const [formValue, setFormValue] = useState({
@@ -28,23 +28,20 @@ function Login() {
     const { name, value } = e.target
     setFormValue(prev => ({
       ...prev,
-      [name]: value.trim()
+      [name]: value
     }))
 
     if (name === "email") {
       if (value.trim() === "") {
-        setIsValid(false);
+        setIsValid(true);
         return;
       }
+      debounceFun(() => handleFormValidation(value), 1000, (result) => {
+        setIsValid(result)
+      })
+
     }
 
-    if (name === 'email') {
-      debounceFun(() => handleFormValidation(value), 2000, (result) => {
-        if (!result) {
-          setIsValid(!result)
-        }
-      })
-    }
   }
 
   //Handle Show/hide Password
@@ -79,7 +76,7 @@ function Login() {
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
                   <Input item={item}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
-                    className={`${isValid ? 'outline-red-600' : ''}`}
+                    className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
                     onChange={(e) => handleFormValue(e)} />
                   {showPassword && EyeSlash ? (
                     <button
@@ -102,7 +99,7 @@ function Login() {
                   )}
                 </div>
                 {item.name === 'email' && formValue.email.trim() !== '' && (
-                  <small className={`text-red-400 text-[12px] ${isValid ? 'block' : 'hidden'}`}>Please fill email properly.</small>
+                  <small className={`text-red-400 text-[12px] ${isValid === false ? 'block' : 'hidden'}`}>Please fill email or phone properly.</small>
                 )}
               </div>
             })}
