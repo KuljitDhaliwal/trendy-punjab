@@ -20,10 +20,10 @@ function Signup() {
     type handlePassword = keyof typeof showPassword
     const handleShowPassword = (btnName: handlePassword) => {
         setShowPassword(prev => (
-                {
-                    ...prev,
-                    [btnName]: !prev[btnName]
-                }
+            {
+                ...prev,
+                [btnName]: !prev[btnName]
+            }
         ))
     }
     console.log('Arr', showPassword)
@@ -44,11 +44,16 @@ function Signup() {
                                 <label htmlFor={item.name}>{item.label}</label>
                                 <div className="flex relative">
                                     <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                                    <Input item={item} />
+                                    <Input item={item} 
+                                    type={(item.name === 'password' || 
+                                    item.name === 'confirmPassword') && 
+                                    !showPassword[item.name as handlePassword] ? 
+                                    'password' : 'text'}/>
+
                                     {showPassword[item.name as handlePassword] && EyeSlash ? (
                                         <button
                                             type="button"
-                                            onClick={()=>handleShowPassword(item.name as handlePassword)}
+                                            onClick={() => handleShowPassword(item.name as handlePassword)}
                                             className="absolute right-2 top-1/2 -translate-y-1/2"
                                         >
                                             <EyeSlash className="text-[22px]" />
@@ -57,7 +62,7 @@ function Signup() {
                                         Eye && (
                                             <button
                                                 type="button"
-                                                onClick={()=>handleShowPassword(item.name as handlePassword)}
+                                                onClick={() => handleShowPassword(item.name as handlePassword)}
                                                 className="absolute right-2 top-1/2 -translate-y-1/2"
                                             >
                                                 <Eye className="text-[22px]" />
@@ -81,7 +86,8 @@ function Signup() {
                         )} className={`bg-linear-45 bg-white`} />
 
                         <p className="text-secondary-text text-center flex gap-2 justify-center">Don't have an account?
-                            <span className="text-orange-dark underline cursor-pointer" onClick={() => navigate('/signup')}>Sign Up</span></p>
+                            <span className="text-orange-dark underline cursor-pointer" onClick={() => navigate('/login')}>Login</span>
+                        </p>
                     </div>
                     <div>
                     </div>

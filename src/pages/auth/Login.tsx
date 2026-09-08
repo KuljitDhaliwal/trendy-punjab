@@ -7,14 +7,56 @@ import { useState } from "react"
 import type { Data } from "../../static/LoginData"
 import type { IconType } from "react-icons"
 import { useNavigate } from "react-router-dom"
+import { useDebounceHook } from "../../hooks/DebounceHook"
+import { handleFormValidation } from "../../utils/FormValidation"
+import LineText from "../../components/LineText"
 
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isValid, setIsValid] = useState<boolean | null>(null)
   const navigate = useNavigate()
+  const { debounceFun } = useDebounceHook()
+  const [formValue, setFormValue] = useState({
+    email: '',
+    password: ''
+  })
+
+
+  //Handle Formvalue 
+  const handleFormValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormValue(prev => ({
+      ...prev,
+      [name]: value
+    }))
+
+    if (name === "email") {
+      if (value.trim() === "") {
+        setIsValid(true);
+        return;
+      }
+      debounceFun(() => handleFormValidation(value), 1000, (result) => {
+        setIsValid(result)
+      })
+
+    }
+
+  }
+
+  //Handle Show/hide Password
   const handleShowPassword = () => {
     setShowPassword(!showPassword)
   }
+
+
+  //Handle Submit Login
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    // formValue
+  }
+
+
   return (
     <div>
       <AuthLayout children={(
@@ -30,37 +72,42 @@ function Login() {
               const EyeSlash: IconType | undefined = item.eyeSlash
               return <div key={key} className='grid gap-2'>
                 <label htmlFor={item.name}>{item.label}</label>
-                <div className="flex relative">
+                <div className="flex relative items-center">
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                  <Input item={item} />
+                  <Input item={item}
+                    type={item.name === 'password' && !showPassword ? 'password' : 'text'}
+                    className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
+                    onChange={(e) => handleFormValue(e)} />
                   {showPassword && EyeSlash ? (
                     <button
                       type="button"
                       onClick={handleShowPassword}
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
                     >
-                      <EyeSlash className="text-[22px]" />
+                      <EyeSlash className="text-[16px]" />
                     </button>
                   ) : (
                     Eye && (
                       <button
                         type="button"
                         onClick={handleShowPassword}
-                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
                       >
-                        <Eye className="text-[22px]" />
+                        <Eye className="text-[16px]" />
                       </button>
                     )
                   )}
                 </div>
+                {item.name === 'email' && formValue.email.trim() !== '' && (
+                  <small className={`text-red-400 text-[12px] ${isValid === false ? 'block' : 'hidden'}`}>Please fill email or phone properly.</small>
+                )}
               </div>
             })}
-            <Button children={'Sign In'} className={`text-white bg-linear-45 from-orange-dark to-orange-600`} />
-            <div className="flex items-center gap-2">
-              <div className="h-px w-full bg-gray-300"></div>
-              <p>or</p>
-              <div className="h-px w-full bg-gray-300"></div>
-            </div>
+            <Button
+              disabled={formValue.email === '' || formValue.password === ''}
+              children={'Sign In'} className={`text-white bg-linear-45 from-orange-dark
+             to-orange-600`} onClick={handleSubmit} />
+            <LineText lineColor={'bg-gray-300'} lineText={<p>or</p>} />
             <Button children={(
               <div className="flex justify-center gap-2 items-center">
                 <img src={Google} alt="Google Logo" className="h-5" />
@@ -80,6 +127,3 @@ function Login() {
 }
 
 export default Login
-{/* <div className="rounde-left rounded-full bg-linear-180 w-100 h-100
-from-orange-700 via-orange-600 to-yellow-400 shadow-2xl absolute
-top-1/2 -left-1/2 translate-x-1/2 blur-lg"></div> */}
