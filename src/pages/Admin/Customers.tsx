@@ -81,9 +81,11 @@ function Customers() {
               <th>last visit</th>
               <th>orders</th>
               <th>total spent</th>
+              <th>Actions</th>
             </thead>
             <tbody>
               {customersData.map(item=> {
+                console.log('Item', item)
                 return <tr key={item.id} className="py-2 border-b border-secondary-text/20">
                   <td className="py-3">{item.name}</td>
                   <td className="py-3">{item.phone}</td>
@@ -91,6 +93,8 @@ function Customers() {
                   <td className="py-3">{item.lastVisit}</td>
                   <td className="py-3">{item.orders}</td>
                   <td className="py-3">{item.totalSpent}</td>
+                  <td><button type="button" className="underline cursor-pointer" 
+                  onClick={()=>navigate(`/dashboard/customers/${item.id}`)}>View</button></td>
                 </tr>
               })}
             </tbody>

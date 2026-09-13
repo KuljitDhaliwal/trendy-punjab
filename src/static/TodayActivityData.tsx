@@ -6,7 +6,7 @@ import { CiWarning } from "react-icons/ci";
 
 export interface TodayActivityType {
     name: string,
-    detail: number
+    detail?: number | null
     icon: IconType
 }
 
