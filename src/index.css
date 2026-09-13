@@ -2,6 +2,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 
+
+:root {
+  /* Brand */
+  --color-brand-orange: #F05A00;
+  --color-orange-dark: #C94700;
+  --color-orange-light: #FFF0E8;
+  --color-base-light: #FBF2E6;
+
+  /* Brand Black & Text */
+  --color-brand-black: #111111;
+  --color-primary-text: #171717;
+  --color-secondary-text: #5F5F5F;
+  --color-muted-text: #8A8A8A;
+
+  /* UI */
+  --color-background-light: #F7F7F5;
+  --color-border: #E2E2DE;
+  --color-strong-border: #D2D2CD;
+
+  /* Semantic */
+  --color-success: #2E7D52;
+  --color-warning: #A66A00;
+  --color-error: #C43D32;
+  --color-info: #356A8A;
+}
+
+
+
+
+
 @theme{
   --color-brand-orange: #F05A00;
   --color-orange-dark: #C94700;
