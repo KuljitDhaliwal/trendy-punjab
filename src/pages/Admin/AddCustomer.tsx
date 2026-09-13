@@ -19,7 +19,7 @@ function AddCustomer() {
             [name]: value
         }))
     }
-    console.log('FormValue', formValue)
+
     return (
         <div className="flex flex-col gap-6 w-full h-full">
             <AdminPagesHeader first={'Customers / Add Customer'}

@@ -167,7 +167,7 @@ function CustomerDetails() {
 
             {/* Quick Actions  */}
             <div className="flex gap-4 justify-end sticky bottom-0 bg-white py-2 text-sm">
-                <button className="px-4 cursor-pointer py-2 border rounded-lg border-border">Edit Customer</button>
+                <button className="px-4 cursor-pointer py-2 border rounded-lg border-border" onClick={()=> navigate(`/dashboard/customers/edit-customer/${id}`)}>Edit Customer</button>
                 <button className="px-4 cursor-pointer py-2 border rounded-lg bg-orange-dark text-white border-border">Create Order</button>
             </div>
         </div >

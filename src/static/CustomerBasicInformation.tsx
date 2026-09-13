@@ -1,11 +1,3 @@
-// import type { IconType } from "react-icons"
-// import {
-//   FiUser,
-//   FiShirt,
-//   FiRuler,
-//   FiFileText,
-// } from "react-icons/fi"
-
 export type CustomerBasicInformation = {
   name: string
   label: string
@@ -35,6 +27,30 @@ export const CustomerBasicInformationData: CustomerBasicInformation[] = [
     placeholder: "Enter email address",
     type: "email",
   },
+  {
+    name: "address",
+    label: "Address",
+    placeholder: "Enter house number, street or locality",
+    type: "text",
+  },
+  {
+    name: "city",
+    label: "City",
+    placeholder: "Enter city",
+    type: "text",
+  },
+  {
+    name: "state",
+    label: "State",
+    placeholder: "Enter state",
+    type: "text",
+  },
+  {
+    name: "pincode",
+    label: "PIN Code",
+    placeholder: "Enter PIN code",
+    type: "tel",
+  },
 ]
 
 
@@ -42,6 +58,7 @@ export type CustomerSize = {
   name: string
   label: string
   placeholder: string
+  options: string[]
 }
 
 export const CustomerSizeData: CustomerSize[] = [
@@ -49,69 +66,112 @@ export const CustomerSizeData: CustomerSize[] = [
     name: "shirtSize",
     label: "Shirt Size",
     placeholder: "Select size",
+    options: [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "36",
+      "38",
+      "40",
+      "42",
+      "44",
+      "46",
+    ],
+  },
+  {
+    name: "shirtFit",
+    label: "Shirt Fit",
+    placeholder: "Select fit",
+    options: [
+      "Regular",
+      "Slim Fit",
+      "Skinny Fit",
+      "Relaxed Fit",
+    ],
   },
   {
     name: "tshirtSize",
     label: "T-Shirt Size",
     placeholder: "Select size",
+    options: [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+    ],
   },
   {
     name: "jeansSize",
     label: "Jeans / Trouser Size",
     placeholder: "Select size",
+    options: [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36",
+      "38",
+      "40",
+      "42",
+      "44",
+    ],
+  },
+  {
+    name: "jeansFit",
+    label: "Jeans / Trouser Fit",
+    placeholder: "Select fit",
+    options: [
+      "Regular",
+      "Slim Fit",
+      "Skinny Fit",
+      "Relaxed Fit",
+    ],
   },
   {
     name: "jacketSize",
     label: "Jacket Size",
     placeholder: "Select size",
+    options: [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "36",
+      "38",
+      "40",
+      "42",
+      "44",
+      "46",
+    ],
   },
   {
     name: "shoeSize",
     label: "Shoe Size",
     placeholder: "Select size",
+    options: [
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+    ],
   },
 ]
 
 
-export type BodyMeasurement = {
-  name: string
-  label: string
-  placeholder: string
-  unit: string
-}
 
-export const BodyMeasurementData: BodyMeasurement[] = [
-  {
-    name: "chest",
-    label: "Chest",
-    placeholder: "e.g. 96",
-    unit: "cm",
-  },
-  {
-    name: "waist",
-    label: "Waist",
-    placeholder: "e.g. 82",
-    unit: "cm",
-  },
-  {
-    name: "shoulder",
-    label: "Shoulder",
-    placeholder: "e.g. 44",
-    unit: "cm",
-  },
-  {
-    name: "sleeveLength",
-    label: "Sleeve Length",
-    placeholder: "e.g. 62",
-    unit: "cm",
-  },
-  {
-    name: "inseam",
-    label: "Inseam",
-    placeholder: "e.g. 76",
-    unit: "cm",
-  },
-]
+
+
 
 
 export type AdditionalInformation = {
