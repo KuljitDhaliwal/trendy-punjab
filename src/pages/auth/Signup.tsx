@@ -44,7 +44,7 @@ function Signup() {
                                 <label htmlFor={item.name}>{item.label}</label>
                                 <div className="flex relative">
                                     <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                                    <Input item={item} 
+                                    <Input item={item} icon={true}
                                     type={(item.name === 'password' || 
                                     item.name === 'confirmPassword') && 
                                     !showPassword[item.name as handlePassword] ? 

@@ -5,10 +5,11 @@ type inputProps = {
         placeholder: string
     },
     type: string,
+    icon: boolean,
     className?: string,
     onChange?: (e: React.ChangeEvent<HTMLInputElement>)=> void | undefined
 }
-export const Input = ({ value, item, className, onChange, type }:inputProps) => {
+export const Input = ({ value, item, className, onChange, type, icon }:inputProps) => {
     return (
         <input
             value={value}
@@ -16,6 +17,6 @@ export const Input = ({ value, item, className, onChange, type }:inputProps) => 
             name={item.name}
             placeholder={item.placeholder}
             onChange={onChange}
-            className={`w-full py-3 px-10 border rounded-md ${className}`} />
+            className={`w-full py-3 ${icon ? 'px-10' : 'px-4'} border rounded-md ${className}`} />
     )
 }

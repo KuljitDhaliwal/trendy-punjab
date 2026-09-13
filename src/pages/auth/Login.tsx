@@ -74,7 +74,7 @@ function Login() {
                 <label htmlFor={item.name}>{item.label}</label>
                 <div className="flex relative items-center">
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                  <Input item={item}
+                  <Input item={item} icon={true}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
                     className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
                     onChange={(e) => handleFormValue(e)} />

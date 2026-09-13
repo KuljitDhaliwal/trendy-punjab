@@ -3,6 +3,7 @@ import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import FindCustomers from "../../features/admin/components/FindCustomers"
 import { CustomerStatData } from "../../static/CustomerStatsData"
 import { customersData } from "../../static/CustomersData"
+import { useNavigate } from "react-router-dom"
 
 
 type BtnType = {
@@ -28,7 +29,7 @@ const Btns: BtnType[] = [
 function Customers() {
   
   const [filterBtn, setFilterBtn] = useState('allcustomers')
-
+  const navigate = useNavigate()
 
   const handleFilterBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     setFilterBtn(e.currentTarget.name)
@@ -39,7 +40,9 @@ function Customers() {
         main={'Customers'} third={'Manage customer information, sizes, measurements and order history.'}
         right={(
           <button className="border-border border px-2 py-2 rounded-lg text-[12px]
-                shadow bg-orange-dark text-white shrink-0">+ Add Customer</button>
+                shadow bg-orange-dark text-white shrink-0" onClick={()=>navigate('add-customer')}>
+                  + Add Customer
+                </button>
         )} />
 
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
