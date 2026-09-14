@@ -20,7 +20,7 @@ function TodayActivityLayout({ head, detail, icon, children, btn }: ActivityData
             <div className="flex justify-between items-center w-full">
                 <div className="flex gap-2">
                     <div className="rounded-full p-1 shadow bg-orange-dark h-fit">
-                        <Icon className="text-white text-2xl" />
+                        <Icon className="text-white" />
                     </div>
                     <div>
                         <p className="font-bold">{head}</p>

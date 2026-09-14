@@ -2,7 +2,7 @@ import { RecentCustomerData } from "../../../static/RecentCustomerData";
 import TodayActivityLayout from "./TodayActivityLayout"
 import { LuUsersRound } from "react-icons/lu";
 
-function RecentCustomers() {
+function  RecentCustomers() {
     return (
         <TodayActivityLayout
             head={'Recent Customers'}
@@ -23,12 +23,12 @@ function RecentCustomers() {
                         <tbody>
                             {RecentCustomerData.map(item => {
                                 return <tr key={item.id}>
-                                    <td className="py-3">
+                                    <td className="py-3 border-border border-b">
                                         {item.name}
                                     </td>
-                                    <td className="py-3">{item.phone}</td>
-                                    <td className="py-3">{item.lastVisit}</td>
-                                    <td className="py-3">{item.lastPurchase}</td>
+                                    <td className="py-3 border-border border-b">{item.phone}</td>
+                                    <td className="py-3 border-border border-b">{item.lastVisit}</td>
+                                    <td className="py-3 border-border border-b">{item.lastPurchase}</td>
                                 </tr>
                             })}
                         </tbody>

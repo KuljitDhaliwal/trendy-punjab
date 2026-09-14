@@ -10,7 +10,7 @@ function Card({name, detail, icon}: TodayActivityType) {
                 <Icon/>
             </div>
         </div>
-        <p className="font-bold text-2xl">{detail}</p>
+        <p className="font-bold">{detail}</p>
     </div>
   )
 }

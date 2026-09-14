@@ -58,7 +58,7 @@ function Login() {
 
 
   return (
-    <div>
+    <div className="text-sm">
       <AuthLayout children={(
         <div className='grid gap-4'>
           <div className="grid">
@@ -105,11 +105,11 @@ function Login() {
             })}
             <Button
               disabled={formValue.email === '' || formValue.password === ''}
-              children={'Sign In'} className={`text-white bg-linear-45 from-orange-dark
+              children={'Sign In'} className={`text-white bg-linear-45 px-10 py-3 from-orange-dark
              to-orange-600`} onClick={handleSubmit} />
             <LineText lineColor={'bg-gray-300'} lineText={<p>or</p>} />
             <Button children={(
-              <div className="flex justify-center gap-2 items-center">
+              <div className="flex justify-center gap-2 px-10 py-3 items-center">
                 <img src={Google} alt="Google Logo" className="h-5" />
                 <p>Continue with Google</p>
               </div>

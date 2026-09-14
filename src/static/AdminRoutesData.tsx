@@ -1,8 +1,6 @@
 import type { IconType } from "react-icons"
 import { LuLayoutDashboard } from "react-icons/lu";
 import { HiUsers } from "react-icons/hi2";
-import { AiFillProduct } from "react-icons/ai";
-import { FaFirstOrder } from "react-icons/fa6";
 
 export type AdminRoutes = {
     name: string,
@@ -20,15 +18,5 @@ export const AdminRoutesData: AdminRoutes[] = [
         name: 'Customers',
         route: 'customers',
         icon: HiUsers
-    },
-    {
-        name: 'Products',
-        route: 'products',
-        icon: AiFillProduct
-    },
-    {
-        name: 'Orders',
-        route: 'orders',
-        icon: FaFirstOrder
     }
 ]
