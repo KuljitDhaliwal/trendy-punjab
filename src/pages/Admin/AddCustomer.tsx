@@ -7,6 +7,8 @@ import { AdditionalInformationData, CustomerBasicInformationData, CustomerSizeDa
 import { Input } from "../../components/ui/Input";
 import { useState } from "react";
 import { IoShirtOutline } from "react-icons/io5";
+import Button from "../../components/ui/Button";
+import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
 
 function AddCustomer() {
     const navigate = useNavigate()
@@ -20,15 +22,25 @@ function AddCustomer() {
         }))
     }
 
+
+    const handleCancel = () => {
+
+    }
+    
+    const handleAddCustomer = () => {
+
+    }
+
     return (
         <div className="flex flex-col gap-6 w-full h-full">
             <AdminPagesHeader first={'Customers / Add Customer'}
                 main={'Add Customer'} third={'Create new customer profile with sizes and measurements.'}
                 right={(
-                    <button className="border-border border px-2 py-2 rounded-lg text-[12px]
-                shadow bg-orange-dark text-white shrink-0 flex items-center gap-2" onClick={() => navigate('/dashboard/customers')}>
+                <Button children={
+                    <p className="flex items-center gap-1">
                         <IoIosArrowRoundBack /> Back to Customers
-                    </button>
+                    </p>
+                } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')}/> 
                 )} />
 
 
@@ -93,11 +105,12 @@ function AddCustomer() {
                     )}
                 />
             </div>
-
-            <div className="flex gap-4 justify-end sticky bottom-0 bg-white py-2">
-                <button className="px-4 py-2 border rounded-lg border-border">Cancel</button>
-                <button className="px-4 py-2 border rounded-lg bg-orange-dark text-white border-border">Add Customer</button>
-            </div>
+            <CustomerPagesFooter btn1Text={'Cancel'} btn1ClickFun={handleCancel}
+            btn2Text={'Add Customer'} btn2ClickFun={handleAddCustomer}/>
+            {/* <div className="flex gap-4 justify-end sticky bottom-0 bg-white py-2">
+                <Button children={'Cancel'} className="px-4 py-2 text-[12px]"/>
+                <Button children={'Add Customer'} className="px-4 py-2 text-[12px] bg-orange-dark text-white"/>
+            </div> */}
         </div>
     )
 }

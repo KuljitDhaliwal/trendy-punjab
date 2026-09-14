@@ -24,16 +24,16 @@ function TodaySales() {
                     <tbody>
                         {TodaySalesData.map(item => {
                             return <tr key={item.id}>
-                                <td className="py-3">
+                                <td className="py-3 border-border border-b">
                                     {item.productName}
                                     <br />
                                     <p className="text-secondary-text text-[12px]">
                                         Size: {item.size} . {item.category}
                                     </p>
                                 </td>
-                                <td className="py-3">{item.quantity}</td>
-                                <td className="py-3">₹{item.price}</td>
-                                <td className="py-3">0000</td>
+                                <td className="py-3 border-border border-b">{item.quantity}</td>
+                                <td className="py-3 border-border border-b">₹{item.price}</td>
+                                <td className="py-3 border-border border-b">0000</td>
                             </tr>
                         })}
                     </tbody>

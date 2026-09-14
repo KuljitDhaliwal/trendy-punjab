@@ -8,6 +8,9 @@ import { MdOutlineHandshake } from "react-icons/md";
 import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout";
 import { IoShirtOutline } from "react-icons/io5";
 import { MdHistory } from "react-icons/md";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import Button from "../../components/ui/Button";
+import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
 
 
 
@@ -16,15 +19,26 @@ function CustomerDetails() {
     const navigate = useNavigate()
     //Filter User Temp
     const customer = customersData.find(item => item.id === Number(id))
+
+
+    const handleEditCustomer = () => {
+        navigate(`/dashboard/customers/edit-customer/${id}`)
+    }
+
+    const handleCancel = () => {
+
+    }
+    
     return (
         <div className="grid gap-6">
             <AdminPagesHeader first={'Customers / Customer Details'}
                 main={'Customer Details'} third={'Check customer information, sizes, measurements and order history.'}
                 right={(
-                    <button className="border-border border px-2 py-2 cursor-pointer rounded-lg text-[12px]
-                shadow bg-orange-dark text-white shrink-0" onClick={() => navigate('/dashboard/customers')}>
-                        Back to Customers
-                    </button>
+                    <Button children={
+                        <p className="flex items-center gap-1">
+                            <IoIosArrowRoundBack /> Back to Customers
+                        </p>
+                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
                 )} />
 
 
@@ -166,10 +180,9 @@ function CustomerDetails() {
 
 
             {/* Quick Actions  */}
-            <div className="flex gap-4 justify-end sticky bottom-0 bg-white py-2 text-sm">
-                <button className="px-4 cursor-pointer py-2 border rounded-lg border-border" onClick={()=> navigate(`/dashboard/customers/edit-customer/${id}`)}>Edit Customer</button>
-                <button className="px-4 cursor-pointer py-2 border rounded-lg bg-orange-dark text-white border-border">Create Order</button>
-            </div>
+            <CustomerPagesFooter btn1Text="Cancel" btn2Text="Edit Customer"
+                btn1ClickFun={handleCancel} btn2ClickFun={handleEditCustomer} />
+
         </div >
     )
 }

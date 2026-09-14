@@ -4,6 +4,7 @@ import FindCustomers from "../../features/admin/components/FindCustomers"
 import { CustomerStatData } from "../../static/CustomerStatsData"
 import { customersData } from "../../static/CustomersData"
 import { useNavigate } from "react-router-dom"
+import Button from "../../components/ui/Button"
 
 
 type BtnType = {
@@ -38,11 +39,9 @@ function Customers() {
     <div className="grid gap-6">
       <AdminPagesHeader first={'Customer records'}
         main={'Customers'} third={'Manage customer information, sizes, measurements and order history.'}
-        right={(
-          <button className="border-border border px-2 py-2 rounded-lg text-[12px]
-                shadow bg-orange-dark text-white shrink-0" onClick={()=>navigate('add-customer')}>
-                  + Add Customer
-                </button>
+        right={(  
+          <Button children={'+ Add Customer'} onClick={()=>navigate('add-customer')}
+          className="text-[12px] px-4 py-2 bg-orange-dark text-white"/>
         )} />
 
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">

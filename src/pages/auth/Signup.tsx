@@ -28,7 +28,7 @@ function Signup() {
     }
     console.log('Arr', showPassword)
     return (
-        <div>
+        <div className="text-sm">
             <AuthLayout children={(
                 <div className='grid gap-4'>
                     <div className="grid">
@@ -72,14 +72,14 @@ function Signup() {
                                 </div>
                             </div>
                         })}
-                        <Button children={'Sign In'} className={`text-white bg-linear-45 from-orange-dark to-orange-600`} />
+                        <Button children={'Sign In'} className={`text-white px-10 py-3 bg-linear-45 from-orange-dark to-orange-600`} />
                         <div className="flex items-center gap-2">
                             <div className="h-px w-full bg-gray-300"></div>
                             <p>or</p>
                             <div className="h-px w-full bg-gray-300"></div>
                         </div>
                         <Button children={(
-                            <div className="flex justify-center gap-2 items-center">
+                            <div className="flex justify-center gap-2 px-10 py-3 items-center">
                                 <img src={Google} alt="Google Logo" className="h-5" />
                                 <p>Continue with Google</p>
                             </div>

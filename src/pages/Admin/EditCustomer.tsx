@@ -1,5 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom"
-import { customersData } from "../../static/CustomersData"
+import { useNavigate } from "react-router-dom"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout"
 import { FaRegUser } from "react-icons/fa";
@@ -7,12 +6,13 @@ import { AdditionalInformationData, CustomerBasicInformationData, CustomerSizeDa
 import { Input } from "../../components/ui/Input";
 import { useState } from "react";
 import { IoShirtOutline } from "react-icons/io5";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import Button from "../../components/ui/Button";
+import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
 
 function EditCustomer() {
-    const { id } = useParams()
     const [formValue, setFormValue] = useState<Record<string, string>>({});
     const navigate = useNavigate()
-    const customer = customersData.filter(item => item.id === Number(id))
 
     const handleFormData = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -22,15 +22,24 @@ function EditCustomer() {
         }))
     }
 
+    const handleCancel = () => {
+
+    }
+
+    const handleUpdateCustomer = () => {
+        
+    }
+
     return (
         <div className="grid gap-6">
             <AdminPagesHeader first={'Customers / Edit Customer'}
                 main={'Edit Details'} third={"Update customer's."}
                 right={(
-                    <button className="border-border border px-2 py-2 cursor-pointer rounded-lg text-[12px]
-                shadow bg-orange-dark text-white shrink-0" onClick={() => navigate('/dashboard/customers')}>
-                        Back to Customers
-                    </button>
+                    <Button children={
+                        <p className="flex items-center gap-1">
+                            <IoIosArrowRoundBack /> Back to Customers
+                        </p>
+                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
                 )} />
 
 
@@ -99,12 +108,9 @@ function EditCustomer() {
                 )}
             />
 
-            <div className="flex gap-4 justify-end sticky bottom-0 bg-white py-2">
-                <button className="px-4 py-2 border rounded-lg border-border">Cancel</button>
-                <button className="px-4 py-2 border rounded-lg bg-orange-dark text-white border-border">Update Customer</button>
-            </div>
-
-
+            {/* Quick Actions  */}
+            <CustomerPagesFooter btn1Text="Cancel" btn2Text="Update Customer"
+            btn1ClickFun={handleCancel} btn2ClickFun={handleUpdateCustomer}/>
         </div>
     )
 }
