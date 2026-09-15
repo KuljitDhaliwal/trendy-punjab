@@ -10,22 +10,34 @@ import { useNavigate } from "react-router-dom"
 import { useDebounceHook } from "../../hooks/DebounceHook"
 import { handleFormValidation } from "../../utils/FormValidation"
 import LineText from "../../components/LineText"
+import { useLogin } from "../../features/auth/api/auth.mutations"
+import { toast } from "react-toastify";
+
+type LoginForm = {
+  email: string;
+  password: string;
+};
 
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [isValid, setIsValid] = useState<boolean | null>(null)
+  const [loginError, setLoginError] = useState('')
   const navigate = useNavigate()
   const { debounceFun } = useDebounceHook()
-  const [formValue, setFormValue] = useState({
+  const [formValue, setFormValue] = useState<LoginForm>({
     email: '',
     password: ''
   })
+
+  //React Query
+  const {mutate: login, isPending} = useLogin()
 
 
   //Handle Formvalue 
   const handleFormValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
+    setLoginError('')
     setFormValue(prev => ({
       ...prev,
       [name]: value
@@ -53,7 +65,20 @@ function Login() {
   //Handle Submit Login
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    // formValue
+    //Login Funtion
+    login(formValue, {
+      onSuccess: (data) => {
+        setFormValue({
+          email: '',
+          password: ''
+        })
+        toast.success("Login Successful!")
+      },
+      onError: (error) => {
+        setLoginError(error.message)
+        toast.error(error.message || 'Login Failed!')
+      }
+    })
   }
 
 
@@ -77,7 +102,7 @@ function Login() {
                   <Input item={item} icon={true}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
                     className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
-                    onChange={(e) => handleFormValue(e)} />
+                    onChange={(e) => handleFormValue(e)} value={formValue[item.name]}/>
                   {showPassword && EyeSlash ? (
                     <button
                       type="button"
@@ -101,12 +126,16 @@ function Login() {
                 {item.name === 'email' && formValue.email.trim() !== '' && (
                   <small className={`text-red-400 text-[12px] ${isValid === false ? 'block' : 'hidden'}`}>Please fill email or phone properly.</small>
                 )}
+                {item.name === 'password' && (
+                  <small className={`text-[12px] text-red-400`}>{loginError}</small>
+                )}
               </div>
             })}
             <Button
-              disabled={formValue.email === '' || formValue.password === ''}
+              disabled={formValue.email === '' || formValue.password === '' || isPending}
               children={'Sign In'} className={`text-white bg-linear-45 px-10 py-3 from-orange-dark
-             to-orange-600`} onClick={handleSubmit} />
+             to-orange-600`} 
+             onClick={handleSubmit} />
             <LineText lineColor={'bg-gray-300'} lineText={<p>or</p>} />
             <Button children={(
               <div className="flex justify-center gap-2 px-10 py-3 items-center">

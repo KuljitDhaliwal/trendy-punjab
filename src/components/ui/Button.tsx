@@ -5,7 +5,7 @@ type Children = {
     children: ReactNode | string,
     className?: string,
     disabled?: boolean,
-    onClick?: React.MouseEventHandler<HTMLButtonElement>
+    onClick?: React.MouseEventHandler<HTMLButtonElement>,
 }
 
 function Button({children, className, disabled, onClick}: Children) {

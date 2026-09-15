@@ -5,7 +5,12 @@ const PORT = process.env.PORT || 5001
 
 
 connectDB()
-
-app.listen(PORT, ()=> {
-    console.log(`Server running on http://localhost:${PORT}`)
-})
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log("Server running on http://localhost:5001");
+    });
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed:", error);
+    process.exit(1);
+  });

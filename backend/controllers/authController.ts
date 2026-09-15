@@ -28,13 +28,13 @@ export const adminLogin = async (req: Request, res: Response) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             })
 
-            return res.status(200).json({ stats: 200, messege: 'Login Successful!', accesstoken })
+            return res.status(200).json({ stats: 200, message: 'Login Successful!', accesstoken })
         } else {
-            return res.status(401).json({ stats: 401, messege: 'Invalid email or password!' })
+            return res.status(401).json({ stats: 401, message: 'Invalid email or password!' })
         }
 
     } catch (error) {
-        return res.status(500).json({ status: 500, messege: 'Login Error!' })
+        return res.status(500).json({ status: 500, message: 'Login Error!' })
     }
 }
 
