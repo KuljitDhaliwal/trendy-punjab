@@ -10,7 +10,7 @@ router.post('/register', adminRegister)
 router.post('/login', adminLogin)
 
 
-router.post('/refresh', refreshToken)
+router.get('/refresh', refreshToken)
 
 
 export default router
