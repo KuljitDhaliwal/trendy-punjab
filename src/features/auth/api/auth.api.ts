@@ -12,3 +12,11 @@ export const getLogin = (data: Login) => {
     }
     return api('auth/login', options)
 }
+
+
+export const getRefreshToken = () => {
+    const options = {
+        method: 'GET',
+    }
+    return api('auth/refresh', options)
+}

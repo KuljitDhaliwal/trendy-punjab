@@ -8,6 +8,7 @@ import AddCustomer from "../pages/Admin/AddCustomer"
 import DashboardCustomerLayout from "../layout/DashboardCustomerLayout"
 import CustomerDetails from "../pages/Admin/CustomerDetails"
 import EditCustomer from "../pages/Admin/EditCustomer"
+import ProtectedRoutes from "./ProtectedRoutes"
 
 
 function Index() {
@@ -16,6 +17,7 @@ function Index() {
         <Routes>
             <Route path="/login" element={<Login/>}/>
             <Route path="/signup" element={<Signup/>}/>
+            <Route element={<ProtectedRoutes/>}>
               <Route path="/dashboard" element={<DashboardLayout/>}>
                 <Route index element={<Dashboard/>}/>
                 <Route path="customers" element={<DashboardCustomerLayout/>}>
@@ -25,6 +27,7 @@ function Index() {
                   <Route path='edit-customer/:id' element={<EditCustomer/>}/>
                 </Route>
               </Route>
+            </Route>
         </Routes>
     </div>
   )

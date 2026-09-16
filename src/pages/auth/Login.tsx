@@ -6,12 +6,16 @@ import Google from '../../assets/images/google.webp'
 import { useState } from "react"
 import type { Data } from "../../static/LoginData"
 import type { IconType } from "react-icons"
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import { useDebounceHook } from "../../hooks/DebounceHook"
 import { handleFormValidation } from "../../utils/FormValidation"
 import LineText from "../../components/LineText"
 import { useLogin } from "../../features/auth/api/auth.mutations"
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux"
+import { setAccessToken } from "../../features/auth/slices/authSlice"
+import type { RootState } from "../../store/Store"
+
 
 type LoginForm = {
   email: string;
@@ -29,6 +33,12 @@ function Login() {
     email: '',
     password: ''
   })
+  const accessToken = useSelector((state: RootState)=> state.auth.accessToken)
+  const dispatch = useDispatch()
+
+  if(accessToken){
+    return <Navigate to="/dashboard" replace />
+  }
 
   //React Query
   const {mutate: login, isPending} = useLogin()
@@ -51,7 +61,6 @@ function Login() {
       debounceFun(() => handleFormValidation(value), 1000, (result) => {
         setIsValid(result)
       })
-
     }
 
   }
@@ -73,6 +82,8 @@ function Login() {
           password: ''
         })
         toast.success("Login Successful!")
+        dispatch(setAccessToken(data.accesstoken))
+        return navigate('/dashboard', {replace: true})
       },
       onError: (error) => {
         setLoginError(error.message)
