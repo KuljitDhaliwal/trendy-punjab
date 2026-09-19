@@ -10,11 +10,12 @@ export const api = async(endPoint: string, options: RequestInit = {}) => {
         credentials: "include"
     })
 
+    const data = await response.json()
+    
     if(!response.ok){
-        throw new Error(`Invalid email or password!`)
+        throw new Error(data.message || "Something went wrong")
     }
 
-    const data = await response.json()
     console.log('Data from API', data)
     return data
 

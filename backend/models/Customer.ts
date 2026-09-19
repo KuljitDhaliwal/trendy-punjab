@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const customerSchema = new mongoose.Schema({
-    fullName: {
+    fullname: {
         type: String,
         required: true,
         trim: true
@@ -66,15 +66,14 @@ const customerSchema = new mongoose.Schema({
         type: String,
     },
 
-    quickNotes: {
-        type: [String],
-        default: [],
-    },
-
     notes: {
         type: String,
         trim: true,
     },
+    
+    lastVisit: {
+        type: Date,
+    }
 },
     {
         timestamps: true,

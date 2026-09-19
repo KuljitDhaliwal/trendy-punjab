@@ -5,10 +5,32 @@ import { FaUser, FaTimes } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
 
+import { useDispatch } from "react-redux";
+import { setLogout } from "../../auth/slices/authSlice";
+import { useNavigate } from "react-router-dom";
+import { useLogout } from "../../auth/api/auth.mutations";
+import { toast } from "react-toastify";
 function AdminSidebar() {
   const [toggleNav, setToggleNav] = useState(false)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
+  //Logout function hook
+  const { mutate: logout } = useLogout()
 
+  //handle Logout
+  const handleLogout = () => {
+    logout(undefined,{
+      onSuccess: (data) => {
+        dispatch(setLogout())
+        navigate('/', { replace: true })
+        toast.success(data.message)
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      }
+    })
+  }
 
   return (
     <div className={`
@@ -24,34 +46,34 @@ function AdminSidebar() {
 
       {/* Routes */}
       <div className="flex-1">
-        <AdminNavbar toggleNav={toggleNav}/>
+        <AdminNavbar toggleNav={toggleNav} />
       </div>
 
 
       {/* Sidebar Footer */}
       <div className="md:grid hidden gap-4 ">
-        <button className="flex gap-2">
+        <button className="flex gap-2 cursor-pointer active:scale-95">
           <IoIosSettings className="text-xl" />
           <p className="lg:block hidden">Settings</p>
         </button>
-        <button className="flex gap-2">
+        <button className="flex gap-2 cursor-pointer active:scale-95" onClick={handleLogout}>
           <LuLogOut className="text-xl" />
           <p className="lg:block hidden">Logout</p>
         </button>
       </div>
       <div className="md:hidden flex self-start gap-4 text-xl">
-        <FaUser className="cursor-pointer"/>
+        <FaUser className="cursor-pointer" />
         {toggleNav ? (
           <button type="button">
-            <FaTimes className="cursor-pointer" onClick={()=> setToggleNav(false)}/>
+            <FaTimes className="cursor-pointer" onClick={() => setToggleNav(false)} />
           </button>
-          )
-        : (
-          <button type="button">
-            <GiHamburgerMenu className="cursor-pointer" onClick={()=> setToggleNav(true)}/>
-          </button>
-        )}
-        
+        )
+          : (
+            <button type="button">
+              <GiHamburgerMenu className="cursor-pointer" onClick={() => setToggleNav(true)} />
+            </button>
+          )}
+
       </div>
     </div>
   )

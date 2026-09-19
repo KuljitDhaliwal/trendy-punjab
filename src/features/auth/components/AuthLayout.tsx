@@ -12,7 +12,7 @@ type Children = {
     children: ReactNode
 }
 
-function AuthLayout({children}: Children) {
+function AuthLayout({ children }: Children) {
     return (
         <div className="md:h-screen overflow-hidden w-full grid md:grid-cols-2 bg-white lg:p-8 md:p-6 p-4 relative">
             <div className="absolute bg-linear-360 from-orange-500 to-amber-400
@@ -41,19 +41,19 @@ function AuthLayout({children}: Children) {
                             <div className="rounded-full grid place-items-center md:p-4 p-2 bg-linear-60 from-orange-dark to-amber-400 shadow">
                                 <FiTruck className='text-white text-xl' />
                             </div>
-                            <p className='tracking-wider uppercase text-sm'>Fast <br className='lg:block hidden'/> Delivery</p>
+                            <p className='tracking-wider uppercase text-sm'>Fast <br className='lg:block hidden' /> Delivery</p>
                         </div>
                         <div className="card flex lg:justify-center gap-2 items-center">
                             <div className="rounded-full grid place-items-center md:p-4 p-2 bg-linear-60 from-orange-dark to-amber-400 shadow">
                                 <IoFlowerOutline className='text-white text-xl' />
                             </div>
-                            <p className='tracking-wider uppercase text-sm'>Best <br className='lg:block hidden'/> Quality</p>
+                            <p className='tracking-wider uppercase text-sm'>Best <br className='lg:block hidden' /> Quality</p>
                         </div>
                         <div className="card flex lg:justify-center gap-2 items-center">
                             <div className="rounded-full grid place-items-center md:p-4 p-2 bg-linear-60 from-orange-dark to-amber-400 shadow">
                                 <FaHeadset className='text-white text-xl' />
                             </div>
-                            <p className='tracking-wider uppercase text-sm'>24/7 <br className='lg:block hidden'/> support</p>
+                            <p className='tracking-wider uppercase text-sm'>24/7 <br className='lg:block hidden' /> support</p>
                         </div>
                     </div>
                 </div>
@@ -65,9 +65,11 @@ function AuthLayout({children}: Children) {
                     <img src={Logo} alt="Logo" className='h-15 m-auto' />
                     <LineText lineText={
                         <p className='shrink-0 uppercase tracking-wider'>Style that speaks <span className='font-bold text-orange-dark'>PANJAB</span></p>
-                    } lineColor={'bg-linear-90 from-orange-light via-orange-dark to-orange-light'}/>
+                    } lineColor={'bg-linear-90 from-orange-light via-orange-dark to-orange-light'} />
                 </div>
-                {children}
+                <div className="max-w-sm w-full mx-auto self-start">
+                    {children}
+                </div>
             </div>
         </div>
     )

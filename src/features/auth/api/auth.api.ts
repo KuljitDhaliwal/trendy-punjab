@@ -16,7 +16,15 @@ export const getLogin = (data: Login) => {
 
 export const getRefreshToken = () => {
     const options = {
-        method: 'GET',
+        method: 'POST',
     }
     return api('auth/refresh', options)
+}
+
+
+export const getLogout = () => {
+    const options = {
+        method: 'POST'
+    }
+    return api('auth/logout', options)
 }

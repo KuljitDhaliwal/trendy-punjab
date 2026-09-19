@@ -1,7 +1,7 @@
 type inputProps = {
     value?: string,
     item: {
-        name: "email" | "password",
+        name: string,
         placeholder: string
     },
     type: React.HTMLInputTypeAttribute,
