@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
-import { customersData } from "../../static/CustomersData"
 import { MdLocalPhone } from "react-icons/md";
 import { BsEnvelope } from "react-icons/bs";
 import { GrNotes } from "react-icons/gr";
@@ -11,14 +10,35 @@ import { MdHistory } from "react-icons/md";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
-
-
+import { useGetCustomer } from "../../features/admin/api/admin.mutations";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import type { Customer } from "./Customers";
+import { nameInitials } from "../../utils/NameInitials";
 
 function CustomerDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
-    //Filter User Temp
-    const customer = customersData.find(item => item.id === Number(id))
+    const { mutate: getCustomer } = useGetCustomer()
+    const [customer, setCustomer] = useState<Customer | null>(null)
+
+    useEffect(() => {
+        if (id) {
+            getCustomer(id, {
+                onSuccess: (data) => {
+                    console.log('Data', data)
+                    setCustomer(data.customer)
+                },
+                onError: (error) => {
+                    toast(error.message)
+                }
+            })
+        }
+    }, [id, getCustomer])
+
+
+    console.log('Customer Details', customer)
+
 
 
     const handleEditCustomer = () => {
@@ -28,7 +48,7 @@ function CustomerDetails() {
     const handleCancel = () => {
 
     }
-    
+
     return (
         <div className="grid gap-6">
             <AdminPagesHeader first={'Customers / Customer Details'}
@@ -47,10 +67,10 @@ function CustomerDetails() {
                 <div className="flex gap-2">
                     <div className="flex gap-2">
                         <div className="rounded-full p-2 bg-orange-dark text-white h-fit shadow">
-                            <p className="text-xl">KS</p>
+                            <p className="text-xl">{nameInitials(customer?.fullname ?? '')}</p>
                         </div>
                         <div className="grid gap-2">
-                            <p>{customer?.name}</p>
+                            <p>{customer?.fullname}</p>
                             <div className="grid gap-2">
                                 <div className="flex gap-1 items-center">
                                     <MdLocalPhone />
@@ -58,23 +78,37 @@ function CustomerDetails() {
                                         {customer?.phone}
                                     </p>
                                 </div>
-                                <div className="flex gap-1 items-center">
-                                    <BsEnvelope />
-                                    <p className="text-[12px] text-secondary-text">
-                                        {customer?.email}
-                                    </p>
-                                </div>
-                                <div className="flex gap-1 items-center">
-                                    <MdOutlineHandshake />
-                                    <p className="text-[12px] text-secondary-text">
-                                        customer since {customer?.customerSince}
-                                    </p>
-                                </div>
+                                {customer && customer.email && (
+                                    <div className="flex gap-1 items-center">
+                                        <BsEnvelope />
+                                        <p className="text-[12px] text-secondary-text">
+                                            {customer?.email}
+                                        </p>
+                                    </div>
+                                )}
+                                {customer && (
+                                    <div className="flex gap-1 items-center">
+                                        <MdOutlineHandshake />
+                                        <p className="text-[12px] text-secondary-text">
+                                            customer since {new Date(customer.createdAt).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="grid gap-2 max-w-100">
+                    <Button children={
+                        <p className="flex items-center gap-1">
+                            + Create Order
+                        </p>
+                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+                </div>
+            </section>
+
+            {customer && customer.notes && (
+                <section className="rounded-lg bg-orange-light/50 p-4 flex justify-between items-start">
                     <div className="flex gap-2">
                         <div className="rounded-full p-2 bg-orange-dark h-fit">
                             <GrNotes className="text-white text-sm" />
@@ -84,28 +118,27 @@ function CustomerDetails() {
                             <p className="text-[12px] text-secondary-text">{customer?.notes}</p>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
 
             {/* Customer's Stats */}
             <section className="grid gap-6">
                 <div className="grid gap-2">
-                    <p className="text-secondary-text">Today's Activity</p>
-                    <p className="font-bold">Today's Overview</p>
+                    <p className="font-bold">Customer Overview</p>
                 </div>
                 <div className="grid md:grid-cols-4 grid-cols-2 bg-orange-light justify-between items-center">
                     <div className="card border border-border p-4 rounded-l-lg">
                         <p className="text-[12px] text-secondary-text">Last Visit</p>
-                        <p className="font-bold">{customer?.lastVisit}</p>
+                        <p className="font-bold">{customer && customer.lastVisit ? new Date(customer.lastVisit).toLocaleDateString() : '--'}</p>
                     </div>
                     <div className="card border border-border p-4">
                         <p className="text-[12px] text-secondary-text">Total Orders</p>
-                        <p className="font-bold">{customer?.orders}</p>
+                        <p className="font-bold">{customer?.orders?.length ?? '--'}</p>
                     </div>
                     <div className="card border border-border p-4">
                         <p className="text-[12px] text-secondary-text">Total Spent</p>
-                        <p className="font-bold">{customer?.totalSpent}</p>
+                        <p className="font-bold">{customer?.totalSpent ?? '--'}</p>
                     </div>
                     <div className="card border border-border p-4 rounded-r-lg">
                         <p className="text-[12px] text-secondary-text">Preferred Contact</p>
@@ -125,28 +158,27 @@ function CustomerDetails() {
                     <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
                         <div className="card bg-white p-4 rounded-md">
                             <p className="text-secondary-text text-[12px]">Shirt Size</p>
-                            <p className="font-bold">{customer?.shirtSize}</p>
+                            <p className="font-bold">{customer?.shirtSize ?? '--'}</p>
                         </div>
                         <div className="card bg-white p-4 rounded-md">
                             <p className="text-secondary-text text-[12px]">T-Shirt Size</p>
-                            <p className="font-bold">{customer?.tshirtSize}</p>
+                            <p className="font-bold">{customer?.tshirtSize ?? '--'}</p>
                         </div>
                         <div className="card bg-white p-4 rounded-md">
                             <p className="text-secondary-text text-[12px]">Jeans Size</p>
-                            <p className="font-bold">{customer?.jeansSize}</p>
+                            <p className="font-bold">{customer?.jeansSize ?? '--'}</p>
                         </div>
                         <div className="card bg-white p-4 rounded-md">
                             <p className="text-secondary-text text-[12px]">Jacket Size</p>
-                            <p className="font-bold">{customer?.jacketSize}</p>
+                            <p className="font-bold">{customer?.jacketSize ?? '--'}</p>
                         </div>
                         <div className="card bg-white p-4 rounded-md">
                             <p className="text-secondary-text text-[12px]">Shoe Size</p>
-                            <p className="font-bold">{customer?.shoeSize}</p>
+                            <p className="font-bold">{customer?.shoeSize ?? '--'}</p>
                         </div>
                     </div>
                 )}
             />
-
 
             {/* Order History */}
             <TodayActivityLayout
@@ -164,14 +196,36 @@ function CustomerDetails() {
                                 <th>Amount</th>
                             </thead>
                             <tbody>
-                                {customer?.orderHistory?.map(item => {
-                                    return <tr key={item.id} className="py-2">
-                                        <td className="py-2 border-b border-border">{item.id}</td>
-                                        <td className="py-2 border-b border-border">{item.date}</td>
-                                        <td className="py-2 border-b border-border">{item.items}</td>
-                                        <td className="py-2 border-b border-border">{item.amount}</td>
-                                    </tr>
-                                })}
+                                {customer && (customer.orders?.length === 0 || !customer?.orders) ?
+                                    (
+                                        <tr>
+                                            <td colSpan={4} className="py-10">
+                                                <span className="grid gap-2 justify-center">
+                                                    <span className="text-center">No Orders!!</span>
+                                                    <span>
+                                                        <Button children={
+                                                            <p className="flex items-center gap-1">
+                                                                + Create Order
+                                                            </p>
+                                                        } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ) :
+                                        customer?.orders?.map(item => {
+                                        return <tr key={item._id} className="py-2">
+                                            <td className="py-2 border-b border-border">{item._id}</td>
+                                            <td className="py-2 border-b border-border">{new Date(item.createdAt).toLocaleDateString()}</td>
+                                            <td className="py-2 border-b border-border">{
+                                                item.items.map(product => {
+                                                    return <span>{product.productName}</span>
+                                                })    
+                                            }</td>
+                                            <td className="py-2 border-b border-border">{item.subtotal}</td>
+                                        </tr>
+                                    })
+                                    }
                             </tbody>
                         </table>
                     </div>

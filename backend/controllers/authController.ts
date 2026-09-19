@@ -61,3 +61,20 @@ export const refreshToken = async (req: Request, res: Response) => {
         return res.status(500).json({ status: 500, message: 'Refresh access token error' })
     }
 }
+
+export const logout = async(req: Request, res: Response) => {
+    try {
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        })
+
+        return res.status(200).json({
+            status: 200,
+            message: 'Logout Successfull!'
+        })
+    } catch (error) {
+        return res.status(500).json({status: 500, message: 'logout error!'})
+    }
+}

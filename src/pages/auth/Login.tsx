@@ -2,14 +2,12 @@ import Button from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import AuthLayout from "../../features/auth/components/AuthLayout"
 import { LoginData } from '../../static/LoginData'
-import Google from '../../assets/images/google.webp'
 import { useState } from "react"
 import type { Data } from "../../static/LoginData"
 import type { IconType } from "react-icons"
 import { Navigate, useNavigate } from "react-router-dom"
 import { useDebounceHook } from "../../hooks/DebounceHook"
 import { handleFormValidation } from "../../utils/FormValidation"
-import LineText from "../../components/LineText"
 import { useLogin } from "../../features/auth/api/auth.mutations"
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux"
@@ -97,8 +95,8 @@ function Login() {
     <div className="text-sm">
       <AuthLayout children={(
         <div className='grid gap-4'>
-          <div className="grid">
-            <p className='text-bold text-2xl'>Signin to Your Account</p>
+          <div className="grid gap-2">
+            <p className='text-bold text-xl tracking-wider'>Signin to Your Account</p>
             <p className="text-secondary-text">Join Trendy Punjab and enjoy shopping</p>
           </div>
           <div className='grid gap-4'>
@@ -147,16 +145,7 @@ function Login() {
               children={'Sign In'} className={`text-white bg-linear-45 px-10 py-3 from-orange-dark
              to-orange-600`} 
              onClick={handleSubmit} />
-            <LineText lineColor={'bg-gray-300'} lineText={<p>or</p>} />
-            <Button children={(
-              <div className="flex justify-center gap-2 px-10 py-3 items-center">
-                <img src={Google} alt="Google Logo" className="h-5" />
-                <p>Continue with Google</p>
-              </div>
-            )} className={`bg-linear-45 bg-white`} />
 
-            <p className="text-secondary-text text-center flex gap-2 justify-center">Don't have an account?
-              <span className="text-orange-dark underline cursor-pointer" onClick={() => navigate('/signup')}>Sign Up</span></p>
           </div>
           <div>
           </div>

@@ -12,7 +12,7 @@ function AdminNavbar({toggleNav}: AdminNavbarProps) {
             {AdminRoutesData.map(item => {
                 const Icon: IconType = item.icon
                 return (
-                    <NavLink to={item.route}
+                    <NavLink key={item.name} to={item.route}
                         end={item.route === ''}
                         className={({ isActive }) =>
                             `flex items-center gap-2 w-full p-2 rounded-lg lg:justify-start border-l-2 md:justify-center 

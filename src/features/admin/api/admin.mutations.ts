@@ -1,0 +1,15 @@
+import { useMutation } from "@tanstack/react-query"
+import { findCustomer, getCustomer, setCustomer } from "./admin.api"
+
+export const useCreateCustomer = () => {
+    return useMutation({mutationFn: setCustomer})
+}
+
+
+export const useGetCustomer = () => {
+    return useMutation({mutationFn: getCustomer})
+}
+
+export const useFindCustomer = () => {
+    return useMutation({mutationFn: (search: string) => findCustomer(search)})
+}
