@@ -1,3 +1,4 @@
+import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
 import { api } from "../../../utils/api"
 
 export const setCustomer = (data: Record<string, string>) => {
@@ -39,4 +40,13 @@ export const findCustomer = (search: string) => {
         method: 'GET'
     }
     return api(`customers/find-customer?search=${search}`, options)
+}
+
+
+export const editCustomer = (customerID: string, value: CustomerFormData) => {
+    const options = { 
+        method: 'PATCH',
+        body: JSON.stringify(value)
+    }
+    return api(`customers/edit-customer/${customerID}`, options)
 }

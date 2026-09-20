@@ -33,12 +33,14 @@ export const getCustomers = async (req: Request, res: Response) => {
 
     const totalPages = Math.ceil(totalCustomers / limit)
     // const customers = await Customer.find({}).skip(skip).limit(limit)
-    return res.status(200).json({ stats: 200, message: 'All customers', customers, pagination: {
-      currentPage: page,
-      limit,
-      totalCustomers,
-      totalPages
-    } })
+    return res.status(200).json({
+      stats: 200, message: 'All customers', customers, pagination: {
+        currentPage: page,
+        limit,
+        totalCustomers,
+        totalPages
+      }
+    })
   } catch (error) {
     return res.status(500).json({ status: 500, message: 'Failed to get customers' })
   }
@@ -47,25 +49,27 @@ export const getCustomers = async (req: Request, res: Response) => {
 
 
 //Filter Customer by phone number
-export const findCustomer = async(req: Request, res: Response) => {
+export const findCustomer = async (req: Request, res: Response) => {
   try {
     //Query
     const search = req.query.search as string
-    const filter = search ? {phone: {
-      $regex: search,
-      $options: "i"
-    }} : {}
+    const filter = search ? {
+      phone: {
+        $regex: search,
+        $options: "i"
+      }
+    } : {}
 
     const customer = await Customer.find(filter)
 
-    if(!customer){
-      return res.status(404).json({status: 404, message: 'Not found!'})
+    if (!customer) {
+      return res.status(404).json({ status: 404, message: 'Not found!' })
     }
 
-    return res.status(200).json({status: 200, message: 'Customer found', customer})
+    return res.status(200).json({ status: 200, message: 'Customer found', customer })
 
   } catch (error) {
-    return res.status(500).json({status: 500, message: 'Customer finding error!'})
+    return res.status(500).json({ status: 500, message: 'Customer finding error!' })
   }
 }
 
@@ -94,8 +98,8 @@ export const getCustomer = async (req: Request, res: Response) => {
 export const customerStats = async (req: Request, res: Response) => {
   try {
     const customers = await Customer.find({})
-    if(!customers){
-      return res.status(404).json({status: 404, message: 'Customers not found!'})
+    if (!customers) {
+      return res.status(404).json({ status: 404, message: 'Customers not found!' })
     }
     //Total Customers
     let totalCustomers = customers.length
@@ -121,9 +125,34 @@ export const customerStats = async (req: Request, res: Response) => {
       },
     ]
 
-    return res.status(200).json({ status: 200, message: 'Customer stats', customerStats})
+    return res.status(200).json({ status: 200, message: 'Customer stats', customerStats })
 
   } catch (error) {
     return res.status(500).json({ status: 500, message: error })
+  }
+}
+
+
+
+//Edit Customer
+export const editCustomer = async (req: Request, res: Response) => {
+  try {
+    const customerID = req.params.customerID
+    const value = req.body
+    console.log('Value from Frontend', value)
+    const customer = await Customer.findByIdAndUpdate(customerID, value,
+      {
+        returnDocument: "after",
+        runValidators: true
+      }
+    )
+
+    if (!customer) {
+      return res.status(404).json({ status: 404, message: 'Customer not found!' })
+    }
+    return res.status(200).json({ status: 200, message: 'Customer edited!', customer })
+
+  } catch (error) {
+    return res.status(500).json({ status: 500, message: 'Edit Customer error!' })
   }
 }
