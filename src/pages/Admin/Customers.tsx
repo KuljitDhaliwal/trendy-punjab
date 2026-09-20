@@ -142,6 +142,15 @@ function Customers() {
   }
 
 
+  //Handle View Customer
+  const handleViewCustomer = (customerID: string) => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    })
+    navigate(`/dashboard/customers/${customerID}`)
+  }
+
 
 
   return (
@@ -237,7 +246,7 @@ function Customers() {
                     <td className="py-3">{item.orders?.length ?? '--'}</td>
                     <td className="py-3">{item.totalSpent ?? '--'}</td>
                     <td><button type="button" className="underline cursor-pointer"
-                      onClick={() => navigate(`/dashboard/customers/${item._id}`)}>View</button></td>
+                      onClick={()=> handleViewCustomer(item._id) }>View</button></td>
                   </tr>
                 })}
             </tbody>

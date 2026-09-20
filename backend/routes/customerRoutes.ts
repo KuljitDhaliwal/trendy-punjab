@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createCustomer, customerStats, findCustomer, getCustomer, getCustomers } from '../controllers/customerController.js'
+import { createCustomer, customerStats, editCustomer, findCustomer, getCustomer, getCustomers } from '../controllers/customerController.js'
 
 const router = Router()
 
@@ -20,6 +20,10 @@ router.get('/find-customer', findCustomer)
 
 //Get Customer
 router.get('/:customerID', getCustomer)
+
+
+//Edit Customer
+router.patch('/edit-customer/:customerID', editCustomer)
 
 
 
