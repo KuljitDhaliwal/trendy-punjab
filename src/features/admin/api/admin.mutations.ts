@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
-import { editCustomer, findCustomer, getCustomer, setCustomer } from "./admin.api"
+import { createProduct, editCustomer, findCustomer, getCustomer, setCustomer } from "./admin.api"
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
 
 export const useCreateCustomer = () => {
@@ -18,4 +18,17 @@ export const useFindCustomer = () => {
 
 export const useEditCustomer = () => {
     return useMutation({mutationFn: ({customerID, value}: {customerID: string, value: CustomerFormData}) => editCustomer(customerID, value)})
+}
+
+
+
+
+
+
+//Prodcuts
+
+//Create Product
+
+export const useCreateProduct = () => {
+    return useMutation({mutationFn: createProduct})
 }

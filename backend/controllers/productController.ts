@@ -9,10 +9,27 @@ export const createProduct = async (req: Request, res: Response) => {
         if (!data || Object.keys(data).length === 0) {
             return res.status(400).json({ status: 400, message: 'Product data missing!' })
         }
-        const product = await Product.create(data)
+
+        const lastProduct = await Product.findOne().sort({ productCode: -1 })
+
+        let nextNumber = 1
+
+        if (lastProduct) {
+            nextNumber = Number(lastProduct.productCode.split("-")[1]) + 1
+        }
+        
+
+        const productCode = `P-${String(nextNumber).padStart(4, "0")}`
+
+        const product = await Product.create({
+            ...data,
+            productCode,
+        })
+
 
         return res.status(201).json({ status: 201, message: 'Product created!', product })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ status: 500, message: 'Product create error!' })
     }
 }
@@ -148,11 +165,11 @@ export const searchProduct = async (req: Request, res: Response) => {
                 $options: 'i'
             },
             isActive: true
-        }: {isActive: true}
+        } : { isActive: true }
 
         const [products, totalProducts] = await Promise.all([
             Product.find(filter)
-            .skip(skip).limit(limit),
+                .skip(skip).limit(limit),
             Product.countDocuments(filter)
         ])
 

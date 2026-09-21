@@ -8,11 +8,13 @@ type ActivityDataType = {
     detail: string,
     icon: IconType,
     children: ReactNode,
-    btn: string
+    btn: string,
+    btnData?: string,
+    btnFun?: () => void
 }
 
 
-function TodayActivityLayout({ head, detail, icon, children, btn }: ActivityDataType) {
+function TodayActivityLayout({ head, detail, icon, children, btn, btnData, btnFun }: ActivityDataType) {
     const Icon: IconType = icon
     return (
         <div className="bg-orange-light text-sm rounded-lg shadow p-4 
@@ -28,9 +30,9 @@ function TodayActivityLayout({ head, detail, icon, children, btn }: ActivityData
                     </div>
                 </div>
                 {btn === 'show' && (
-                    <button className="flex gap-1 underline cursor-pointer acitve:scale-95">
+                    <button onClick={btnFun} className="flex gap-1 underline cursor-pointer acitve:scale-95">
                         <p className="text-[12px] font-semibold">
-                            View all sales
+                            {btnData}
                         </p>
                         <MdOutlineArrowRightAlt />
                     </button>

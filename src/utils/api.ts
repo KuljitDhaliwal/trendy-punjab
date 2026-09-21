@@ -1,11 +1,14 @@
-const API_URL = import.meta.env.VITE_API_URL
-console.log("API_URL =", API_URL);
-export const api = async(endPoint: string, options: RequestInit = {}) => {
+import { store } from "../store/Store"
 
+const API_URL = import.meta.env.VITE_API_URL
+
+export const api = async(endPoint: string, options: RequestInit = {}) => {
+    const token = store.getState().auth.accessToken
     const response = await fetch(`${API_URL}${endPoint}`, {
         ...options,
         headers: {
             'Content-type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         credentials: "include"
     })

@@ -1,6 +1,11 @@
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
+import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
+import type { AddProductType } from "../../../static/AddProductData"
 import { api } from "../../../utils/api"
 
+
+
+//Customer APIS
 export const setCustomer = (data: Record<string, string>) => {
     const options: RequestInit = {
         method: 'POST',
@@ -49,4 +54,30 @@ export const editCustomer = (customerID: string, value: CustomerFormData) => {
         body: JSON.stringify(value)
     }
     return api(`customers/edit-customer/${customerID}`, options)
+}
+
+
+
+//Product API
+
+
+export const getProducts = (page: number, search: string,  limit: number) => {
+    const options = {
+        method: 'GET',
+    }
+
+    return api(`products/search-product/?page=${page}&limit=${limit}&search=${search}`, options)
+
+}
+
+
+
+//Add product
+
+export const createProduct = (data: FormValueType) => {
+    const options = {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }
+    return api('products/create-product', options)
 }

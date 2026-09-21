@@ -7,7 +7,7 @@ type PaginationTypeProps = {
 }
 
 function Pagination({pagination, onClick}: PaginationTypeProps) {
-
+    console.log('pageination', pagination)
     //Handle Page
     const handlePage = (pageNumber: number) => {
         onClick(pageNumber)
@@ -20,7 +20,8 @@ function Pagination({pagination, onClick}: PaginationTypeProps) {
 
   return (
     <div className="w-full py-4 flex gap-4 items-center justify-center text-sm">
-        <button onClick={()=>handlePrev(pagination.currentPage - 1)} className={`${pagination?.currentPage <= 1 ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer'} font-bold`}>prev</button>
+        <button onClick={()=>handlePrev(pagination.currentPage - 1)} disabled={pagination?.currentPage <= 1}
+        className={`disabled:text-gray-400 disabled:cursor-not-allowed font-bold disabled:font-normal`}>prev</button>
         {Array.from({length: pagination?.totalPages}, (_, index)=>{
             const pageNumber: number = index + 1;
             return (
@@ -30,8 +31,8 @@ function Pagination({pagination, onClick}: PaginationTypeProps) {
                 </button>
             )
         })}
-        <button onClick={()=>handlePrev(pagination.currentPage + 1)}
-        className={`${pagination?.currentPage < pagination?.totalPages ? 'cursor-pointer' : 'text-gray-400 cursor-not-allowed'}`}>next</button>
+        <button onClick={()=>handlePrev(pagination.currentPage + 1)} disabled={pagination?.currentPage >= pagination?.totalPages}
+        className={`disabled:text-gray-400 disabled:cursor-not-allowed font-bold disabled:font-normal`}>next</button>
     </div>
   )
 }

@@ -30,7 +30,7 @@ const productSchema = new mongoose.Schema(
         productCode: {
             type: String,
             required: true,
-            unique: true,
+            unique: true,   
             trim: true,
         },
 
