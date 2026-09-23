@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
-import { createProduct, editCustomer, findCustomer, getCustomer, setCustomer } from "./admin.api"
+import { createProduct, deactiveProduct, editProduct, editCustomer, findCustomer, getCustomer, getProduct, setCustomer } from "./admin.api"
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
+import type { AddProductType } from "../../../static/AddProductData"
+import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
 
 export const useCreateCustomer = () => {
     return useMutation({mutationFn: setCustomer})
@@ -22,6 +24,11 @@ export const useEditCustomer = () => {
 
 
 
+type EditProductType = {
+    productID: string,
+    value: FormValueType
+}
+
 
 
 
@@ -32,3 +39,21 @@ export const useEditCustomer = () => {
 export const useCreateProduct = () => {
     return useMutation({mutationFn: createProduct})
 }
+
+
+//Get Product
+export const useGetProduct = () => {
+    return useMutation({mutationFn: (productID: string) => getProduct(productID)})
+}
+
+//Deactive Product
+export const useDeactivateProduct = () => {
+    return useMutation({mutationFn: (productID: string) => deactiveProduct(productID)})
+}
+
+
+//Edit Product
+export const useEditProduct = () => {
+    return useMutation({mutationFn: ({productID, value}: EditProductType) => editProduct(productID, value)})
+}
+

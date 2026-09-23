@@ -23,7 +23,6 @@ export type FormValueType = {
     category: string,
     brand: string,
     price: number,
-    color: string,
     variants: ProductVariantType[]
 }
 
@@ -33,7 +32,6 @@ type ErrorType = {
     category: string
     brand: string
     price: string
-    color: string
 }
 
 
@@ -46,11 +44,11 @@ function AddProduct() {
         category: '',
         brand: '',
         price: 0,
-        color: '',
         variants: [
             {
                 size: '',
-                stock: 0
+                stock: 0,
+                color: ''
             }
         ]
     })
@@ -80,7 +78,8 @@ function AddProduct() {
                 ...prev.variants,
                 {
                     size: "",
-                    stock: 0
+                    stock: 0,
+                    color: ""
                 }
             ]
         }))
@@ -91,8 +90,15 @@ function AddProduct() {
     //Handle Remove variant
     const handleRemoveVariant = (variantIndex: number) => {
         console.log('variant Index', variantIndex)
-        let newVariants = variants.filter((variant, index) => index !== variantIndex)
+        let newVariants = variants.filter((_, index) => index !== variantIndex)
         setVariants(newVariants)
+
+        setFormValue(prev => ({
+            ...prev,
+            variants: prev.variants.filter(
+                (_, index) => index !== variantIndex
+            )
+        }))
 
     }
 
@@ -139,13 +145,12 @@ function AddProduct() {
         })
     }
 
+    console.log('FormValue', formValue)
 
 
     const handleVariantChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, variantIndex: number) => {
 
-
-
-        if (e.target.name === 'size') {
+        if (e.target.name === 'size' || e.target.name === 'color') {
             setFormValue(prev => (
                 {
                     ...prev,
@@ -199,9 +204,8 @@ function AddProduct() {
             category: '',
             brand: '',
             price: 0,
-            color: '',
             variants: [
-                {size: '', stock: 0}
+                { size: '', stock: 0, color: '' }
             ]
         })
     }
@@ -249,12 +253,15 @@ function AddProduct() {
                         category: '',
                         brand: '',
                         price: 0,
-                        color: '',
                         variants: [
-                            {size: '', stock: 0}
+                            { size: '', stock: 0, color: '' }
                         ]
                     }
                 )
+
+                setVariants([productVariantData])
+                setStockError([])
+
             },
             onError: (error) => {
                 toast.error(error.message)
@@ -262,6 +269,9 @@ function AddProduct() {
         })
 
     }
+
+    console.log("UI variants:", variants.length)
+    console.log("Form variants:", formValue.variants.length)
 
     return (
         <div className="flex flex-col gap-6 w-full min-h-[calc(100vh-48px)] ">
@@ -285,7 +295,7 @@ function AddProduct() {
                         icon={FaRegUser}
                         children={(
                             <div className="grid gap-4 md:grid-cols-3">
-                                {addProductData.map((item: AddProductType, index: number) => {
+                                {addProductData.map((item: AddProductType) => {
                                     return <div className="grid gap-2 self-start" key={item.name}>
                                         <div className="flex gap-2">
                                             <label htmlFor={item.name}>{item.label}</label>
@@ -298,13 +308,12 @@ function AddProduct() {
                                                     : (item.name as
                                                         | "productName"
                                                         | "category"
-                                                        | "brand"
-                                                        | "color")
+                                                        | "brand")
                                             ] ? 'border-red-500' : 'border-border'}`}
                                             value={
                                                 item.name === "price"
                                                     ? formValue.price
-                                                    : formValue[item.name as "productName" | "category" | "brand" | "color"]
+                                                    : formValue[item.name as "productName" | "category" | "brand"]
                                             } />
                                         <p className={`${error[
                                             item.name === "price"
@@ -312,16 +321,14 @@ function AddProduct() {
                                                 : (item.name as
                                                     | "productName"
                                                     | "category"
-                                                    | "brand"
-                                                    | "color")
+                                                    | "brand")
                                         ] ? 'block' : 'hidden'} text-red-500 text-sm`}>{error[
                                             item.name === "price"
                                                 ? "price"
                                                 : (item.name as
                                                     | "productName"
                                                     | "category"
-                                                    | "brand"
-                                                    | "color")
+                                                    | "brand")
                                         ]}</p>
 
                                     </div>
@@ -358,7 +365,7 @@ function AddProduct() {
                                                                         <label htmlFor={item.name}>{item.label}</label>
                                                                         {item.required && (<p className="text-red-600">*</p>)}
                                                                     </div>
-                                                                    <select name={item.name} value={formValue.variants[index].size}
+                                                                    <select name={item.name} value={formValue.variants[index].size || ""}
                                                                         onChange={(e) => handleVariantChange(e, index)}
                                                                         className="border-border w-full border px-2 py-3 rounded-md">
                                                                         <option value="" disabled>
@@ -369,17 +376,27 @@ function AddProduct() {
                                                                         })}
                                                                     </select>
                                                                 </div>
-                                                            ) : (
+                                                            ) : item.name === 'stock' ? (
                                                                 <div className="grid gap-2 w-full self-start" key={item.name}>
                                                                     <div className="flex gap-2">
                                                                         <label htmlFor={item.name}>{item.label}</label>
                                                                         {item.required && (<p className="text-red-600">*</p>)}
                                                                     </div>
                                                                     <Input icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
-                                                                        value={formValue.variants[index].stock} className={`${stockError.includes(index) ? 'border-red-500' : 'border-border'} w-full`} />
+                                                                        value={formValue.variants[index].stock ?? 0} className={`${stockError.includes(index) ? 'border-red-500' : 'border-border'} w-full`} />
                                                                     <p className={`text-sm ${stockError.includes(index) ? 'block' : 'hidden'} text-red-500`}>Please add stock</p>
                                                                 </div>
-                                                            )
+                                                            ) :
+                                                                (
+                                                                    <div className="grid gap-2 w-full self-start" key={item.name}>
+                                                                        <div className="flex gap-2">
+                                                                            <label htmlFor={item.name}>{item.label}</label>
+                                                                            {item.required && (<p className="text-red-600">*</p>)}
+                                                                        </div>
+                                                                        <Input icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                                                            value={formValue.variants[index].color || ''} className={'border-border'} />
+                                                                    </div>
+                                                                )
                                                         }
                                                     </div>
                                                 ))

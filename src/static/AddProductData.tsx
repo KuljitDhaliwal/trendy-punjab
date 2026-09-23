@@ -4,7 +4,7 @@ export type AddProductType = {
   label: string
   name: string
   placeholder?: string
-    type?: "text" | "tel" | "email" | "number"
+  type?: "text" | "tel" | "email" | "number"
   required?: boolean
   options?: string[]
 }
@@ -13,7 +13,8 @@ export type AddProductType = {
 
 export type ProductVariant = {
   size: string
-  stock: number
+  stock: number,
+  color: string
 }
 
 export const addProductData: AddProductType[] = [
@@ -35,12 +36,6 @@ export const addProductData: AddProductType[] = [
     label: "Brand",
     name: "brand",
     placeholder: "Enter brand name",
-    type: "text",
-  },
-  {
-    label: "Color",
-    name: "color",
-    placeholder: "Enter color",
     type: "text",
   },
   {
@@ -83,9 +78,16 @@ export const productVariantData: AddProductType[] = [
     type: "number",
     required: true,
   },
+  {
+    label: "Color",
+    name: "color",
+    placeholder: "Enter product color",
+    type: "text",
+  },
 ]
 
 export const initialProductVariant: ProductVariant = {
   size: "",
   stock: 0,
+  color: ""
 }

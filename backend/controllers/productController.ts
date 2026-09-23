@@ -17,7 +17,7 @@ export const createProduct = async (req: Request, res: Response) => {
         if (lastProduct) {
             nextNumber = Number(lastProduct.productCode.split("-")[1]) + 1
         }
-        
+
 
         const productCode = `P-${String(nextNumber).padStart(4, "0")}`
 
@@ -36,7 +36,6 @@ export const createProduct = async (req: Request, res: Response) => {
 
 
 //Get Prodcuts
-
 export const getProducts = async (req: Request, res: Response) => {
     try {
         const products = await Product.find({ isActive: true })
@@ -50,7 +49,6 @@ export const getProducts = async (req: Request, res: Response) => {
 
 
 //Get product
-
 export const getProduct = async (
     req: Request,
     res: Response
@@ -86,7 +84,6 @@ export const getProduct = async (
 
 
 //Edit Product
-
 export const editProduct = async (req: Request, res: Response) => {
     try {
         const productID = req.params.productID
@@ -149,11 +146,10 @@ export const deactivateProduct = async (req: Request, res: Response) => {
 
 
 //Product Search + Pagination
-
 export const searchProduct = async (req: Request, res: Response) => {
     try {
         //Queries
-        const search = String(req.query.product || "")
+        const search = String(req.query.search || "")
         const limit = Number(req.query.limit) || 10
         const page = Number(req.query.page) || 1
         const skip = (page - 1) * limit
@@ -189,5 +185,105 @@ export const searchProduct = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Product search error:", error)
         return res.status(500).json({ status: 500, message: 'Product search error!' })
+    }
+}
+
+
+
+//Product Stats
+export const getProductStats = async (req: Request, res: Response) => {
+    try {
+        const productID = req.params.productID
+        console.log(productID)
+        const product = await Product.findOne({
+            _id: productID,
+            isActive: true
+        })
+        if (!product) {
+            return res.status(404).json({ status: 404, message: 'Product not found!' })
+        }
+
+        let totalStocks = 0
+        let totalVariants = product.variants.length
+        let outOfStock = 0
+        let inStocks = 0
+        product.variants.map(variant => {
+            if (variant.stock) {
+                totalStocks += variant.stock
+                if (variant.stock === 0) {
+                    outOfStock += 1
+                } else {
+                    inStocks += 1
+                }
+            }
+        })
+
+        const productStats = [
+            {
+                label: 'totalStocks',
+                value: totalStocks
+            },
+            {
+                label: 'totalVariants',
+                value: totalVariants
+            },
+            {
+                label: 'outOfStock',
+                value: outOfStock
+            },
+            {
+                label: 'inStocks',
+                value: inStocks
+            },
+        ]
+
+        return res.status(200).json({ status: 200, message: 'Product Stats!', productStats })
+
+
+    } catch (error) {
+        return res.status(500).json({ status: 500, message: 'Product details error' })
+    }
+}
+
+
+
+
+
+//All Products Stats
+
+export const getProductsStats = async (req: Request, res: Response) => {
+    try {
+        const products = await Product.find({ isActive: true })
+        const totalProducts = products.length
+        let outOfStock = 0
+        let inStocks = 0
+        products.map(product => {
+            product.variants?.map((variant: any) => {
+                if (variant.stock === 0) {
+                    outOfStock += 1
+                } else {
+                    inStocks += 1
+                }
+            })
+        })
+
+        const productsStats = [
+            {
+                label: 'Total Products',
+                value: totalProducts
+            },
+            {
+                label: 'Out of Stocks',
+                value: outOfStock
+            },
+            {
+                label: 'In Stocks',
+                value: inStocks
+            },
+        ]
+        return res.status(200).json({status: 200, message: 'Products stats', productsStats})
+    } catch (error) {
+        return res.status(500).json({ status: 500, message: 'Products Stats error' })
+
     }
 }

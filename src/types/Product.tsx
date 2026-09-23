@@ -1,6 +1,7 @@
 export type ProductVariantType = {
     size?: string,
-    stock?: number
+    stock?: number,
+    color?: string
 }
 
 
@@ -10,7 +11,6 @@ export type ProductType = {
     productCode: string,
     category: string,
     brand: string,
-    color: string,
     price: number,
     variants: ProductVariantType[],
     isActive: boolean

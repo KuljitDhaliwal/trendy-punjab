@@ -4,29 +4,62 @@ import AdminPagesHeader from "../../../features/admin/components/AdminPagesHeade
 import { ProductSummaryData, type ProductSummaryDataType } from "../../../static/ProductsStats"
 import StatsCard from "../../../features/admin/components/StatsCard"
 import FindProducts from "../../../features/admin/components/FindProducts"
-import { useGetProducts } from "../../../features/admin/api/admin.queries"
+import { useGetProducts, useGetProductsStats } from "../../../features/admin/api/admin.queries"
 import type { ProductType } from "../../../types/Product"
 import Pagination from "../../../components/Pagination"
 import { useState } from "react"
+import { useDeactivateProduct } from "../../../features/admin/api/admin.mutations"
+import { toast } from "react-toastify"
+import { useQueryClient } from "@tanstack/react-query"
 // import { useState } from "react"
 
 function Products() {
     const [page, setPage] = useState<number>(1)
-    const { data, isLoading, error } = useGetProducts(page, '', 10)
+    const [search, setSearch] = useState<string>('')
+    const { data, isLoading, error } = useGetProducts(page, search, 10)
+    const { mutate: deactiveProduct, isPending } = useDeactivateProduct()
+    const { data: productsStats, isLoading: productsStatsLoading, error: productsStatsError } = useGetProductsStats()
     const navigate = useNavigate()
-
+    const queryClient = useQueryClient()
 
     //handleViewCustomer
-    const handleViewCustomer = (id: string) => {
-        console.log(id)
+    const handleViewProduct = (productID: string) => {
+        navigate(`/dashboard/products/${productID}`)
+    }
+
+    //handleFindProduct
+    const handleFindProduct = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let searchVal = e.target.value
+        if (searchVal.length > 2) {
+            setSearch(searchVal.trim())
+        }
+        if (searchVal === '') {
+            setSearch(searchVal)
+        }
     }
 
     //handlePage
-
     const handlePage = (pageNumber: number) => {
-        console.log('Cjecl page', pageNumber)
         setPage(pageNumber)
     }
+
+    //Handle Deactivate Product
+    const handleDeactivateProduct = (productID: string) => {
+        deactiveProduct(productID, {
+            onSuccess: () => {
+                toast.success('Product deleted!')
+                queryClient.invalidateQueries({
+                    queryKey: ['products']
+                })
+            },
+            onError: () => {
+                toast.error('Delete product error!')
+            }
+        })
+    }
+
+
+
 
     return (
         <div className="grid gap-6">
@@ -39,15 +72,27 @@ function Products() {
 
 
             {/* //Prodcuts Stats */}
-            <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                {ProductSummaryData.map((item: ProductSummaryDataType) => {
-                    return <StatsCard key={item.label} item={item} />
-                })}
+            <div>
+                {productsStatsLoading ? (
+                    <div className="bg-orange-light w-full h-20 rounded-lg shadow animate-pulse grid place-items-center">
+                        <p>Loading...</p>
+                    </div>
+                ) : productsStatsError ? (<div>
+                    <div className="bg-orange-light w-full h-20 rounded-lg shadow animate-pulse grid place-items-center">
+                        <p>Something went wrong!!</p>
+                    </div>
+                </div>) : (
+                    <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                        {productsStats.productsStats.map((item: ProductSummaryDataType) => {
+                            return <StatsCard key={item.label} item={item} />
+                        })}
+                    </div>
+                )}
             </div>
 
 
             {/* Find Products */}
-            <FindProducts />
+            <FindProducts handleFindProduct={handleFindProduct} />
 
 
             {/* All Products */}
@@ -94,19 +139,23 @@ function Products() {
                                 </tr>
                             ) :
                                 data.products.map((item: ProductType) => {
-                                    return <tr key={item.productName} className="py-2 border-b border-secondary-text/20">
+                                    return <tr key={item.productCode} className="py-2 border-b border-secondary-text/20">
                                         <td className="py-3">{item.productName}</td>
                                         <td className="py-3">{item.productCode}</td>
                                         <td className="py-3">{item.category}</td>
                                         <td className="py-3">₹{item.price}</td>
-                                        <td><button type="button" className="underline cursor-pointer"
-                                            onClick={() => handleViewCustomer(item._id)}>View</button></td>
+                                        <td className="flex gap-4 items-center py-3">
+                                            <button type="button" className="underline cursor-pointer"
+                                                onClick={() => handleViewProduct(item._id)}>View</button>
+                                            <button type="button" className="underline cursor-pointer disabled:cursor-not-allowed text-red-500" disabled={isPending}
+                                                onClick={() => handleDeactivateProduct(item._id)}>Delete</button>
+                                        </td>
                                     </tr>
                                 })}
                         </tbody>
                     </table>
                 </div>
-                <Pagination pagination={data?.pagination} onClick={handlePage}/> 
+                <Pagination pagination={data?.pagination} onClick={handlePage} />
             </div>
 
         </div>

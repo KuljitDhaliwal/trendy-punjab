@@ -14,6 +14,10 @@ const productVariantSchema = new mongoose.Schema(
             min: 0,
             default: 0,
         },
+        color: {
+            type: String,
+            trim: true,
+        },
     },
     {
         _id: false,
@@ -41,11 +45,6 @@ const productSchema = new mongoose.Schema(
         },
 
         brand: {
-            type: String,
-            trim: true,
-        },
-
-        color: {
             type: String,
             trim: true,
         },
