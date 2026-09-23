@@ -1,10 +1,11 @@
+
 type inputProps = {
-    value?: string,
+    value?: string | number,
     item: {
         name: string,
-        placeholder: string
+        placeholder?: string
     },
-    type: React.HTMLInputTypeAttribute,
+    type?: React.HTMLInputTypeAttribute,
     icon: boolean,
     className?: string,
     onChange?: (e: React.ChangeEvent<HTMLInputElement>)=> void | undefined

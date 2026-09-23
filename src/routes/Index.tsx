@@ -8,6 +8,11 @@ import DashboardCustomerLayout from "../layout/DashboardCustomerLayout"
 import CustomerDetails from "../pages/Admin/CustomerDetails"
 import EditCustomer from "../pages/Admin/EditCustomer"
 import ProtectedRoutes from "./ProtectedRoutes"
+import Products from "../pages/Admin/Products/Products"
+import DashboardProductLayout from "../layout/DashboardProductLayout"
+import AddProduct from "../pages/Admin/Products/AddProduct"
+import ProductDetails from "../pages/Admin/Products/ProductDetails"
+import EditProduct from "../pages/Admin/Products/EditProduct"
 
 
 function Index() {
@@ -23,6 +28,12 @@ function Index() {
                   <Route path='add-customer' element={<AddCustomer/>}/>
                   <Route path=':id' element={<CustomerDetails/>}/>
                   <Route path='edit-customer/:id' element={<EditCustomer/>}/>
+                </Route>
+                <Route path="products" element={<DashboardProductLayout/>}>
+                  <Route index element={<Products/>} />
+                  <Route path="add-product" element={<AddProduct/>} />
+                  <Route path=":productID" element={<ProductDetails/>} />
+                  <Route path="edit-product/:productID" element={<EditProduct/>} />
                 </Route>
               </Route>
             </Route>

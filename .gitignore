@@ -1,3 +1,21 @@
+#Environment Variables
+.env
+.env.*
+!.env.example
+
+#Dependencies
+node_modules/
+
+#Built
+dist/
+
+#vite
+.vite/
+
+
+
+
+
 # Logs
 logs
 *.log
@@ -17,6 +35,7 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+*.log
 *.suo
 *.ntvs*
 *.njsproj

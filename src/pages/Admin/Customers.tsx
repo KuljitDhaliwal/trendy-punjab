@@ -6,6 +6,7 @@ import Button from "../../components/ui/Button"
 import { useGetCustomers, useGetCustomersStats } from "../../features/admin/api/admin.queries"
 import Pagination from "../../components/Pagination"
 import { useFindCustomer } from "../../features/admin/api/admin.mutations"
+import StatsCard from "../../features/admin/components/StatsCard"
 
 
 
@@ -67,7 +68,7 @@ export type Customer = {
 
 
 
-type CustomerStats = {
+export type CustomerStats = {
   label: string,
   value: number
 }
@@ -109,7 +110,7 @@ function Customers() {
         console.log('Success', data.customer)
         setGetCustomer(data.customer)
       },
-      onError: (error) => {
+      onError: () => {
         console.log('Somethinf went wrong!')
       }
     })
@@ -171,10 +172,7 @@ function Customers() {
       ) : (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
           {customerStatsData && customerStatsData.customerStats.map((item: CustomerStats) => {
-            return <div key={item.label} className="bg-orange-light w-full rounded-lg shadow p-4">
-              <p className="text-[12px] text-secondary-text">{item.label}</p>
-              <p className="font-bold">{item.value}</p>
-            </div>
+            return <StatsCard item={item} />
           })}
         </div>
       )}
