@@ -36,11 +36,6 @@ function CustomerDetails() {
         }
     }, [id, getCustomer])
 
-
-    console.log('Customer Details', customer)
-
-
-
     const handleEditCustomer = () => {
         navigate(`/dashboard/customers/edit-customer/${id}`)
     }
@@ -103,7 +98,7 @@ function CustomerDetails() {
                         <p className="flex items-center gap-1">
                             + Create Order
                         </p>
-                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
                 </div>
             </section>
 

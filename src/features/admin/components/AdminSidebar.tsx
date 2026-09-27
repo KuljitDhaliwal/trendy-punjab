@@ -1,26 +1,26 @@
 import AdminNavbar from "./AdminNavbar"
-import { IoIosSettings } from "react-icons/io";
+import { IoIosSettings, IoIosCart } from "react-icons/io";
 import { LuLogOut } from "react-icons/lu";
 import { FaUser, FaTimes } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { useState } from "react";
-
+import { useContext, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../auth/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "../../auth/api/auth.mutations";
 import { toast } from "react-toastify";
+import { ToggleCartContext } from "../../../context/ToggleCartContext";
 function AdminSidebar() {
   const [toggleNav, setToggleNav] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-
+  const { setToggleCart } = useContext(ToggleCartContext)
   //Logout function hook
   const { mutate: logout } = useLogout()
 
   //handle Logout
   const handleLogout = () => {
-    logout(undefined,{
+    logout(undefined, {
       onSuccess: (data) => {
         dispatch(setLogout())
         navigate('/', { replace: true })
@@ -63,6 +63,9 @@ function AdminSidebar() {
       </div>
       <div className="md:hidden flex self-start gap-4 text-xl">
         <FaUser className="cursor-pointer" />
+        <button>
+          <IoIosCart className="cursor-pointer md:hidden flex" onClick={()=>setToggleCart((prev: boolean) => !prev)} />
+        </button>
         {toggleNav ? (
           <button type="button">
             <FaTimes className="cursor-pointer" onClick={() => setToggleNav(false)} />

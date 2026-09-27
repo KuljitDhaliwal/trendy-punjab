@@ -287,3 +287,31 @@ export const getProductsStats = async (req: Request, res: Response) => {
 
     }
 }
+
+
+
+//Search Single Product
+export const searchSingleProduct = async(req: Request, res: Response) => {
+    try {
+        const search: string = String(req.query.search)
+        console.log('Search', search)
+        const isValid = search?.slice(0,2).toUpperCase() === 'P-'
+        const searchProduct = isValid ? 'productCode': 'productName'
+        const product = await Product.find({
+            [searchProduct]: {
+                $regex: search,
+                $options: 'i'
+            },
+            isActive: true
+        })
+        console.log('Product', product)
+        if(!product){
+            return res.status(404).json({status: 404, message: 'Product not found!'})
+        }
+
+        return res.status(200).json({status: 200, message: 'Product found!', product})
+
+    } catch (error) {
+        return res.status(500).json({status: 500, message: error})
+    }
+}

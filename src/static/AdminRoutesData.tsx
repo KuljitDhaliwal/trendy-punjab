@@ -24,5 +24,10 @@ export const AdminRoutesData: AdminRoutes[] = [
         name: 'Products',
         route: 'products',
         icon: MdBorderAll
+    },
+    {
+        name: 'Orders',
+        route: 'orders',
+        icon: MdBorderAll
     }
 ]
