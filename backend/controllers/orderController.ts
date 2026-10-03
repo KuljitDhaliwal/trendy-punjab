@@ -104,3 +104,70 @@ export const createOrder = async (req: Request, res: Response) => {
         return res.status(500).json({ status: 500, message: 'Order create error' })
     }
 }
+
+
+
+//Get order
+export const getOrder = async (req: Request, res: Response) => {
+    try {
+        const orderID = req.params.orderID
+        const order = await Order.findById(orderID)
+        if (!order) {
+            return res.status(404).json({ status: 404, message: 'Order not found!!' })
+        }
+
+        return res.status(200).json({ status: 200, message: 'Order found!!', order })
+
+    } catch (error) {
+        return res.status(500).json({ status: 500, message: 'Error in getting order!!' })
+    }
+}
+
+
+
+//Get orders
+export const getOrders = async (req: Request, res: Response) => {
+    try {
+        const search = typeof req.query.search === "string"
+            ? req.query.search
+            : ""
+        const page: number = Number(req.query.page || 1)
+        const limit: number = Number(req.query.limit || 10)
+        console.log('Search', search, page, limit)
+        const skip = (page - 1) * limit
+
+        const isPhone: boolean = /^[0-9]/.test(search)
+        console.log('isPhone', isPhone)
+        const query = isPhone ? "phone" : "fullname"
+        console.log('Query', query)
+        const customers = search === "" ? [] : await Customer.find({
+            [query]: {
+                $regex: search,
+                $options: "i"
+            }
+        }).select("_id")
+
+        const customerIds = customers.map(customer => customer._id)
+        const searchQuery = search === "" ? {} : { customerId: { $in: customerIds } }
+        console.log('SearchQuery', searchQuery)
+        const [orders, totalOrders] = await Promise.all([
+            Order.find(searchQuery).skip(skip).limit(limit).populate("customerId"),
+            Order.countDocuments(searchQuery)
+        ])
+
+
+        const pagination = {
+            totalPages: Math.ceil(totalOrders / limit),
+            limit: limit,
+            currentPage: page,
+            orders: orders,
+        }
+
+        // console.log('Orders', orders, totalOrders)
+
+        // const orders = await Order.find().populate("customerId")
+        return res.status(200).json({ status: 200, message: 'Orders found!!', pagination })
+    } catch (error) {
+        return res.status(500).json({ status: 500, message: 'Error in getting orders!!' })
+    }
+}
