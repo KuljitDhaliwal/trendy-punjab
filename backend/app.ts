@@ -5,7 +5,7 @@ import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import cookieParser from "cookie-parser"
 import orderRoutes from './routes/orderRoutes.js'
-
+import dashboardRoutes from './routes/adminRoutes.js'
 
 
 const app = express()
@@ -29,5 +29,6 @@ app.use('/api/products', productRoutes)
 
 app.use('/api/orders', orderRoutes)
 
+app.use('/api/dashboard', dashboardRoutes)
 
 export default app

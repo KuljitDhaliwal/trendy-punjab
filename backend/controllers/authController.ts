@@ -7,6 +7,7 @@ import { generateToken, generateRefreshToken, verifyRefreshToken } from "../conf
 
 export const adminLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body
+    
     try {
         const admin = await Admin.findOne({ email })
         if (!admin) {

@@ -61,7 +61,7 @@ const orderSchema = new mongoose.Schema(
             ref: "Customer",
             required: true,
         },
-
+        
         items: {
             type: [orderItemSchema],
             required: true,

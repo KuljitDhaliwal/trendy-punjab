@@ -1,6 +1,5 @@
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
 import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
-import type { AddProductType } from "../../../static/AddProductData"
 import { api } from "../../../utils/api"
 
 
@@ -130,3 +129,12 @@ export const getProductsStats = () => {
     return api('products/products-stats', options)
 }
 
+
+
+//Search Single Product
+export const getSearchSingleProduct = (search: string) => {
+    const options = {
+        method: 'GET'
+    }
+    return api(`products/search-single-product?search=${search}`, options)
+}
