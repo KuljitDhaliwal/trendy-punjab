@@ -1,5 +1,6 @@
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
 import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
+import type { OrderType } from "../../../pages/Order/CreateOrder"
 import { api } from "../../../utils/api"
 
 
@@ -62,9 +63,7 @@ export const getProducts = (page: number, search: string,  limit: number) => {
     const options = {
         method: 'GET',
     }
-    console.log('VVVVV', search)
     return api(`products/search-product?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`, options)
-
 }
 
 
@@ -137,4 +136,45 @@ export const getSearchSingleProduct = (search: string) => {
         method: 'GET'
     }
     return api(`products/search-single-product?search=${search}`, options)
+}
+
+
+
+//Create Order
+export const createOrder = (customerID: string, data: OrderType ) => {
+    const options = {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }
+    return api(`orders/create-order/${customerID}`, options)
+}
+
+
+//Get Order
+export const getOrder = (orderID: string) => {
+    const options = {
+        method: 'GET',
+    }
+    return api(`orders/order/${orderID}`, options)
+}
+
+
+//Get Orders
+export const getOrders = (page: number, limit: number, search: string | number) => {
+    
+    const options = {
+        method: 'GET'
+    }
+
+    return api(`orders?page=${page}&limit=${limit || '10'}&search=${search}`, options)
+}
+
+
+
+//Admin Dashboard
+export const getTodayStats = () => {
+    const options = {
+        method: 'GET'
+    }
+    return api('dashboard/today-stats', options)
 }

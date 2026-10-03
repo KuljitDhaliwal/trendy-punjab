@@ -16,6 +16,7 @@ import EditProduct from "../pages/Admin/Products/EditProduct"
 import DashboardOrderLayout from "../layout/DashboardOrderLayout"
 import Orders from "../pages/Order/Orders"
 import CreateOrder from "../pages/Order/CreateOrder"
+import OrderReceipt from "../pages/Order/OrderReceipt"
 
 
 function Index() {
@@ -41,6 +42,7 @@ function Index() {
                 <Route path="orders" element={<DashboardOrderLayout/>}>
                   <Route index element={<Orders/>} />
                   <Route path="create-order/:customerID" element={<CreateOrder/>} />
+                  <Route path="order/:orderID" element={<OrderReceipt/>} />
                 </Route>
               </Route>
             </Route>

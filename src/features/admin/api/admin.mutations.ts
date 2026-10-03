@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
-import { createProduct, deactiveProduct, editProduct, editCustomer, findCustomer, getCustomer, getProduct, setCustomer, getSearchSingleProduct } from "./admin.api"
+import { createProduct, deactiveProduct, editProduct, editCustomer, findCustomer, getCustomer, getProduct, setCustomer, getSearchSingleProduct, createOrder } from "./admin.api"
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
 import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
+import type { OrderType } from "../../../pages/Order/CreateOrder"
 
 export const useCreateCustomer = () => {
     return useMutation({mutationFn: setCustomer})
@@ -62,3 +63,14 @@ export const useGetSearchSingleProduct = () => {
     return useMutation({mutationKey: ['product'], mutationFn:(search: string)=> getSearchSingleProduct(search)})
 }
 
+
+
+type createOrderType = {
+    customerID: string,
+    data: OrderType
+}
+
+//Create Order
+export const useCreateOrder = () => {
+    return useMutation({mutationKey: ['order'], mutationFn: ({customerID, data}: createOrderType) => createOrder(customerID, data)})
+}

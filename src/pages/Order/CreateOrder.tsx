@@ -3,20 +3,20 @@ import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import Button from "../../components/ui/Button"
 import { useNavigate, useParams } from "react-router-dom"
 import { nameInitials } from "../../utils/NameInitials"
-import React, { useContext, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import type { Customer } from "../Admin/Customers"
 import { toast } from "react-toastify"
-import { useGetCustomer, useGetSearchSingleProduct } from "../../features/admin/api/admin.mutations"
+import { useCreateOrder, useGetCustomer, useGetSearchSingleProduct } from "../../features/admin/api/admin.mutations"
 import { MdLocalPhone, MdOutlineHandshake } from "react-icons/md"
 import { BsCashStack, BsEnvelope } from "react-icons/bs"
 import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout"
 import { IoShirtOutline } from "react-icons/io5"
 import type { ProductType } from "../../types/Product"
 import { FaRegTrashAlt } from "react-icons/fa"
-import { ToggleCartContext } from "../../context/ToggleCartContext"
+import { useToggleCart } from "../../context/ToggleCartContext"
 
 
-type OrderItemType = {
+export type OrderItemType = {
   productId?: string,
   productName?: string,
   category?: string,
@@ -27,7 +27,12 @@ type OrderItemType = {
   total?: number,
 }
 
-type OrderType = {
+type PaymentType = {
+  payment: "Cash" | "UPI";
+  status: "Pending" | "Paid" | "Partially Paid" | "Refunded";
+};
+
+export type OrderType = {
   orderNumber?: string,
   customerId?: string,
   items: OrderItemType[],
@@ -52,7 +57,6 @@ function CreateOrder() {
   const { customerID } = useParams()
   const [product, setProduct] = useState<ProductType[]>([])
   const [order, setOrder] = useState<OrderType>({
-    orderNumber: '',
     customerId: '',
     items: [],
     subtotal: 0,
@@ -60,26 +64,50 @@ function CreateOrder() {
     totalAmount: 0,
     paymentMethod: 'Cash',
     paymentStatus: 'Pending',
-    orderStatus: 'Pending',
     notes: ''
   })
   const [selectedProduct, setSelectedProduct] = useState<ProductType[]>([])
   const [customer, setCustomer] = useState<Customer | null>(null)
-  const [color, setColor] = useState<Record<number | string, string>>({})
+  const [color, setColor] = useState<Record<number | string, string | undefined>>({})
   const [sizeBtn, setSizeBtn] = useState<Record<number, string>>({})
   const [totalAmount, setTotalAmount] = useState<number | null>(null)
+  const [errorValidation, setErrorValidation] = useState<Record<number, string | undefined>>({})
   const [subTotal, setSubTotal] = useState<number | null>(null)
   const [discount, setDiscount] = useState<number | null>(null)
-  const [uniqueQuantity, setUniqueQuantity] = useState<Record<number, number>>({ 0: 1 })
+  const [orderDisable, setOrderDisabled] = useState(false)
+  const [orderNotes, setOrderNotes] = useState('')
+  const [payment, setPayment] = useState<PaymentType>({
+    payment: "Cash",
+    status: "Pending"
+  });
+  const [uniqueQuantity, setUniqueQuantity] = useState<Record<number, number>>({})
   const { mutate: getCustomer } = useGetCustomer()
   const { mutate: getSearchSingleProduct, isPending, error } = useGetSearchSingleProduct()
-  const { toggleCart } = useContext(ToggleCartContext)
+  const { toggleCart, setToggleCart } = useToggleCart()
+  const { mutate: getCreateOrder } = useCreateOrder()
+  //Handle Toggle button false on window resize
+  useEffect(() => {
+
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setToggleCart(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+
+  }, [])
+
+
 
   useEffect(() => {
     if (customerID) {
       getCustomer(customerID, {
         onSuccess: (data) => {
-          console.log('Data', data)
           setCustomer(data.customer)
         },
         onError: (error) => {
@@ -109,6 +137,7 @@ function CreateOrder() {
 
   //Handle Select Product
   const handleSelectProduct = (product: ProductType) => {
+    setUniqueQuantity(prev => ({ ...prev, [selectedProduct.length]: 1 }))
     setSelectedProduct(prev => ([...prev, product]))
     setProduct([])
   }
@@ -116,6 +145,14 @@ function CreateOrder() {
 
   //Handle Item
   const handleItem = (product: ProductType, productIndex: number) => {
+    console.log(sizeBtn[productIndex], color[productIndex])
+    //Validate Size and Color
+    if (sizeBtn[productIndex] === undefined || color[productIndex] === undefined) {
+      setErrorValidation(prev => ({ ...prev, [productIndex]: `Please select color and size` }))
+      return
+    }
+
+
     setOrder(prev => ({
       ...prev,
       'items': [...prev.items, {
@@ -130,26 +167,44 @@ function CreateOrder() {
       }],
     }))
 
-    setColor(prev => ({...prev, [productIndex]: ''}))
-    setSizeBtn(prev => ({...prev, [productIndex]: ''}))
-    setUniqueQuantity(prev=> ({...prev, [productIndex]: 1}))
+    setColor(prev => ({ ...prev, [productIndex]: '' }))
+    setSizeBtn(prev => ({ ...prev, [productIndex]: '' }))
+    setUniqueQuantity(prev => ({ ...prev, [productIndex]: 1 }))
   }
 
 
   //Handle Subtotal
-  useEffect(()=>{
-    const price = order.items.map(item=> {
+  useEffect(() => {
+    const price = order.items.map(item => {
       return item.total
     })
 
-    const total = price.reduce((acc, curr)=>{
+    const total = price.reduce((acc, curr) => {
       return ((acc || 0) + (curr || 0))
-    },0)
+    }, 0)
 
-    setSubTotal(total || null)
-    discount !== null ? setTotalAmount(total || null) : 0
-  },[order, discount])
+    setSubTotal(total || 0)
+    const discountAmount = ((total || 0) * ((discount || 0) / 100))
+    let val = discount === null ? (total || 0) : ((total || 0) - discountAmount)
+    setTotalAmount(Number(val))
+  }, [order, discount])
 
+
+  //Handle Delete Item from cart
+  const handleRemoveItem = (item: OrderItemType) => {
+    setOrder(prev => ({
+      ...prev,
+      'items': prev.items.filter(el => el.productId !== item.productId)
+    }))
+  }
+
+  //handle Clear Cart
+  const handleClearCart = () => {
+    setOrder(prev => ({
+      ...prev,
+      'items': []
+    }))
+  }
 
   //Handle Discount
   const handleDiscount = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,14 +216,28 @@ function CreateOrder() {
   // //SetColor
   const handleColor = (productIndex: number, mycolor: string) => {
     setColor(prev => ({ ...prev, [productIndex]: mycolor }))
+
+    if (sizeBtn[productIndex] === undefined) return
+    //Reset Validator
+    setErrorValidation(prev => ({
+      ...prev,
+      [productIndex]: undefined
+    }))
   }
 
 
   // //Handle Unique size btn
   // //SetBtn
   const handleSizeBtn = (productIndex: number, variantSize: string) => {
-    setColor(prev => ({ ...prev, [productIndex]: '' }))
+    setColor(prev => ({ ...prev, [productIndex]: undefined }))
     setSizeBtn(prev => ({ ...prev, [productIndex]: variantSize }))
+    console.log('This is color before', color[productIndex])
+    if (color[productIndex] === undefined) return
+    //Reset Validator
+    setErrorValidation(prev => ({
+      ...prev,
+      [productIndex]: undefined
+    }))
   }
 
 
@@ -185,6 +254,93 @@ function CreateOrder() {
     }
   }
 
+
+
+  //Handle Payment method and status
+  const handlePayment = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.currentTarget
+    setPayment(prev => ({ ...prev, [name]: value }))
+  }
+
+
+
+  //Handle Create Order Validation
+  const handleCreateOrderValidation = () => {
+    if (order.items.length === 0
+      || !customerID
+      || subTotal === null
+      || totalAmount === null
+      || Object.entries(payment).length < 2
+      || payment.status === 'Pending'
+    ) {
+      setOrderDisabled(true)
+      return
+    }
+    setOrderDisabled(false)
+  }
+
+  useEffect(() => {
+    handleCreateOrderValidation()
+  }, [order, customerID, subTotal, totalAmount, payment])
+
+  //handle Create Order
+  const handleCreateOrder = () => {
+    setOrder((prev: OrderType) => ({
+      ...prev,
+      subtotal: subTotal ?? 0,
+      totalAmount: totalAmount ?? 0,
+      paymentMethod: payment?.payment,
+      paymentStatus: payment?.status,
+      customerId: customerID,
+      notes: orderNotes
+    }))
+
+
+    const data: OrderType = {
+      customerId: customerID,
+      items: order.items,
+      subtotal: subTotal ?? 0,
+      totalAmount: totalAmount ?? 0,
+      paymentMethod: payment.payment,
+      paymentStatus: payment.status,
+      notes: orderNotes
+    }
+
+    if (!customerID) {
+      toast.error("Please select a customer");
+      return;
+    }
+
+    if (Object.entries(data).length === 0) {
+      toast.error("Data is missing");
+      return;
+    }
+
+    getCreateOrder({ customerID, data }, {
+      onSuccess: (data) => {
+        toast.success('Order Created!!')
+        setOrder(
+          {
+            customerId: '',
+            items: [],
+            subtotal: 0,
+            discount: 0,
+            totalAmount: 0,
+            paymentMethod: 'Cash',
+            paymentStatus: 'Pending',
+            notes: ''
+          }
+        )
+        navigate(`/dashboard/orders/order/${data.order._id}`)
+      },
+      onError: () => {
+        toast.error('Order Create Error!!')
+      }
+    })
+  }
+
+
+  console.log('Final Order', order)
 
   return (
     <div className="grid gap-6">
@@ -258,7 +414,7 @@ function CreateOrder() {
                       <div className="grid gap-2 w-full">
                         {
                           product?.map((pro: ProductType) => {
-                            return <button onClick={() => handleSelectProduct(pro)}
+                            return <button key={pro._id} onClick={() => handleSelectProduct(pro)}
                               className="bg-orange-light cursor-pointer p-4 w-full">
                               <span className="flex justify-between items-center">
                                 <span className="grid gap-1 text-left justify-start">
@@ -291,7 +447,7 @@ function CreateOrder() {
                   ) : (
                     <div className="grid gap-4">
                       {selectedProduct.map((product, productIndex) => {
-                        return <div className="grid gap-4 bg-white p-4 rounded-md">
+                        return <div key={product._id} className="grid gap-4 bg-white p-4 rounded-md">
                           <div className="grid gap-1">
                             <p className="text-sm text-secondary-text">{product.productCode}</p>
                             <p className="">{product.productName}</p>
@@ -299,7 +455,7 @@ function CreateOrder() {
                             <p className="text-sm text-secondary-text">Category {product.category}</p>
                             <p className="text-orange-dark font-bold text-lg">₹{product.price}</p>
                           </div>
-                          <div className="grid md:grid-cols-3 gap-4 justify-between items-start">
+                          <div className="grid gap-4 justify-between items-start">
 
                             <div className="gap-2 grid self-start">
                               <p className="font-bold">Size</p>
@@ -349,7 +505,7 @@ function CreateOrder() {
                                   <p className="font-bold">Quantity</p>
                                   <div className="flex gap-4">
                                     <div className="flex border border-border rounded-md">
-                                      <button disabled={uniqueQuantity[productIndex] <= 1}
+                                      <button disabled={(uniqueQuantity[productIndex]) <= 1}
                                         value={uniqueQuantity[productIndex]} name="decrement"
                                         onClick={(e) => handleQunatity(productIndex, e)}
                                         className="p-2 w-10 disabled:bg-border/30 disabled:cursor-not-allowed 
@@ -368,8 +524,13 @@ function CreateOrder() {
                               )
                             }
                           </div>
-                          <Button children={'Add to Cart'} onClick={() => handleItem(product, productIndex)}
-                            className="bg-orange-dark px-4 py-3 w-fit ml-auto text-white mt-4" />
+                          <div className="relative mt-4">
+                            {errorValidation[productIndex] && (
+                              <p className="text-red-500 absolute -top-6">{errorValidation[productIndex]}</p>
+                            )}
+                            <Button children={'Add to Cart'} onClick={() => handleItem(product, productIndex)}
+                              className="bg-orange-dark px-4 py-3 w-fit ml-auto text-white" />
+                          </div>
                         </div>
                       })}
                     </div>
@@ -380,30 +541,43 @@ function CreateOrder() {
           />
         </div>
 
-        <div className={` ${toggleCart ? 'absolute w-full h-full inset-0 mt-10' : 'md:flex flex-col hidden'}
-          min-w-120 text-sm items-start h-[calc(100vh-145px)]
-          w-full bg-orange-light rounded-lg`}>
+
+        <div className={`
+    ${toggleCart
+            ? "fixed flex inset-0 z-50 w-full mt-10 h-auto overflow-y-auto"
+            : "hidden md:flex"
+          }
+    flex-col
+    items-start
+    text-sm
+    w-full
+    h-[calc(100vh-145px)]
+    lg:min-w-100
+    min-w-80
+    rounded-lg
+    bg-orange-light
+  `}>
           <div className="flex justify-between p-4 w-full items-center sticky top-0">
             <p className="font-bold">Order Items {order.items.length > 0 && (`(${order.items.length})`)}</p>
-            <div className="flex gap-1 items-center text-xs underline 
-                  text-orange-dark cursor-pointer">
+            <button className="flex gap-1 items-center text-xs underline 
+                  text-orange-dark cursor-pointer" onClick={handleClearCart}>
               <FaRegTrashAlt /> Clear All
-            </div>
+            </button>
           </div>
           <hr className="border-border" />
           <div className="flex-1 min-h-0 overflow-y-auto w-full scroll-smooth p-4">
             {order && order.items.length > 0 ? (
               <div className="grid gap-4">
                 {order && order.items.map((product, index) => {
-                  return <div className="grid gap-4 w-full bg-white p-4 rounded-md">
+                  return <div key={product.productId} className="grid gap-4 w-full bg-white p-4 rounded-md">
                     <div className="grid text-sm gap-2">
                       <div className="flex justify-between items-center">
                         <p>Product {index + 1}</p>
-                        <button className="cursor-pointer">
+                        <button className="cursor-pointer" onClick={() => handleRemoveItem(product)}>
                           <FaRegTrashAlt />
                         </button>
                       </div>
-                      <hr className="border border-border"/>
+                      <hr className="border border-border" />
                       <p>{product.productName}</p>
                       <p className="text-secondary-text">{product.category}</p>
                       <div className="flex text-xs text-secondary-text">
@@ -442,27 +616,31 @@ function CreateOrder() {
                     </div>
                     <p>Payment Details</p>
                   </div>
-                  <div className="flex gap-4 justify-between">
+                  <div className="flex md:flex-row flex-col gap-4 justify-between">
                     <div className="grid gap-2 w-full">
                       <p>Payment Method</p>
-                      <select name="payment" className="border-border rounded-lg bg-white border p-2 w-full">
+                      <select name="payment" value={payment.payment} onChange={handlePayment} className="border-border rounded-lg bg-white border p-2 w-full">
                         <option disabled selected>Select Payment Method</option>
-                        <option value="">Cash</option>
-                        <option value="">UPI</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Upi">UPI</option>
                       </select>
                     </div>
                     <div className="grid gap-2 w-full">
                       <p>Payment Status</p>
-                      <select name="payment-status" className="border-border rounded-lg bg-white border p-2 w-full">
-                        <option selected disabled>Pending</option>
-                        <option value="">Paid</option>
+                      <select name="status" value={payment.status} onChange={handlePayment} className="border-border rounded-lg bg-white border p-2 w-full">
+                        <option disabled selected>Select Payment Method</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
                       </select>
                     </div>
                   </div>
 
                   <div>
                     <p>Order Notes (optional)</p>
-                    <textarea name="order-notes" className="w-full h-20 border border-border rounded-lg"></textarea>
+                    <textarea name="order-notes"
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      className="w-full h-20 border border-border rounded-lg"></textarea>
                   </div>
                 </div>
               </div>
@@ -473,7 +651,17 @@ function CreateOrder() {
             )}
           </div>
           <div className="p-4 w-full">
-            <Button children={'Create Order'} className="bg-orange-dark w-full sticky bottom-0 px-4 py-3 text-white" />
+            <Button
+              children={'Create Order'}
+              disabled={orderDisable}
+              onClick={handleCreateOrder}
+              className="
+            bg-orange-dark 
+            w-full sticky 
+            bottom-0 
+            px-4 
+            py-3 
+            text-white" />
           </div>
         </div>
       </section>
