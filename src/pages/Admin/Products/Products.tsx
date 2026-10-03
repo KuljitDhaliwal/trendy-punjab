@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import Button from "../../../components/ui/Button"
 import AdminPagesHeader from "../../../features/admin/components/AdminPagesHeader"
-import { ProductSummaryData, type ProductSummaryDataType } from "../../../static/ProductsStats"
+import { type ProductSummaryDataType } from "../../../static/ProductsStats"
 import StatsCard from "../../../features/admin/components/StatsCard"
 import FindProducts from "../../../features/admin/components/FindProducts"
 import { useGetProducts, useGetProductsStats } from "../../../features/admin/api/admin.queries"
@@ -70,7 +70,6 @@ function Products() {
                         className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
                 )} />
 
-
             {/* //Prodcuts Stats */}
             <div>
                 {productsStatsLoading ? (
@@ -104,7 +103,7 @@ function Products() {
                     </div>
                 </div>
                 <div className="overflow-x-auto w-full">
-                    <table className="text-sm table-auto min-w-200 w-full">
+                    <table className="text-xs table-auto min-w-200 w-full">
                         <thead className="text-left text-secondary-text uppercase text-[12px]">
                             <tr>
                                 <th>product</th>

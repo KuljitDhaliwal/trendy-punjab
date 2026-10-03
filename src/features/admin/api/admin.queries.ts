@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { findCustomer, getCustomers, getCustomersStats, getProducts, getProductsStats, getProductStats } from "./admin.api"
+import { findCustomer, getCustomers, getCustomersStats, getOrder, getOrders, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
 
 export const useGetCustomers = (page: number, limit: number = 10) => {
     return useQuery({queryKey: ['getCustomers', page, limit], queryFn: ()=> getCustomers(page, limit)})
@@ -33,4 +33,29 @@ export const useGetProductsStats = () => {
     return useQuery({queryKey: ['stats'], queryFn: getProductsStats})
 }
 
+//Get Order
+export const useGetOrder = (orderID: string) => {
+    return useQuery({queryKey: ['order'], queryFn: ()=> getOrder(orderID)})
+}
 
+
+type OrdersType = {
+    page: number,
+    limit: number,
+    search: string | number
+}
+
+//Get Orders
+export const useGetOrders = ({page, limit, search}: OrdersType) => {
+    return useQuery({queryKey: ['order', page, limit, search], queryFn: ()=> getOrders(page, limit, search)})
+}
+
+
+
+
+//Dashboard
+
+//Today Stats
+export const useGetTodayStats = () => {
+    return useQuery({queryKey: ['stats'], queryFn: ()=> getTodayStats()})
+}

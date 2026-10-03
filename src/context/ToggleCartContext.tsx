@@ -1,4 +1,4 @@
-import { createContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 
 type ToggleCartType = {
@@ -17,4 +17,14 @@ export const ToggleCartProvider = ({children}: ToggleCartProviderProps) => {
     return (
         <ToggleCartContext.Provider value={{toggleCart, setToggleCart}}>{children}</ToggleCartContext.Provider>
     )
+}
+
+
+export const useToggleCart = () => {
+    const context = useContext(ToggleCartContext)
+    if(!context){
+        throw new Error('Toggle Context error!!')
+    }
+
+    return context
 }

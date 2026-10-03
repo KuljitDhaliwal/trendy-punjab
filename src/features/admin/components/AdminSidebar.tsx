@@ -3,18 +3,19 @@ import { IoIosSettings, IoIosCart } from "react-icons/io";
 import { LuLogOut } from "react-icons/lu";
 import { FaUser, FaTimes } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../auth/slices/authSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useLogout } from "../../auth/api/auth.mutations";
 import { toast } from "react-toastify";
-import { ToggleCartContext } from "../../../context/ToggleCartContext";
+import { useToggleCart } from "../../../context/ToggleCartContext";
 function AdminSidebar() {
   const [toggleNav, setToggleNav] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { setToggleCart } = useContext(ToggleCartContext)
+  const location = useLocation()
+  const { setToggleCart } = useToggleCart()
   //Logout function hook
   const { mutate: logout } = useLogout()
 
@@ -36,7 +37,7 @@ function AdminSidebar() {
     <div className={`
     fixed left-0 top-0 md:h-screen ${toggleNav ? 'h-screen' : 'h-14'}  
     z-1 bg-orange-light w-full lg:w-70 md:w-20 gap-10 overflow-hidden
-    transition-all duration-300 lg:p-6 p-4 flex md:flex-col justify-start
+    transition-all duration-300 lg:p-6 p-4 flex md:flex-col justify-start print:hidden
     `}>
 
       {/* Logo */}
@@ -63,9 +64,11 @@ function AdminSidebar() {
       </div>
       <div className="md:hidden flex self-start gap-4 text-xl">
         <FaUser className="cursor-pointer" />
-        <button>
-          <IoIosCart className="cursor-pointer md:hidden flex" onClick={()=>setToggleCart((prev: boolean) => !prev)} />
-        </button>
+        {location.pathname.includes('create-order') && (
+          <button>
+            <IoIosCart className="cursor-pointer md:hidden flex" onClick={()=>setToggleCart((prev: boolean) => !prev)} />
+          </button>
+        )}
         {toggleNav ? (
           <button type="button">
             <FaTimes className="cursor-pointer" onClick={() => setToggleNav(false)} />

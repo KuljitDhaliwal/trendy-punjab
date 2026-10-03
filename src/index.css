@@ -62,3 +62,25 @@ body {
 ::placeholder{
   font-size: 12px;
 }
+
+
+.ticket{
+  mask: 
+    radial-gradient(3px at 50% 3px,#000 99%,#0000 101%) calc(50% - 6px) 0/12px 51% repeat-x,
+    radial-gradient(3px at 50% 0px,#0000 99%,#000 101%) 50% 3px/12px calc(51% - 3px) repeat-x,
+    radial-gradient(3px at 50% calc(100% - 3px),#000 99%,#0000 101%) calc(50% - 6px) 100%/12px 51% repeat-x,
+    radial-gradient(3px at 50% calc(100% + 0px),#0000 99%,#000 101%) 50% calc(100% - 3px)/12px calc(51% - 3px) repeat-x;
+}
+
+
+
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+  }
+}
