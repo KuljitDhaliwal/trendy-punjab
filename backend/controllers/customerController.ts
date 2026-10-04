@@ -24,7 +24,7 @@ export const getCustomers = async (req: Request, res: Response) => {
 
     const skip = (page - 1) * limit
     let customerQuery = Customer.find({})
-    customerQuery = Customer.find({}).skip(skip).limit(limit)
+    customerQuery = Customer.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit)
 
     const [customers, totalCustomers] = await Promise.all([
       customerQuery,

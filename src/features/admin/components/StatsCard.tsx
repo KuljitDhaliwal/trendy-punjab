@@ -6,7 +6,7 @@ export type ProductStatsType = {
 
 function StatsCard({item}: ProductStatsType) {
     return (
-        <div key={item.label} className="bg-orange-light rounded-lg shadow p-4 w-full">
+        <div key={item.label} className="bg-orange-light rounded-lg grid gap-2 shadow p-4 w-full">
             <p className="text-[12px] text-secondary-text">{item.label}</p>
             <p className="font-bold">{item.value}</p>
         </div>

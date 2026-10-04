@@ -15,8 +15,8 @@ function AdminNavbar({toggleNav}: AdminNavbarProps) {
                     <NavLink key={item.name} to={item.route}
                         end={item.route === ''}
                         className={({ isActive }) =>
-                            `flex items-center gap-2 w-full p-2 rounded-lg lg:justify-start border-l-2 md:justify-center 
-                        transition-all duration-300 ${isActive ? 'bg-orange-400/50 border-l-orange-500' :
+                            `flex items-center gap-2 w-full p-4 rounded-lg lg:justify-start border-l-2 md:justify-center 
+                        transition-all duration-300 ${isActive ? 'bg-white border-l-orange-500' :
                                 'border-l-transparent'
                             }`}>
                         <Icon className="text-xl" />

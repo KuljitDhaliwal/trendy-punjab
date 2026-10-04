@@ -1,5 +1,6 @@
 import type { IconType } from "react-icons"
-import { FiUserPlus, FiSearch } from "react-icons/fi"
+import { AiFillProduct } from "react-icons/ai"
+import { FiUserPlus } from "react-icons/fi"
 
 export type QuickAction = {
   id: number
@@ -19,9 +20,9 @@ export const QuickActionData: QuickAction[] = [
   },
   {
     id: 2,
-    title: "Find customer",
-    description: "Search phone or customer name",
-    route: "#findCustomers",
-    icon: FiSearch,
+    title: "Add Product",
+    description: "Create a product with variants",
+    route: "/dashboard/products/add-product",
+    icon: AiFillProduct,
   }
 ]

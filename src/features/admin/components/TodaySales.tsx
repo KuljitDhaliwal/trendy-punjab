@@ -1,45 +1,81 @@
-import { TodaySalesData } from "../../../static/TodaySalesData";
+import { useNavigate } from "react-router-dom";
+import type { OrderType } from "../../../types/Order";
 import TodayActivityLayout from "./TodayActivityLayout";
 import { CgLoadbarSound } from "react-icons/cg";
 
+type TodayStats = {
+    label: string,
+    value: []
+}
 
-function TodaySales() {
+type TodayOrdersType = {
+    todayOrders: TodayStats[],
+    todayStatsError: Error | null,
+    todayStatsLoading: boolean
+}
+
+function TodaySales({ todayOrders, todayStatsError, todayStatsLoading }: TodayOrdersType) {
+    const navigate = useNavigate()
     return (
-        <TodayActivityLayout 
-        head={"Today's Sale"} 
-        btn={'show'}
-        icon={CgLoadbarSound}
-        detail={"Products sold today in store."} 
-        children={(
-            <div className="w-full">
-                <table className="w-full text-sm text-left">
-                    <thead>
-                        <tr className="w-full text-secondary-text text-[12px]">
-                            <th className="py-3">PRODUCT</th>
-                            <th className="py-3">QTY</th>
-                            <th className="py-3">PRICE</th>
-                            <th className="py-3">TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {TodaySalesData.map(item => {
-                            return <tr key={item.id}>
-                                <td className="py-3 border-border border-b">
-                                    {item.productName}
-                                    <br />
-                                    <p className="text-secondary-text text-[12px]">
-                                        Size: {item.size} . {item.category}
-                                    </p>
-                                </td>
-                                <td className="py-3 border-border border-b">{item.quantity}</td>
-                                <td className="py-3 border-border border-b">₹{item.price}</td>
-                                <td className="py-3 border-border border-b">0000</td>
+        <TodayActivityLayout
+            head={"Today's Sale"}
+            btn={'show'}
+            btnData="Orders"
+            icon={CgLoadbarSound}
+            detail={"Products sold today in store."}
+            btnFun={()=>navigate(`/dashboard/orders/`)}
+            children={(
+                <div className="w-full text-xs overflow-x-auto">
+                    <table className="text-sm text-left table-auto min-w-120 w-full">
+                        <thead>
+                            <tr className="w-full shrink-0 text-secondary-text text-left text-[12px] uppercase">
+                                <th className="p-3 text-left">#</th>
+                                <th className="p-3 shrink-0">customer</th>
+                                <th className="p-3 shrink-0">item</th>
+                                <th className="p-3 shrink-0">total amount</th>
+                                <th className="p-3 shrink-0">payment status</th>
+                                <th className="p-3 shrink-0">Action</th>
                             </tr>
-                        })}
-                    </tbody>
-                </table>
-            </div>
-        )} />
+                        </thead>
+                        <tbody>
+                            {todayStatsLoading ?
+                                (<tr>
+                                    <td colSpan={7} className="py-10 text-center">
+                                        Loading...
+                                    </td>
+                                </tr>) : todayStatsError ?
+                                    (<tr>
+                                        <td colSpan={7} className="py-10 text-center">
+                                            Something error
+                                        </td>
+                                    </tr>) :
+                                    todayOrders && todayOrders.map(stats => {
+                                        console.log('Statsss', stats)
+                                        return stats.label === 'Order Created' && (stats.value.length === 0 ? (<tr>
+                                            <td colSpan={7} className="py-10 text-center">
+                                                No orders yet!!
+                                            </td>
+                                        </tr>) : stats.value.map((item: OrderType, key) => {
+                                            console.log('Itemm', item)
+                                            return key <= 4 && <tr key={item._id} className="w-full">
+                                                <td className="p-3 border-border border-b">{key + 1}</td>
+                                                <td className="p-3 border-border border-b">
+                                                    {item.customerId.fullname}
+                                                </td>
+                                                <td className="p-3 border-border border-b">{item.items.length}</td>
+                                                <td className="p-3 border-border border-b">₹{item.totalAmount}</td>
+                                                <td className="p-3 border-border border-b">{item.paymentStatus}</td>
+                                                <td className="p-3 border-border border-b">
+                                                    <button className="underline cursor-pointer">View</button>
+                                                </td>
+                                            </tr>
+                                        }))
+                                    })
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            )} />
     )
 }
 
