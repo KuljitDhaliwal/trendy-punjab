@@ -11,17 +11,19 @@ import { useState } from "react"
 import { useDeactivateProduct } from "../../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
+import useModalContext from "../../../context/ModalContext"
 // import { useState } from "react"
 
 function Products() {
     const [page, setPage] = useState<number>(1)
     const [search, setSearch] = useState<string>('')
-    const { data, isLoading, error } = useGetProducts(page, search, 10)
+    const [limit, setLimit] = useState<number>(10)
+    const { data, isLoading, error } = useGetProducts(page, search, limit)
     const { mutate: deactiveProduct, isPending } = useDeactivateProduct()
     const { data: productsStats, isLoading: productsStatsLoading, error: productsStatsError } = useGetProductsStats()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-
+    const { setModal } = useModalContext()
     //handleViewCustomer
     const handleViewProduct = (productID: string) => {
         navigate(`/dashboard/products/${productID}`)
@@ -73,11 +75,11 @@ function Products() {
             {/* //Prodcuts Stats */}
             <div>
                 {productsStatsLoading ? (
-                    <div className="bg-orange-light w-full h-20 rounded-lg shadow animate-pulse grid place-items-center">
+                    <div className="glass-card w-full h-20 animate-pulse grid place-items-center">
                         <p>Loading...</p>
                     </div>
                 ) : productsStatsError ? (<div>
-                    <div className="bg-orange-light w-full h-20 rounded-lg shadow animate-pulse grid place-items-center">
+                    <div className="glass-card w-full h-20 animate-pulse grid place-items-center">
                         <p>Something went wrong!!</p>
                     </div>
                 </div>) : (
@@ -95,25 +97,26 @@ function Products() {
 
 
             {/* All Products */}
-            <div className="bg-orange-light p-4 rounded-lg shadow grid gap-4">
+            <div className="p-4 glass-card grid gap-4">
                 <div className="flex md:flex-row gap-4 flex-col justify-between">
                     <div className="grid gap-2">
                         <p className="font-bold">All Products</p>
-                        <p className="text-[12px] text-secondary-text">1248 product records</p>
+                        <p className="text-[12px] text-secondary-text">{data?.pagination?.totalProducts} product records</p>
                     </div>
                 </div>
                 <div className="overflow-x-auto w-full">
-                    <table className="text-xs table-auto min-w-200 w-full">
-                        <thead className="text-left text-secondary-text uppercase text-[12px]">
+                    <table className="table-auto min-w-120 w-full">
+                        <thead className="text-left text-white bg-orange-dark uppercase text-[12px]">
                             <tr>
-                                <th>product</th>
-                                <th>product code</th>
-                                <th>category</th>
-                                <th>price</th>
-                                <th>Actions</th>
+                                <th className="p-4 rounded-l-lg">#</th>
+                                <th className="p-4">product</th>
+                                <th className="p-4">product code</th>
+                                <th className="p-4">category</th>
+                                <th className="p-4">price</th>
+                                <th className="p-4 rounded-r-lg">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={7} className="py-10">
@@ -137,17 +140,26 @@ function Products() {
                                     </td>
                                 </tr>
                             ) :
-                                data.products.map((item: ProductType) => {
-                                    return <tr key={item.productCode} className="py-2 border-b border-secondary-text/20">
-                                        <td className="py-3">{item.productName}</td>
-                                        <td className="py-3">{item.productCode}</td>
-                                        <td className="py-3">{item.category}</td>
-                                        <td className="py-3">₹{item.price}</td>
-                                        <td className="flex gap-4 items-center py-3">
-                                            <button type="button" className="underline cursor-pointer"
+                                data.products.map((item: ProductType, key: number) => {
+                                    return <tr key={item.productCode} className="py-2 border-b border-border">
+                                        <td className="p-4">{(page - 1) * limit + key + 1}</td>
+                                        <td className="p-4">{item.productName}</td>
+                                        <td className="p-4">{item.productCode}</td>
+                                        <td className="p-4">{item.category}</td>
+                                        <td className="p-4">₹{item.price}</td>
+                                        <td className="flex gap-2 items-center p-4">
+                                            <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
                                                 onClick={() => handleViewProduct(item._id)}>View</button>
-                                            <button type="button" className="underline cursor-pointer disabled:cursor-not-allowed text-red-500" disabled={isPending}
-                                                onClick={() => handleDeactivateProduct(item._id)}>Delete</button>
+                                            <button type="button" className="bg-red-700 text-white py-1 px-2 disabled:cursor-not-allowed active:scale-95 rounded-md cursor-pointer" disabled={isPending}
+                                                onClick={() => setModal({
+                                                    type: 'delete-product',
+                                                    data: {
+                                                        header: 'Remove Product',
+                                                        subHeading: <p>Do you want to remove {item.productName} product</p>,
+                                                        actionBtn: () => handleDeactivateProduct(item._id),
+                                                        actionBtnText: 'Delete'
+                                                    }
+                                                })}>Delete</button>
                                         </td>
                                     </tr>
                                 })}

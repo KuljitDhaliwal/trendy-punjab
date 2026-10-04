@@ -1,5 +1,6 @@
 import type { Request, Response } from "express"
 import Customer from "../models/Customer.js"
+import Order from "../models/Order.js"
 
 export const createCustomer = async (req: Request, res: Response) => {
   try {
@@ -23,8 +24,7 @@ export const getCustomers = async (req: Request, res: Response) => {
     const limit: number = Number(req.query.limit) || 10
 
     const skip = (page - 1) * limit
-    let customerQuery = Customer.find({})
-    customerQuery = Customer.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit)
+    let customerQuery = Customer.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).populate("orders")
 
     const [customers, totalCustomers] = await Promise.all([
       customerQuery,
@@ -32,7 +32,6 @@ export const getCustomers = async (req: Request, res: Response) => {
     ])
 
     const totalPages = Math.ceil(totalCustomers / limit)
-    // const customers = await Customer.find({}).skip(skip).limit(limit)
     return res.status(200).json({
       stats: 200, message: 'All customers', customers, pagination: {
         currentPage: page,
@@ -60,7 +59,7 @@ export const findCustomer = async (req: Request, res: Response) => {
       }
     } : {}
 
-    const customer = await Customer.find(filter)
+    const customer = await Customer.find(filter).populate("orders")
 
     if (!customer) {
       return res.status(404).json({ status: 404, message: 'Not found!' })
@@ -79,7 +78,7 @@ export const findCustomer = async (req: Request, res: Response) => {
 export const getCustomer = async (req: Request, res: Response) => {
   try {
     const customerID = req.params.customerID
-    const customer = await Customer.findById(customerID)
+    const customer = await Customer.findById(customerID).populate("orders")
     if (!customer) {
       return res.status(404).json({
         status: 404,

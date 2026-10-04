@@ -7,6 +7,7 @@ import type { RootState } from "./store/Store";
 import Loading from "./components/Loading";
 import AuthInitializer from "./features/auth/api/AuthInitializer";
 
+
 const queryClient = new QueryClient()
 
 function App() {

@@ -7,6 +7,7 @@ import { useGetCustomers, useGetCustomersStats } from "../../features/admin/api/
 import Pagination from "../../components/Pagination"
 import { useFindCustomer } from "../../features/admin/api/admin.mutations"
 import StatsCard from "../../features/admin/components/StatsCard"
+import { calculateOrderAmount } from "../../utils/CalculateTotal"
 
 
 
@@ -33,7 +34,8 @@ export type Order = {
   orderStatus: "Pending" | "Completed" | "Cancelled" | "Returned"
   notes: string
   createdAt: Date
-  updatedAt: Date
+  updatedAt: Date,
+  orderNumber: string
 }
 
 
@@ -86,12 +88,13 @@ function Customers() {
   const [getCustomer, setGetCustomer] = useState<Customer[] | undefined>()
   const [phoneError, setPhoneError] = useState(false)
   const [search, setSearch] = useState<string>('')
+  const [ limit, setLimit ] = useState<number>(10)
   const [hasSearched, setHasSearched] = useState(false)
   const navigate = useNavigate()
   const [page, setPage] = useState<number>(1)
   const phoneRegex = /^[0-9]*$/
   //Get customers
-  const { data, isLoading, error } = useGetCustomers(page, 10)
+  const { data, isLoading, error } = useGetCustomers(page, limit)
   console.log('Customer Page', data?.customers)
   //Get customers stats
   const {
@@ -152,6 +155,8 @@ function Customers() {
     navigate(`/dashboard/customers/${customerID}`)
   }
 
+  console.log('Customerssssss', data?.customers)
+
 
 
   return (
@@ -183,27 +188,28 @@ function Customers() {
         findCustomer={getCustomer}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => findCustomer(e)} />
 
-      <div className="bg-orange-light p-4 rounded-lg shadow grid gap-4">
+      <div className="p-4 glass-card grid gap-4">
         <div className="flex md:flex-row gap-4 flex-col justify-between">
           <div className="grid gap-2">
             <p className="font-bold">All Customers</p>
-            <p className="text-[12px] text-secondary-text">1248 customer records</p>
+            <p className="text-[12px] text-secondary-text">{data?.pagination.totalCustomers} customer records</p>
           </div>
         </div>
         <div className="overflow-x-auto w-full">
-          <table className="text-sm table-auto min-w-200 w-full">
-            <thead className="text-left text-secondary-text uppercase text-[12px]">
-              <tr>
-                <th>customer</th>
-                <th>phone</th>
-                <th>sizes</th>
-                <th>last visit</th>
-                <th>orders</th>
-                <th>total spent</th>
-                <th>Actions</th>
+          <table className="table-auto min-w-120 w-full">
+            <thead className="text-left rounded-lg text-white uppercase text-[12px]">
+              <tr className="bg-orange-dark p-4">
+                <th className="p-4 rounded-l-lg">#</th>
+                <th className="p-4">customer</th>
+                <th className="p-4">phone</th>
+                <th className="p-4">sizes</th>
+                <th className="p-4">last visit</th>
+                <th className="p-4">orders</th>
+                <th className="p-4">total spent</th>
+                <th className="p-4 rounded-r-lg">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-xs">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="py-10 text-center">
@@ -227,11 +233,12 @@ function Customers() {
                   </td>
                 </tr>
               ) :
-                data.customers.map((item: Customer) => {
-                  return <tr key={item._id} className="py-2 border-b border-secondary-text/20">
-                    <td className="py-3">{item.fullname}</td>
-                    <td className="py-3">{item.phone}</td>
-                    <td className="py-3">
+                data.customers.map((item: Customer, key:number) => {
+                  return <tr key={item._id} className="p-4 border-b border-border">
+                    <td className="p-4">{(page - 1) * limit + key + 1}</td>
+                    <td className="p-4">{item.fullname}</td>
+                    <td className="p-4">{item.phone}</td>
+                    <td className="p-4">
                       {(!item.shirtSize && !item.jeansSize) ? '--' : (
                         <>
                           {item.shirtSize && `Shirt: ${item.shirtSize}`}
@@ -240,11 +247,15 @@ function Customers() {
                         </>
                       )}
                     </td>
-                    <td className="py-3">{item.lastVisit ? new Date(item.lastVisit).toLocaleDateString() : '--'}</td>
-                    <td className="py-3">{item.orders?.length ?? '--'}</td>
-                    <td className="py-3">{item.totalSpent ?? '--'}</td>
-                    <td><button type="button" className="underline cursor-pointer"
-                      onClick={()=> handleViewCustomer(item._id) }>View</button></td>
+                    <td className="p-4">{item.lastVisit ? new Date(item.lastVisit).toLocaleDateString() : '--'}</td>
+                    <td className="p-4">{item.orders?.length ?? '--'}</td>
+                    <td className="p-4">₹{calculateOrderAmount(item.orders)}</td>
+                    <td className="p-4">
+                      <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
+                      onClick={()=> handleViewCustomer(item._id) }>
+                        View
+                      </button>
+                    </td>
                   </tr>
                 })}
             </tbody>

@@ -17,7 +17,7 @@ type ActivityDataType = {
 function TodayActivityLayout({ head, detail, icon, children, btn, btnData, btnFun }: ActivityDataType) {
     const Icon: IconType = icon
     return (
-        <div className="bg-orange-light text-sm rounded-lg shadow p-4 
+        <div className="text-sm rounded-lg glass-card p-4 
         grid gap-6 items-start grid-rows-[auto_1fr] relative">
             <div className="flex justify-between items-center w-full">
                 <div className="flex gap-2">

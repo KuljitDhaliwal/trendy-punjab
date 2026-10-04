@@ -555,15 +555,18 @@ function CreateOrder() {
     h-[calc(100vh-145px)]
     lg:min-w-100
     min-w-80
-    rounded-lg
-    bg-orange-light
+    glass-card
   `}>
           <div className="flex justify-between p-4 w-full items-center sticky top-0">
             <p className="font-bold">Order Items {order.items.length > 0 && (`(${order.items.length})`)}</p>
-            <button className="flex gap-1 items-center text-xs underline 
+            {
+              order.items.length > 0 && (
+                <button className="flex gap-1 items-center text-xs underline 
                   text-orange-dark cursor-pointer" onClick={handleClearCart}>
-              <FaRegTrashAlt /> Clear All
-            </button>
+                  <FaRegTrashAlt /> Clear All
+                </button>
+              )
+            }
           </div>
           <hr className="border-border" />
           <div className="flex-1 min-h-0 overflow-y-auto w-full scroll-smooth p-4">

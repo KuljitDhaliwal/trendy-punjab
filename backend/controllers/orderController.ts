@@ -153,7 +153,6 @@ export const getOrders = async (req: Request, res: Response) => {
 
         const customerIds = customers.map(customer => customer._id)
         const searchQuery = search === "" ? {} : { customerId: { $in: customerIds } }
-        console.log('SearchQuery', searchQuery)
         const [orders, totalOrders] = await Promise.all([
             Order.find(searchQuery).skip(skip).limit(limit).populate("customerId"),
             Order.countDocuments(searchQuery)
@@ -165,13 +164,45 @@ export const getOrders = async (req: Request, res: Response) => {
             limit: limit,
             currentPage: page,
             orders: orders,
+            totalOrders: totalOrders
         }
 
-        // console.log('Orders', orders, totalOrders)
-
-        // const orders = await Order.find().populate("customerId")
         return res.status(200).json({ status: 200, message: 'Orders found!!', pagination })
     } catch (error) {
         return res.status(500).json({ status: 500, message: 'Error in getting orders!!' })
+    }
+}
+
+
+
+///Order Stats
+
+export const getOrderStats = async(req: Request, res: Response) => {
+    try {
+        const orders = await Order.find({})
+        const completed = orders.filter(order => order.paymentStatus === 'Paid')
+        const totalAmount = completed.map(order => order.totalAmount)
+        const totalSales = totalAmount.reduce((acc, cur)=>{
+            return acc + cur
+        },0)
+        const stats = [
+            {
+                label: 'Total Orders',
+                value: orders.length
+            },
+            {
+                label: 'Completed',
+                value: completed.length
+            },
+            {
+                label: 'Total Sales',
+                value: `₹${totalSales}`
+            },
+        ]
+
+
+        return res.status(200).json({status: 200, message: 'Order stats', stats})
+    } catch (error) {
+        return res.status(500).json({ status: 500, message: 'Error in getting order stats!!' })
     }
 }

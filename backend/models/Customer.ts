@@ -80,6 +80,22 @@ const customerSchema = new mongoose.Schema({
     }
 )
 
+
+customerSchema.virtual("orders", {
+    ref: "Order",
+    localField: "_id",
+    foreignField: "customerId"
+})
+
+customerSchema.set("toJSON", {
+    virtuals: true
+})
+
+customerSchema.set("toObject", {
+  virtuals: true,
+});
+
+
 const Customer = mongoose.model("Customer", customerSchema)
 
 export default Customer
