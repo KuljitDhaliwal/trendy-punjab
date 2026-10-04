@@ -11,36 +11,39 @@ import TodaySales from "../../features/admin/components/TodaySales"
 import { useTodayDate } from "../../hooks/TodayDate"
 import type { Customer } from "./Customers"
 import { useFindCustomer } from "../../features/admin/api/admin.mutations"
-import { useGetTodayStats } from "../../features/admin/api/admin.queries"
+import { useGetCustomers, useGetTodayStats } from "../../features/admin/api/admin.queries"
 
 function Dashboard() {
   const { date } = useTodayDate()
   const [phoneError, setPhoneError] = useState(false)
+  const [page, setPage] = useState<number>(1)
   const [search, setSearch] = useState<string>('')
   const [hasSearched, setHasSearched] = useState(false)
   const [getCustomer, setGetCustomer] = useState<Customer[] | undefined>()
   const phoneRegex = /^[0-9]*$/
   const { mutate: findCustomerFun, isPending: findingCustomer } = useFindCustomer()
-  const { data: todayStats, 
-    isLoading: todayStatsLoading, 
+  const { data: todayStats,
+    isLoading: todayStatsLoading,
     error: todayStatsError } = useGetTodayStats()
+  //Get customers
+  const { data: customerData, isLoading: customerLoading, error: customerError } = useGetCustomers(page, 10)
+    console.log('Customer Data', customerData)
+  useEffect(() => {
+    if (!hasSearched) return
+    if (search.length <= 3) return
+    findCustomerFun(search, {
+      onSuccess: (data) => {
+        setGetCustomer(data.customer)
+        console.log('Success', data.customer)
+        setGetCustomer(data.customer)
+      },
+      onError: () => {
+        console.log('Somethinf went wrong!')
+      }
+    })
+  }, [search])
 
-    useEffect(() => {
-      if (!hasSearched) return
-      if (search.length <= 3) return
-      findCustomerFun(search, {
-        onSuccess: (data) => {
-          setGetCustomer(data.customer)
-          console.log('Success', data.customer)
-          setGetCustomer(data.customer)
-        },
-        onError: () => {
-          console.log('Somethinf went wrong!')
-        }
-      })
-    }, [search])
-
-
+  console.log('jhckjabkcasc', todayStats?.stats)
   //Handle Find Customer
   const findCustomer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
@@ -68,16 +71,31 @@ function Dashboard() {
         findingCustomer={findingCustomer}
         findCustomer={getCustomer}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => findCustomer(e)} />
-        
-      <TodayActivity />
+
+
+      <TodayActivity
+        todayStatsLoading={todayStatsLoading}
+        todayStats={todayStats?.stats}
+        todayStatsError={todayStatsError}
+      />
+
 
       <div className="grid md:grid-cols-[1.5fr_1fr] gap-4">
-        <TodaySales />
-        <InventryAlert />
+        <TodaySales
+          todayOrders={todayStats?.stats}
+          todayStatsLoading={todayStatsLoading}
+          todayStatsError={todayStatsError} />
+          
+        <InventryAlert todayOrders={todayStats?.stats}
+          todayStatsLoading={todayStatsLoading}
+          todayStatsError={todayStatsError}/>
       </div>
 
       <div className="grid md:grid-cols-[1.5fr_1fr] gap-4">
-        <RecentCustomers />
+        <RecentCustomers 
+        customerData={customerData?.customers} 
+        customerLoading={customerLoading}
+        customerError={customerError}/>
         <QuickActions />
       </div>
     </div>

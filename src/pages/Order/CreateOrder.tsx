@@ -463,7 +463,8 @@ function CreateOrder() {
                                 {product && (
                                   [...new Set(product.variants.map(variant => variant.size))].map(size => {
                                     return <button onClick={() => handleSizeBtn(productIndex, String(size))}
-                                      className={`p-2 border-2 self-start disabled:bg-border disabled:cursor-not-allowed
+                                      disabled={Number(product.variants.find(variant => variant.size === size)?.stock) <= 0}
+                                      className={`p-2 border-2 self-start disabled:bg-border disabled:active:scale-100 disabled:cursor-not-allowed
                                       ${sizeBtn[productIndex] === String(size) ? 'border-blue-700' :
                                           'border-transparent'} cursor-pointer rounded-md shadow active:scale-95`}>
                                       {size}

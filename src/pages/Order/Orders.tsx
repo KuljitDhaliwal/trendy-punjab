@@ -3,9 +3,8 @@ import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useGetOrders } from "../../features/admin/api/admin.queries"
 import { useEffect, useState } from "react"
-import StatsCard, { type ProductStatsType } from "../../features/admin/components/StatsCard"
+import StatsCard from "../../features/admin/components/StatsCard"
 import Pagination from "../../components/Pagination"
-import FindProducts from "../../features/admin/components/FindProducts"
 import FindOrder from "../../features/admin/components/FindOrder"
 
 
@@ -106,13 +105,13 @@ function Orders() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-10">
+                  <td colSpan={7} className="py-10 text-center">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={7} className="py-10">
+                  <td colSpan={7} className="py-10 text-center">
                     Something error
                   </td>
                 </tr>

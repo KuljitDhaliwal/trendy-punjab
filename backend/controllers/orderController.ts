@@ -93,6 +93,10 @@ export const createOrder = async (req: Request, res: Response) => {
             notes: data.notes,
         })
 
+        await Customer.findByIdAndUpdate(customerID, {
+            lastVisit: new Date()
+        })
+
         return res.status(201).json({
             status: 201,
             message: "Order created successfully!",

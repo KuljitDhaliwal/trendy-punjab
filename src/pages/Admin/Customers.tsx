@@ -92,7 +92,7 @@ function Customers() {
   const phoneRegex = /^[0-9]*$/
   //Get customers
   const { data, isLoading, error } = useGetCustomers(page, 10)
-
+  console.log('Customer Page', data?.customers)
   //Get customers stats
   const {
     data: customerStatsData,
@@ -163,7 +163,7 @@ function Customers() {
             className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
         )} />
 
-      {customerStatsIsLoading ? (<div className="bg-orange-light w-full rounded-lg shadow p-4 h-20 grid place-items-center">
+      {customerStatsIsLoading ? (<div className="bg-orange-light text-center w-full rounded-lg shadow p-4 h-20 grid place-items-center">
         <p>Loading...</p>
       </div>) : customerStatsError ? (
         <div className="bg-orange-light w-full rounded-lg shadow p-4 h-20 grid place-items-center">
@@ -206,7 +206,7 @@ function Customers() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-10">
+                  <td colSpan={7} className="py-10 text-center">
                     Loading...
                   </td>
                 </tr>

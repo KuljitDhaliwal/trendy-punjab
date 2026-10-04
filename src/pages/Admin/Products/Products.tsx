@@ -82,7 +82,7 @@ function Products() {
                     </div>
                 </div>) : (
                     <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                        {productsStats.productsStats.map((item: ProductSummaryDataType) => {
+                        {productsStats?.productsStats?.map((item: ProductSummaryDataType) => {
                             return <StatsCard key={item.label} item={item} />
                         })}
                     </div>
@@ -130,8 +130,8 @@ function Products() {
                                 <tr>
                                     <td colSpan={7}>
                                         <span className="grid gap-2 py-10">
-                                            <p className="text-center">No customer! Please add</p>
-                                            <Button children={'+ Add Customer'} onClick={() => navigate('add-customer')}
+                                            <p className="text-center">No Product! Please add</p>
+                                            <Button children={'+ Add Product'} onClick={() => navigate('/dashboard/products/add-product/')}
                                                 className="text-[12px] px-4 py-2 block w-fit m-auto bg-orange-dark text-white" />
                                         </span>
                                     </td>
