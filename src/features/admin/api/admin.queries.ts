@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { findCustomer, getCustomers, getCustomersStats, getOrder, getOrders, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
+import { findCustomer, getCustomers, getCustomersStats, getOrder, getOrders, getOrderStats, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
 
 export const useGetCustomers = (page: number, limit: number = 10) => {
     return useQuery({queryKey: ['getCustomers', page, limit], queryFn: ()=> getCustomers(page, limit)})
@@ -48,6 +48,12 @@ type OrdersType = {
 //Get Orders
 export const useGetOrders = ({page, limit, search}: OrdersType) => {
     return useQuery({queryKey: ['order', page, limit, search], queryFn: ()=> getOrders(page, limit, search)})
+}
+
+
+//Get Orders Stats
+export const useGetOrdersStats = () => {
+    return useQuery({queryKey: ['order'], queryFn: ()=> getOrderStats()})
 }
 
 

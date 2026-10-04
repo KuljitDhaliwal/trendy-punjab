@@ -170,6 +170,15 @@ export const getOrders = (page: number, limit: number, search: string | number) 
 }
 
 
+//Order Stats
+export const getOrderStats = () => {
+    const options = {
+        method: 'GET'
+    }
+    return api('orders/orders-stats', options)
+}
+
+
 
 //Admin Dashboard
 export const getTodayStats = () => {
@@ -178,3 +187,7 @@ export const getTodayStats = () => {
     }
     return api('dashboard/today-stats', options)
 }
+
+
+
+

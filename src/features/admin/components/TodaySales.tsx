@@ -25,19 +25,19 @@ function TodaySales({ todayOrders, todayStatsError, todayStatsLoading }: TodayOr
             detail={"Products sold today in store."}
             btnFun={()=>navigate(`/dashboard/orders/`)}
             children={(
-                <div className="w-full text-xs overflow-x-auto">
-                    <table className="text-sm text-left table-auto min-w-120 w-full">
+                <div className="w-full overflow-x-auto">
+                    <table className="text-left table-auto min-w-120 w-full">
                         <thead>
-                            <tr className="w-full shrink-0 text-secondary-text text-left text-[12px] uppercase">
-                                <th className="p-3 text-left">#</th>
-                                <th className="p-3 shrink-0">customer</th>
-                                <th className="p-3 shrink-0">item</th>
-                                <th className="p-3 shrink-0">total amount</th>
-                                <th className="p-3 shrink-0">payment status</th>
-                                <th className="p-3 shrink-0">Action</th>
+                            <tr className="w-full shrink-0 text-white bg-orange-dark text-left text-[12px] uppercase">
+                                <th className="p-4 rounded-l-lg text-left">#</th>
+                                <th className="p-4  shrink-0">customer</th>
+                                <th className="p-4  shrink-0">item</th>
+                                <th className="p-4  shrink-0">total amount</th>
+                                <th className="p-4  shrink-0">payment status</th>
+                                <th className="p-4 rounded-r-lg  shrink-0">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {todayStatsLoading ?
                                 (<tr>
                                     <td colSpan={7} className="py-10 text-center">
@@ -56,16 +56,15 @@ function TodaySales({ todayOrders, todayStatsError, todayStatsLoading }: TodayOr
                                                 No orders yet!!
                                             </td>
                                         </tr>) : stats.value.map((item: OrderType, key) => {
-                                            console.log('Itemm', item)
                                             return key <= 4 && <tr key={item._id} className="w-full">
-                                                <td className="p-3 border-border border-b">{key + 1}</td>
-                                                <td className="p-3 border-border border-b">
+                                                <td className="p-4 border-border border-b">{key + 1}</td>
+                                                <td className="p-4 border-border border-b">
                                                     {item.customerId.fullname}
                                                 </td>
-                                                <td className="p-3 border-border border-b">{item.items.length}</td>
-                                                <td className="p-3 border-border border-b">₹{item.totalAmount}</td>
-                                                <td className="p-3 border-border border-b">{item.paymentStatus}</td>
-                                                <td className="p-3 border-border border-b">
+                                                <td className="p-4 border-border border-b">{item.items.length}</td>
+                                                <td className="p-4 border-border border-b">₹{item.totalAmount}</td>
+                                                <td className="p-4 border-border border-b">{item.paymentStatus}</td>
+                                                <td className="p-4 border-border border-b">
                                                     <button className="underline cursor-pointer">View</button>
                                                 </td>
                                             </tr>

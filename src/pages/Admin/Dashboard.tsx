@@ -48,7 +48,6 @@ function Dashboard() {
   const findCustomer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     if (!phoneRegex.test(value)) {
-      console.log('Runnnn')
       setPhoneError(true)
       return
     }
@@ -59,7 +58,7 @@ function Dashboard() {
       setHasSearched(false)
       return
     }
-    if (value.length <= 3) return
+    if (value.length <= 2) return
     setHasSearched(true)
   }
   return (

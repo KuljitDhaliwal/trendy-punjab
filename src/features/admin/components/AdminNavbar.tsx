@@ -3,20 +3,21 @@ import { AdminRoutesData } from "../../../static/AdminRoutesData"
 import { NavLink } from "react-router-dom"
 
 interface AdminNavbarProps {
-    toggleNav: boolean
+    toggleNav: boolean,
+    setToggleNav: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function AdminNavbar({toggleNav}: AdminNavbarProps) {
+function AdminNavbar({toggleNav, setToggleNav}: AdminNavbarProps) {
     return (
         <div className={`gap-2 ${toggleNav ? 'top-20 absolute left-1/2 -translate-x-1/2 w-[90%]' : 'md:grid hidden w-full'} grid`}>
             {AdminRoutesData.map(item => {
                 const Icon: IconType = item.icon
                 return (
-                    <NavLink key={item.name} to={item.route}
+                    <NavLink onClick={()=> setToggleNav(false)} key={item.name} to={item.route}
                         end={item.route === ''}
                         className={({ isActive }) =>
                             `flex items-center gap-2 w-full p-4 rounded-lg lg:justify-start border-l-2 md:justify-center 
-                        transition-all duration-300 ${isActive ? 'bg-white border-l-orange-500' :
+                         ${isActive ? 'glass-card border-l-orange-500 text-orange-dark' :
                                 'border-l-transparent'
                             }`}>
                         <Icon className="text-xl" />

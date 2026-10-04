@@ -23,17 +23,17 @@ function RecentCustomers({ customerData, customerError, customerLoading }: Custo
             icon={LuUsersRound}
             children={(
                 <div className="w-full overflow-x-auto">
-                    <table className="w-full text-sm text-left min-w-120 table-auto">
+                    <table className="w-full text-left min-w-120 table-auto">
                         <thead>
-                            <tr className="w-full text-secondary-text text-[12px]">
-                                <th className="p-3">#</th>
-                                <th className="p-3">CUSTOMER</th>
-                                <th className="p-3">PHONE</th>
-                                <th className="p-3">EMAIL</th>
-                                <th className="p-3">LAST VISIT</th>
+                            <tr className="w-full text-white bg-orange-dark text-[12px]">
+                                <th className="p-4 rounded-l-lg">#</th>
+                                <th className="p-4">CUSTOMER</th>
+                                <th className="p-4">PHONE</th>
+                                <th className="p-4">EMAIL</th>
+                                <th className="p-4 rounded-r-lg">LAST VISIT</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="text-xs">
                             {customerLoading ?
                                 (<tr>
                                     <td colSpan={7} className="py-10 text-center">
@@ -49,22 +49,22 @@ function RecentCustomers({ customerData, customerError, customerLoading }: Custo
                                         <td colSpan={7}>
                                             <span className="grid gap-2 py-10">
                                                 <p className="text-center">No customer! Please add</p>
-                                                <Button children={'+ Add Customer'} onClick={() => navigate('add-customer')}
+                                                <Button children={'+ Add Customer'} onClick={() => navigate('/dashboard/customers/add-customer')}
                                                     className="text-[12px] px-4 py-2 block w-fit m-auto bg-orange-dark text-white" />
                                             </span>
                                         </td>
                                     </tr> :
                                         customerData.map((item, key) => {
                                             return key < 5 && <tr key={item._id}>
-                                                <td className="p-3 border-border border-b">
+                                                <td className="p-4 border-border border-b">
                                                     {key + 1}
                                                 </td>
-                                                <td className="p-3 border-border border-b">
+                                                <td className="p-4 border-border border-b">
                                                     {item.fullname}
                                                 </td>
-                                                <td className="p-3 border-border border-b">{item.phone ?? '--'}</td>
-                                                <td className="p-3 border-border border-b">{item.email ?? '--'}</td>
-                                                <td className="p-3 border-border border-b">{item.lastVisit ? new Date(item.lastVisit).toLocaleDateString() : '--'}</td>
+                                                <td className="p-4 border-border border-b">{item.phone ?? '--'}</td>
+                                                <td className="p-4 border-border border-b">{item.email ?? '--'}</td>
+                                                <td className="p-4 border-border border-b">{item.lastVisit ? new Date(item.lastVisit).toLocaleDateString() : '--'}</td>
                                             </tr>
                                         })
                             }

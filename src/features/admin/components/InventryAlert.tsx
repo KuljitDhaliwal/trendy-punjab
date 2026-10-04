@@ -13,10 +13,6 @@ type TodayOrdersType = {
 
 
 function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading }: TodayOrdersType) {
-    const btnColors = {
-        low: 'bg-red-200',
-        out: 'bg-red-600'
-    }
     const navigate = useNavigate()
     return (
         <TodayActivityLayout
@@ -25,7 +21,7 @@ function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading }: Toda
             detail={"Products sold today in store."}
             btn={'show'}
             btnData="Products"
-            btnFun={()=> navigate('/dashboard/products/')}
+            btnFun={() => navigate('/dashboard/products/')}
             children={(
                 <div className="grid gap-2">
                     {todayStatsLoading ? (
@@ -38,10 +34,10 @@ function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading }: Toda
                         </div>
                     ) :
                         todayOrders && todayOrders.map((item: any) => {
-                            return item.label === 'Inventory Alert' && item.value.map((product: any) => {
-                                    console.log('Productttt', product)
+                            return item.label === 'Inventory Alert' && (item.value.length === 0 ? (<div className="grid place-items-center h-30">
+                                No Alerts!!
+                            </div>) : item.value.map((product: any) => {
                                 return product.variants.map((variant: any, key: number) => {
-                                    console.log('Varianttt', variant)
                                     return key < 5 && <div key={key} className="flex justify-between items-center">
                                         <div>
                                             {product.productName}
@@ -57,6 +53,7 @@ function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading }: Toda
                                     </div>
                                 })
                             })
+                            )
                         })
                     }
 

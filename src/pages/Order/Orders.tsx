@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
-import { useGetOrders } from "../../features/admin/api/admin.queries"
+import { useGetOrders, useGetOrdersStats } from "../../features/admin/api/admin.queries"
 import { useEffect, useState } from "react"
 import StatsCard from "../../features/admin/components/StatsCard"
 import Pagination from "../../components/Pagination"
@@ -19,7 +19,7 @@ function Orders() {
   const [limit, setLimit] = useState<number>(10)
   const [search, setSearch] = useState<string | number>("")
   const { data, isLoading, error } = useGetOrders({ page, limit, search })
-
+  const {data: orderStats, isLoading: orderStatsLoading, error: orderStatsError} = useGetOrdersStats()
   const navigate = useNavigate()
 
   //handleViewCustomer
@@ -54,7 +54,6 @@ function Orders() {
     console.log('CurrentPage', currentPage)
     setPage(currentPage)
   }
-  console.log('Page', page)
 
 
 
@@ -63,6 +62,7 @@ function Orders() {
     setSearch(e.target.value)
   }
 
+  console.log('Order stats', ordersStats)
 
   return (
     <div className="grid gap-6">
@@ -71,8 +71,8 @@ function Orders() {
         right={('')} />
 
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-        {ordersStats.map((item: OrderStatsType) => {
-          return <StatsCard item={item} />
+        {orderStats && orderStats.stats.map((item: OrderStatsType, key: number) => {
+          return <StatsCard item={item} key={key}/>
         })}
       </div>
 
@@ -81,28 +81,28 @@ function Orders() {
 
 
       {/* All Products */}
-      <div className="bg-orange-light p-4 rounded-lg shadow grid gap-4">
+      <div className="p-4 glass-card grid gap-4">
         <div className="flex md:flex-row gap-4 flex-col justify-between">
           <div className="grid gap-2">
             <p className="font-bold">All Orders</p>
-            <p className="text-[12px] text-secondary-text">1248 order records</p>
+            <p className="text-[12px] text-secondary-text">{data?.pagination?.totalOrders} order records</p>
           </div>
         </div>
         <div className="overflow-x-auto w-full">
-          <table className="text-xs table-auto min-w-200 w-full">
-            <thead className="text-left text-secondary-text uppercase text-[12px]">
+          <table className="table-auto min-w-120 w-full">
+            <thead className="text-left text-white text-[12px] bg-orange-dark uppercase">
               <tr>
-                <th>#</th>
-                <th>customer</th>
-                <th>items</th>
-                <th>total amount</th>
-                <th>payment</th>
-                <th>payment status</th>
-                <th>date</th>
-                <th>action</th>
+                <th className="p-4 rounded-l-lg">#</th>
+                <th className="p-4">customer</th>
+                <th className="p-4">items</th>
+                <th className="p-4">total amount</th>
+                <th className="p-4">payment</th>
+                <th className="p-4">payment status</th>
+                <th className="p-4">date</th>
+                <th className="p-4 rounded-r-lg">action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-xs">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="py-10 text-center">
@@ -128,15 +128,19 @@ function Orders() {
               ) :
                 data?.pagination?.orders?.map((item: any, key: number) => {
                   return <tr key={item._id} className="py-2 border-b border-secondary-text/20">
-                    <td className="py-3">{(Number(page) - 1) * limit + key + 1}</td>
-                    <td className="py-3">{item.customerId.fullname}</td>
-                    <td className="py-3">{item.items.length}</td>
-                    <td className="py-3">₹{item.totalAmount}</td>
-                    <td className="py-3">{item.paymentMethod}</td>
-                    <td className="py-3">{item.paymentStatus}</td>
-                    <td className="py-3">{new Date(item.createdAt).toLocaleDateString()}</td>
-                    <td className="flex gap-4 items-center py-3">
-                      <button type="button" className="underline cursor-pointer"
+                    <td className="p-3">{(Number(page) - 1) * limit + key + 1}</td>
+                    <td className="p-4">{item.customerId.fullname}</td>
+                    <td className="p-4">{item.items.length}</td>
+                    <td className="p-4">₹{item.totalAmount}</td>
+                    <td className="p-4">{item.paymentMethod}</td>
+                    <td className="p-4">
+                      <span className="bg-green-600 px-2 py-1 text-white rounded-lg">
+                        {item.paymentStatus}
+                      </span>
+                    </td>
+                    <td className="p-4">{new Date(item.createdAt).toLocaleDateString()}</td>
+                    <td className="fl4x gap-4 items-center p-4">
+                      <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
                         onClick={() => handleViewOrder(item._id)}>View</button>
                     </td>
                   </tr>

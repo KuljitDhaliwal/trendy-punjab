@@ -1,7 +1,7 @@
 function Admin() {
   return (
     <div className="flex gap-2">
-        <div className="rounded-full bg-orange-light p-2">
+        <div className="rounded-full bg-orange-dark text-white p-2 w-10 h-10">
             <p>AS</p>
         </div>
         <div>

@@ -1,9 +1,9 @@
-import { IoIosArrowBack } from "react-icons/io"
+import { IoIosArrowBack, IoIosArrowRoundBack } from "react-icons/io"
 import Button from "../../../components/ui/Button"
 import AdminPagesHeader from "../../../features/admin/components/AdminPagesHeader"
 import { useNavigate, useParams } from "react-router-dom"
 import CustomerPagesFooter from "../../../features/admin/components/CustomerPagesFooter"
-import { useGetProduct } from "../../../features/admin/api/admin.mutations"
+import { useDeactivateProduct, useGetProduct } from "../../../features/admin/api/admin.mutations"
 import { useEffect, useState } from "react"
 import type { ProductType } from "../../../types/Product"
 import { toast } from "react-toastify"
@@ -11,6 +11,9 @@ import TodayActivityLayout from "../../../features/admin/components/TodayActivit
 import { IoShirtOutline } from "react-icons/io5"
 import { useGetProductStats } from "../../../features/admin/api/admin.queries"
 import type { CustomerStats } from "../Customers"
+import StatsCard from "../../../features/admin/components/StatsCard"
+import { useQueryClient } from "@tanstack/react-query"
+import useModalContext from "../../../context/ModalContext"
 
 
 
@@ -18,12 +21,15 @@ function ProductDetails() {
     const navigate = useNavigate()
     const { productID } = useParams()
     const { mutate: getProduct, isPending, error } = useGetProduct()
+    const { mutate: deactiveProduct, isPending: deactiveProductLoading } = useDeactivateProduct()
+    const {setModal} = useModalContext()
     const {
         data: productStatsData,
         error: productStatsError,
         isLoading: productStatsLoading
     } = useGetProductStats(productID || '')
     const [product, setProduct] = useState<ProductType>()
+    const queryClient = useQueryClient()
 
     //Get Product
     useEffect(() => {
@@ -54,6 +60,21 @@ function ProductDetails() {
 
 
 
+    //Handle Deactivate Product
+    const handleDeactivateProduct = (productID: string) => {
+        deactiveProduct(productID, {
+            onSuccess: () => {
+                toast.success('Product deleted!')
+                queryClient.invalidateQueries({
+                    queryKey: ['products']
+                })
+                navigate('/dashboard/products/')
+            },
+            onError: () => {
+                toast.error('Delete product error!')
+            }
+        })
+    }
 
     return (
         <div className="grid gap-6">
@@ -62,9 +83,9 @@ function ProductDetails() {
                 right={(
                     <Button children={
                         <p className="flex items-center gap-1">
-                            <IoIosArrowBack /> Back to Products
+                            <IoIosArrowRoundBack /> Back to Products
                         </p>
-                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/products/')} />
                 )} />
 
 
@@ -78,7 +99,7 @@ function ProductDetails() {
                     children={(
                         <div className="grid gap-4">
                             <div className="flex gap-4">
-                                <p className="font-bold text-lg">{product?.productName}</p>
+                                <p className="text-lg">{product?.productName}</p>
                                 {product?.isActive && (
                                     <span className="bg-success border border-success-subtle text-white text-xs font-medium rounded grid place-items-center px-1">Active</span>
                                 )}
@@ -116,23 +137,19 @@ function ProductDetails() {
                     children={(
                         <div>
                             {productStatsLoading ? (
-                                <div className="w-full h-50 bg-gray-200 animate-pulse grid place-items-center">
+                                <div className="w-full h-50 glass-card animate-pulse grid place-items-center">
                                     <p>Loading...</p>
                                 </div>) : productStatsError ? (
-                                    <div className="w-full h-50 bg-gray-200 animate-pulse grid place-items-center">
+                                    <div className="w-full h-50 glass-card animate-pulse grid place-items-center">
                                         <p>Something went wrong!</p>
                                     </div>) : (
                                 <div className="grid gap-4 md:grid-cols-2">
                                     {productStatsData?.productStats.map((item: CustomerStats, key: number) => {
-                                        return <div className="w-full bg-white h-20 p-4 rounded-lg grid gap-2" key={key}>
-                                            <p className="text-secondary-text text-sm">{item.label}</p>
-                                            <p className="font-bold">{item.value}</p>
-                                        </div>
+                                        return <StatsCard item={item} key={key} />
                                     })}
                                 </div>
                             )}
                         </div>
-
                     )}
                 />
             </div>
@@ -145,14 +162,14 @@ function ProductDetails() {
                 icon={IoShirtOutline}
                 children={(
                     <div className="w-full overflow-y-auto">
-                        <table className="min-w-150 w-full">
+                        <table className="min-w-120 table-auto w-full">
                             <thead>
-                                <tr className="text-left uppercase text-sm">
-                                    <th className="py-2 font-bold">#</th>
-                                    <th className="py-2 font-bold">size</th>
-                                    <th className="py-2 font-bold">color</th>
-                                    <th className="py-2 font-bold">stock</th>
-                                    <th className="py-2 font-bold">status</th>
+                                <tr className="text-left bg-orange-dark text-white uppercase text-sm">
+                                    <th className="p-4 rounded-l-lg font-bold">#</th>
+                                    <th className="p-4 font-bold">size</th>
+                                    <th className="p-4 font-bold">color</th>
+                                    <th className="p-4 font-bold">stock</th>
+                                    <th className="p-4 rounded-r-lg font-bold">status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -180,12 +197,12 @@ function ProductDetails() {
                                     </tr>
                                 ) :
                                     product?.variants.map((item, key: number) => {
-                                        return <tr key={key} className="py-2 border-b border-secondary-text/20 text-sm">
-                                            <td className="py-3">{key + 1}</td>
-                                            <td className="py-3">{item.size}</td>
-                                            <td className="py-3">{item.color}</td>
-                                            <td className="py-3">{item.stock}</td>
-                                            <td className="py-3">
+                                        return <tr key={key} className="border-b border-border text-xs">
+                                            <td className="p-4">{key + 1}</td>
+                                            <td className="p-4">{item.size}</td>
+                                            <td className="p-4">{item.color}</td>
+                                            <td className="p-4">{item.stock}</td>
+                                            <td className="p-4">
                                                 <span className={`${item.stock === 0 ? 'bg-red-500' : 'bg-success'} w-fit border border-success-subtle text-white text-xs font-medium rounded grid place-items-center p-1`}>
                                                     {item.stock === 0 ? 'outOfStock' : 'inStock'}
                                                 </span>
@@ -200,8 +217,20 @@ function ProductDetails() {
 
 
             {/* Quick Actions  */}
-            <CustomerPagesFooter btn1Color="bg-red-500 text-white" btn1Text="Delete Product" btn2Text="Edit Customer"
-                btn1ClickFun={handleCancel} btn2ClickFun={handleEditProduct} />
+            <CustomerPagesFooter btn1Color="bg-red-700 text-white" btn1Text="Delete Product" btn2Text="Edit Customer"
+                btn1ClickFun={() => {
+                    if(!product)return
+                    setModal({
+                        type: 'delete-product',
+                        data: {
+                            header: 'Remove Product',
+                            subHeading: <p>Do you want to remove {product.productName} product</p>,
+                            actionBtn: () => handleDeactivateProduct(product._id),
+                            actionBtnText: 'Delete'
+                        }
+                    })
+                } 
+                } btn2ClickFun={handleEditProduct} />
 
         </div >
     )

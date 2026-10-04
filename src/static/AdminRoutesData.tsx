@@ -2,6 +2,7 @@ import type { IconType } from "react-icons"
 import { LuLayoutDashboard } from "react-icons/lu";
 import { HiUsers } from "react-icons/hi2";
 import { MdBorderAll } from "react-icons/md";
+import { FaCartPlus } from "react-icons/fa";
 
 export type AdminRoutes = {
     name: string,
@@ -28,6 +29,6 @@ export const AdminRoutesData: AdminRoutes[] = [
     {
         name: 'Orders',
         route: 'orders',
-        icon: MdBorderAll
+        icon: FaCartPlus
     }
 ]

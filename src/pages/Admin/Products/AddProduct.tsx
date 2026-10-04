@@ -270,8 +270,6 @@ function AddProduct() {
 
     }
 
-    console.log("UI variants:", variants.length)
-    console.log("Form variants:", formValue.variants.length)
 
     return (
         <div className="flex flex-col gap-6 w-full min-h-[calc(100vh-48px)] ">
@@ -282,7 +280,7 @@ function AddProduct() {
                         <p className="flex items-center gap-1">
                             <IoIosArrowRoundBack /> Back to Products
                         </p>
-                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+                    } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/products/')} />
                 )} />
 
             <div className="flex-1 gap-6 min-h-0 flex flex-col">

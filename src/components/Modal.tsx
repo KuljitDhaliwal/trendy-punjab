@@ -1,0 +1,46 @@
+import type { ReactNode } from "react"
+import { FaTimes } from "react-icons/fa"
+import useModalContext from "../context/ModalContext"
+
+export type ModalDataType = {
+    header?: string,
+    subHeading?: ReactNode,
+    actionBtn?: ()=> void,
+    actionBtnText?: string
+}
+
+
+
+
+function Modal({ header, actionBtn, actionBtnText, subHeading }: ModalDataType) {
+    const { setModal } = useModalContext()
+    const handleCancel = () => {
+        setModal(null)
+    }
+    return (
+        <div className={`fixed backdrop-blur-sm bg-gray-900/20 inset-0 z-100`}>
+            <div className="p-6 m-auto grid items-start gap-6 rounded-xl shadow bg-white max-w-xl h-fit absolute inset-0">
+                <button onClick={handleCancel} className="cursor-pointer active:scale-95 justify-self-end w-fit p-2 bg-gray-200 rounded-full">
+                    <FaTimes />
+                </button>
+                <div className="grid gap-2">
+                    <p className="text-2xl text-center font-bold tracking-wider">
+                        {header}
+                    </p>
+                    <p className="text-secondary-text text-sm text-center">
+                        {subHeading}
+                    </p>
+                </div>
+                <div className="flex justify-center gap-4">
+                    <button onClick={handleCancel} className="px-6 bg-white border py-3 rounded-lg shadow cursor-pointer active:scale-95 border-border">Cancel</button>
+                    <button onClick={actionBtn} 
+                    className="px-6 bg-orange-dark text-white shadow 
+                    border py-3 rounded-lg cursor-pointer active:scale-95 
+                    border-border">{actionBtnText}</button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default Modal

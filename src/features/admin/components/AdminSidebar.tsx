@@ -10,12 +10,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useLogout } from "../../auth/api/auth.mutations";
 import { toast } from "react-toastify";
 import { useToggleCart } from "../../../context/ToggleCartContext";
+import useModalContext from "../../../context/ModalContext";
 function AdminSidebar() {
   const [toggleNav, setToggleNav] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const { setToggleCart } = useToggleCart()
+  const { setModal } = useModalContext()
   //Logout function hook
   const { mutate: logout } = useLogout()
 
@@ -25,6 +27,7 @@ function AdminSidebar() {
       onSuccess: (data) => {
         dispatch(setLogout())
         navigate('/', { replace: true })
+        setModal(null)
         toast.success(data.message)
       },
       onError: (error) => {
@@ -36,7 +39,7 @@ function AdminSidebar() {
   return (
     <div className={`
     fixed left-0 top-0 md:h-screen ${toggleNav ? 'h-screen' : 'h-14'}  
-    z-1 bg-orange-light w-full lg:w-70 md:w-20 gap-10 overflow-hidden
+    z-1 backdrop-blur-2xl w-full lg:w-70 md:w-20 gap-10 overflow-hidden
     transition-all duration-300 lg:p-6 p-4 flex md:flex-col justify-start print:hidden
     `}>
 
@@ -47,7 +50,7 @@ function AdminSidebar() {
 
       {/* Routes */}
       <div className="flex-1">
-        <AdminNavbar toggleNav={toggleNav} />
+        <AdminNavbar setToggleNav={setToggleNav} toggleNav={toggleNav} />
       </div>
 
 
@@ -57,7 +60,18 @@ function AdminSidebar() {
           <IoIosSettings className="text-xl" />
           <p className="lg:block hidden">Settings</p>
         </button>
-        <button className="flex gap-2 cursor-pointer active:scale-95" onClick={handleLogout}>
+        <button className="flex gap-2 cursor-pointer active:scale-95"
+          onClick={() => setModal({
+            type: "logout",
+            data: {
+              header: 'Logout',
+              subHeading: (<p>Are you sure you want to logout from your account?
+                <br />
+                You will need to sign in again to access the dashboard.</p>),
+              actionBtn: ()=> handleLogout(),
+              actionBtnText: 'Logout'
+            }
+          })}>
           <LuLogOut className="text-xl" />
           <p className="lg:block hidden">Logout</p>
         </button>
@@ -66,7 +80,7 @@ function AdminSidebar() {
         <FaUser className="cursor-pointer" />
         {location.pathname.includes('create-order') && (
           <button>
-            <IoIosCart className="cursor-pointer md:hidden flex" onClick={()=>setToggleCart((prev: boolean) => !prev)} />
+            <IoIosCart className="cursor-pointer md:hidden flex" onClick={() => setToggleCart((prev: boolean) => !prev)} />
           </button>
         )}
         {toggleNav ? (
