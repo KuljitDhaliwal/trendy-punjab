@@ -24,12 +24,10 @@ function CustomerDetails() {
     const { mutate: getCustomer, isPending, error } = useGetCustomer()
     const [customer, setCustomer] = useState<Customer | null>(null)
 
-
-    useEffect(() => {
+    const fetchCustomer = () => {
         if (id) {
             getCustomer(id, {
                 onSuccess: (data) => {
-                    console.log('Data', data)
                     setCustomer(data.customer)
                 },
                 onError: (error) => {
@@ -37,7 +35,12 @@ function CustomerDetails() {
                 }
             })
         }
-    }, [id, getCustomer])
+    }
+
+    useEffect(() => {
+        fetchCustomer()
+    }, [id])
+
 
     const handleEditCustomer = () => {
         navigate(`/dashboard/customers/edit-customer/${id}`)
@@ -68,57 +71,87 @@ function CustomerDetails() {
             {/* Customer's Personal Details Banner */}
             <section className="glass-card p-4 flex justify-between items-start">
                 {isPending ? (
-                    <div className="grid place-items-center h-25 w-full">
-                        <p>Loading...</p>
-                    </div>
-                ) : error ? (
-                    <div className="grid place-items-center h-25 w-full">
-                        <p>Something went wrong!</p>
-                    </div>
-                ) : (
-                    <>
+                    <div className="flex md:flex-row flex-col gap-4 justify-between w-full items-start">
                         <div className="flex gap-2">
-                            <div className="flex gap-2">
-                                <div className="rounded-full p-2 bg-orange-dark text-white h-fit shadow">
-                                    <p className="text-xl">{nameInitials(customer?.fullname ?? '')}</p>
-                                </div>
+                            <div className="rounded-full p-2 w-10 h-10 bg-gray-200 shadow animate-pulse">
+                            </div>
+                            <div className="grid gap-2">
+                                <div className="bg-gray-200 h-4 rounded-md w-30 shadow"></div>
                                 <div className="grid gap-2">
-                                    <p>{customer?.fullname}</p>
-                                    <div className="grid gap-2">
-                                        <div className="flex gap-1 items-center">
-                                            <MdLocalPhone />
-                                            <p className="text-[12px] text-secondary-text">
-                                                {customer?.phone}
-                                            </p>
-                                        </div>
-                                        {customer && customer.email && (
-                                            <div className="flex gap-1 items-center">
-                                                <BsEnvelope />
-                                                <p className="text-[12px] text-secondary-text">
-                                                    {customer?.email}
-                                                </p>
-                                            </div>
-                                        )}
-                                        {customer && (
-                                            <div className="flex gap-1 items-center">
-                                                <MdOutlineHandshake />
-                                                <p className="text-[12px] text-secondary-text">
-                                                    customer since {new Date(customer.createdAt).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                        )}
+                                    <div className="flex gap-1 items-center">
+                                        <MdLocalPhone />
+                                        <div className="bg-gray-200 h-3 rounded-md w-25 shadow"></div>
+                                    </div>
+                                    <div className="flex gap-1 items-center">
+                                        <BsEnvelope />
+                                        <div className="bg-gray-200 h-3 rounded-md w-40 shadow"></div>
+                                    </div>
+                                    <div className="flex gap-1 items-center">
+                                        <MdOutlineHandshake />
+                                        <div className="bg-gray-200 h-3 rounded-md w-40 shadow"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="grid gap-2 max-w-100">
-                            <Button children={
-                                <p className="flex items-center gap-1">
-                                    + Create Order
-                                </p>
-                            } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
+                        <Button children={
+                            ''
+                        } className="text-[12px] md:w-30 w-full px-4 py-2 h-9 bg-gray-200 text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
+                    </div>
+                ) : error ? (
+                    <div className="grid place-items-center h-25 w-full">
+                        <span className="grid gap-2 w-full text-center text-xs">
+                            <span>Unable to load today's stats</span>
+                            <span>Something went wrong while fetching data!!</span>
+                            <button onClick={fetchCustomer} disabled={isPending} className={
+                                `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                            }>
+                                {isPending ? 'Refetching...' : 'Try again'}
+                            </button>
+                        </span>
+                    </div>
+                ) : (
+                    <div className="flex md:flex-row gap-4 w-full justify-between flex-col items-start">
+
+                        <div className="flex gap-2">
+                            <div className="rounded-full p-2 bg-orange-dark text-white h-fit shadow">
+                                <p className="text-xl">{nameInitials(customer?.fullname ?? '')}</p>
+                            </div>
+                            <div className="grid gap-2">
+                                <p>{customer?.fullname}</p>
+                                <div className="grid gap-2">
+                                    <div className="flex gap-1 items-center">
+                                        <MdLocalPhone />
+                                        <p className="text-[12px] text-secondary-text">
+                                            {customer?.phone}
+                                        </p>
+                                    </div>
+                                    {customer && customer.email && (
+                                        <div className="flex gap-1 items-center">
+                                            <BsEnvelope />
+                                            <p className="text-[12px] text-secondary-text">
+                                                {customer?.email}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {customer && (
+                                        <div className="flex gap-1 items-center">
+                                            <MdOutlineHandshake />
+                                            <p className="text-[12px] text-secondary-text">
+                                                customer since {new Date(customer.createdAt).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    </>
+
+
+                        <Button children={
+                            <p className="flex items-center gap-1">
+                                + Create Order
+                            </p>
+                        } className="text-[12px] md:w-auto w-full px-4 py-2 bg-orange-dark text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
+                    </div>
 
                 )
                 }
@@ -126,12 +159,34 @@ function CustomerDetails() {
 
             <section className="glass-card p-4">
                 {isPending ? (
-                    <div className="grid place-items-center h-25 w-full">
-                        <p>Loading...</p>
+                    <div className="flex gap-2">
+                        <div className="rounded-full p-2 bg-orange-dark h-fit">
+                            <FaAddressCard className="text-white text-sm" />
+                        </div>
+
+                        <address className="grid gap-2">
+                            <div className="flex items-center gap-2">
+                                Address: <div className="bg-gray-200 h-3 rounded-md w-25 shadow"></div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                City: <div className="bg-gray-200 h-3 rounded-md w-25 shadow"></div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                Pincode: <div className="bg-gray-200 h-3 rounded-md w-25 shadow"></div>
+                            </div>
+                        </address>
                     </div>
                 ) : error ? (
                     <div className="grid place-items-center h-25 w-full">
-                        <p>Something went wrong!</p>
+                        <span className="grid gap-2 w-full text-center text-xs">
+                            <span>Unable to load today's stats</span>
+                            <span>Something went wrong while fetching data!!</span>
+                            <button onClick={fetchCustomer} disabled={isPending} className={
+                                `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                            }>
+                                {isPending ? 'Refetching...' : 'Try again'}
+                            </button>
+                        </span>
                     </div>
                 ) : (
                     <div className="md:grid-cols-2 grid gap-4">
@@ -143,17 +198,17 @@ function CustomerDetails() {
                             <address className="grid gap-2">
                                 <p>
                                     Address: <span className="text-[12px] text-secondary-text">
-                                        {customer?.address}
+                                        {customer?.address ?? '--'}
                                     </span>
                                 </p>
                                 <p>
                                     City: <span className="text-[12px] text-secondary-text">
-                                        {customer?.city}
+                                        {customer?.city ?? '--'}
                                     </span>
                                 </p>
                                 <p>
                                     Pincode: <span className="text-[12px] text-secondary-text">
-                                        {customer?.pincode}
+                                        {customer?.pincode ?? '--'}
                                     </span>
                                 </p>
                             </address>
@@ -189,23 +244,42 @@ function CustomerDetails() {
                     <p className="font-bold">Customer Overview</p>
                 </div>
                 <div className="grid md:grid-cols-4 grid-cols-2 glass-card justify-between items-center">
-                    <div className="card border border-border p-4 rounded-l-lg grid gap-2">
+                    <div className="card border-r md:border-b-0 border-b border-border p-4 rounded-l-lg grid gap-2">
                         <p className="text-[12px] text-secondary-text">Last Visit</p>
-                        <p className="">{customer && customer.lastVisit ? new Date(customer.lastVisit).toLocaleDateString() : '--'}</p>
+                        {isPending ? (
+                            <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                        ) : (
+                            <p>{customer && customer.lastVisit ? new Date(customer.lastVisit).toLocaleDateString() : '--'}</p>
+                        )}
                     </div>
-                    <div className="card border border-border p-4 grid gap-2">
+                    <div className="card border-r md:border-b-0 border-b border-border p-4 grid gap-2">
                         <p className="text-[12px] text-secondary-text">Total Orders</p>
-                        <p className="">{customer?.orders?.length ?? '--'}</p>
+                        {isPending ? (
+                            <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                        ) : (
+                            <p className="">{customer?.orders?.length ?? '--'}</p>
+                        )}
+
                     </div>
-                    <div className="card border border-border p-4 grid gap-2">
+                    <div className="card border-r border-border p-4 grid gap-2">
                         <p className="text-[12px] text-secondary-text">Total Spent</p>
-                        <p className="">₹{calculateOrderAmount(customer?.orders) ?? '--'}</p>
+                        {isPending ? (
+                            <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                        ) : (
+                            <p className="">₹{calculateOrderAmount(customer?.orders) ?? '--'}</p>
+                        )}
+
                     </div>
-                    <div className="card border border-border p-4 rounded-r-lg grid gap-2">
+                    <div className="card p-4 rounded-r-lg grid gap-2">
                         <p className="text-[12px] text-secondary-text">Preferred Contact</p>
-                        <p className="">{customer?.phone ?? '--'}</p>
+                        {isPending ? (
+                            <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                        ) : (
+                            <p className="">{customer?.phone ?? '--'}</p>
+                        )}
+
                     </div>
-                </div>
+                </div> 2 whitespace-nowrap
             </section >
 
 
@@ -219,23 +293,47 @@ function CustomerDetails() {
                     <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Shirt Size</p>
-                            <p className="font-bold">{customer?.shirtSize ?? '--'}</p>
+                            {isPending ? (
+                                <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                            ) : (
+                                <p className="font-bold">{customer?.shirtSize ?? '--'}</p>
+                            )}
+
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">T-Shirt Size</p>
-                            <p className="font-bold">{customer?.tshirtSize ?? '--'}</p>
+                            {isPending ? (
+                                <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                            ) : (
+                                <p className="font-bold">{customer?.tshirtSize ?? '--'}</p>
+                            )}
+
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Jeans Size</p>
-                            <p className="font-bold">{customer?.jeansSize ?? '--'}</p>
+                            {isPending ? (
+                                <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                            ) : (
+                                <p className="font-bold">{customer?.jeansSize ?? '--'}</p>
+                            )}
+
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Jacket Size</p>
-                            <p className="font-bold">{customer?.jacketSize ?? '--'}</p>
+                            {isPending ? (
+                                <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                            ) : (
+                                <p className="font-bold">{customer?.jacketSize ?? '--'}</p>
+                            )}
+
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Shoe Size</p>
-                            <p className="font-bold">{customer?.shoeSize ?? '--'}</p>
+                            {isPending ? (
+                                <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
+                            ) : (
+                                <p className="font-bold">{customer?.shoeSize ?? '--'}</p>
+                            )}
                         </div>
                     </div>
                 )}
@@ -251,33 +349,43 @@ function CustomerDetails() {
                     <div className="w-full overflow-x-auto">
                         <table className="w-full min-w-120 table-auto">
                             <thead className="text-left text-white bg-orange-dark">
-                                <th className="p-4 rounded-l-lg">#</th>
-                                <th className="p-4 ">Order ID</th>
-                                <th className="p-4 ">Date</th>
-                                <th className="p-4 ">Items</th>
-                                <th className="p-4">Amount</th>
-                                <th className="p-4 rounded-r-lg">Receipt</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap rounded-l-lg">#</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap ">Order ID</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap ">Date</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap ">Items</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap">Amount</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap rounded-r-lg">Receipt</th>
                             </thead>
                             <tbody>
 
                                 {
                                     isPending ? (
-                                        <tr>
-                                            <td colSpan={7} className="py-10 text-center">
-                                                Loading...
-                                            </td>
-                                        </tr>
+                                        Array.from({ length: 5 }, (_, index) => {
+                                            return <tr key={index} className="py-4 animate-pulse">
+                                                <td className="py-4" colSpan={6}>
+                                                    <div className="bg-gray-200 rounded-md h-4 w-full" />
+                                                </td>
+                                            </tr>
+                                        })
                                     ) : error ? (
                                         <tr>
-                                            <td colSpan={7} className="py-10">
-                                                Something error
+                                            <td colSpan={6} className="py-10 text-center">
+                                                <span className="grid gap-2 w-full text-center text-xs">
+                                                    <span>Unable to load today's stats</span>
+                                                    <span>Something went wrong while fetching data!!</span>
+                                                    <button onClick={fetchCustomer} disabled={isPending} className={
+                                                        `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                                                    }>
+                                                        {isPending ? 'Refetching...' : 'Try again'}
+                                                    </button>
+                                                </span>
                                             </td>
                                         </tr>
                                     ) :
                                         customer && (customer.orders?.length === 0 || !customer?.orders) ?
                                             (
                                                 <tr>
-                                                    <td colSpan={4} className="py-10">
+                                                    <td colSpan={6} className="py-10">
                                                         <span className="grid gap-2 justify-center">
                                                             <span className="text-center">No Orders!!</span>
                                                             <span>
@@ -292,16 +400,16 @@ function CustomerDetails() {
                                                 </tr>
                                             ) :
                                             customer?.orders?.map((item, key) => {
-                                                return <tr key={item._id} className="py-2 text-xs">
-                                                    <td className="p-4 border-b border-border">{key + 1}</td>
-                                                    <td className="p-4 border-b border-border">{item.orderNumber}</td>
-                                                    <td className="p-4 border-b border-border">{new Date(item.createdAt).toLocaleDateString()}</td>
-                                                    <td className="p-4 border-b border-border">{
+                                                return <tr key={item._id} className="text-xs">
+                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{key + 1}</td>
+                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{item.orderNumber}</td>
+                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{new Date(item.createdAt).toLocaleDateString()}</td>
+                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{
                                                         item.items.map(product => {
                                                             return <span>{product.productName}</span>
                                                         })
                                                     }</td>
-                                                    <td className="p-4 border-b border-border">₹{item.totalAmount}</td>
+                                                    <td className="md:p-4 p-2 py-4 border-b border-border">₹{item.totalAmount}</td>
                                                     <td className="flex gap-4 items-center p-4 border-b border-border">
                                                         <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
                                                             onClick={() => handleViewOrder(item._id)}>View</button>

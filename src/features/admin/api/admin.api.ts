@@ -1,7 +1,9 @@
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
-import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
 import type { OrderType } from "../../../pages/Order/CreateOrder"
+import type { FormValueType } from "../../../pages/Products/AddProduct"
+import type { AdminProfilePasswordType, AdminProfileType } from "../../../types/AdminProfile"
 import { api } from "../../../utils/api"
+import type { UpdatePasswordType } from "./admin.mutations"
 
 
 
@@ -188,6 +190,37 @@ export const getTodayStats = () => {
     return api('dashboard/today-stats', options)
 }
 
+
+
+
+//Admin Profile Setup
+export const updateAdminProfile = (data: AdminProfileType) => {
+    const options = {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    }
+
+    return api('dashboard/update-profile', options)
+}
+
+//Admin Profile Setup
+export const updateAdminPassword = (data: UpdatePasswordType) => {
+    const options = {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    }
+
+    return api('dashboard/update-password', options)
+}
+
+//Get Admin Info
+export const getAdminInfo = () => {
+    const options = {
+        method: 'GET',
+    }
+
+    return api('dashboard/admin-info', options)
+}
 
 
 

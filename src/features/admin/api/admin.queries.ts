@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { findCustomer, getCustomers, getCustomersStats, getOrder, getOrders, getOrderStats, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
+import { findCustomer, getAdminInfo, getCustomers, getCustomersStats, getOrder, getOrders, getOrderStats, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
 
 export const useGetCustomers = (page: number, limit: number = 10) => {
     return useQuery({queryKey: ['getCustomers', page, limit], queryFn: ()=> getCustomers(page, limit)})
@@ -64,4 +64,9 @@ export const useGetOrdersStats = () => {
 //Today Stats
 export const useGetTodayStats = () => {
     return useQuery({queryKey: ['stats'], queryFn: ()=> getTodayStats()})
+}
+
+//Get Admin info
+export const useGetAdminInfo = () => {
+    return useQuery({queryKey: ['admin'], queryFn: ()=> getAdminInfo()})
 }

@@ -7,10 +7,29 @@ const adminSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
+
         password: {
             type: String,
             required: true
+        },
+
+        fullname: {
+            type: String,
+            trim: true
+        },
+
+        role: {
+            type: String,
+            enum: ['Owner', 'Manager'],
+            required: true
+        },
+
+        profileImage: {
+            type: String,
+            default: "",
+            trim: true,
         }
+
     },
     {
         timestamps: true

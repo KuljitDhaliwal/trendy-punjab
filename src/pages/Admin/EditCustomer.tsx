@@ -4,7 +4,7 @@ import TodayActivityLayout from "../../features/admin/components/TodayActivityLa
 import { FaRegUser } from "react-icons/fa";
 import { AdditionalInformationData, CustomerBasicInformationData, CustomerSizeData } from "../../static/CustomerBasicInformation";
 import { Input } from "../../components/ui/Input";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoShirtOutline } from "react-icons/io5";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Button from "../../components/ui/Button";
@@ -54,14 +54,16 @@ function EditCustomer() {
     })
     const [required, setRequired] = useState(false)
     const [phoneError, setPhoneError] = useState(false)
+    const inputRef = useRef<HTMLInputElement[]>([])
     const navigate = useNavigate()
     const { id: customerID } = useParams()
-    const { mutate: getCustomer } = useGetCustomer()
-    const { mutate: editCustomer } = useEditCustomer()
+    const { mutate: getCustomer, isPending: getCustomerPending, isError: getCustomerError } = useGetCustomer()
+    const { mutate: editCustomer, isPending: editCustomerPending,
+        isError: editCustomerError } = useEditCustomer()
     const phoneRegex = /^[0-9]{0,10}$/
 
-    //Get User Details
-    useEffect(() => {
+
+    const getCustomerData = () => {
         if (customerID) {
             getCustomer(customerID, {
                 onSuccess: (data) => {
@@ -91,6 +93,12 @@ function EditCustomer() {
                 }
             })
         }
+    }
+
+
+    //Get User Details
+    useEffect(() => {
+        getCustomerData()
     }, [customerID, getCustomer])
 
 
@@ -123,6 +131,10 @@ function EditCustomer() {
             ...prev,
             [name]: value
         }))
+    }
+
+    const handleFocusInput = (key: number) => {
+        inputRef.current[key].select()
     }
 
     const handleCancel = () => {
@@ -195,6 +207,8 @@ function EditCustomer() {
         })
     }
 
+
+
     return (
         <div className="grid gap-6">
             <AdminPagesHeader first={'Customers / Edit Customer'}
@@ -215,22 +229,45 @@ function EditCustomer() {
                 detail="Enter the customer's basic details"
                 icon={FaRegUser}
                 children={(
-                    <div className="grid gap-4 md:grid-cols-3 items-start">
-                        {CustomerBasicInformationData.map(item => {
-                            return <div className="grid gap-2">
-                                <div className="flex gap-2">
-                                    <label htmlFor={item.name}>{item.label}</label>
-                                    {item.required && (<p className="text-red-600">*</p>)}
+                    getCustomerPending ? (
+                        <div className="grid gap-4 md:grid-cols-3 items-start">
+                            {Array.from({ length: 7 }, (_, index) => {
+                                return <div className="grid gap-2" key={index}>
+                                    <div className="flex gap-2 rounded-md h-4 w-20 bg-gray-200 animate-pulse" />
+                                    <div className="flex gap-2 rounded-md h-10 bg-gray-200 animate-pulse" />
                                 </div>
-                                <Input icon={false} item={item} onChange={handleFormData} className={`border-border`}
-                                    value={getFormValue(item.name)} type={'text'} />
-                                {(item.required && (getFormValue(item.name) === undefined || getFormValue(item.name) === '') && required) && (
-                                    <p className="text-red-400">{`Please fill ${item.label}`}</p>
-                                )}
-                                {item.name === 'phone' && phoneError && (<p className="text-red-400">{`Please enter valid phone number only!`}</p>)}
-                            </div>
-                        })}
-                    </div>
+                            })}
+                        </div>
+                    ) : getCustomerError ? (
+                        <div className="w-full p-4 glass-card grid place-items-center">
+                            <span className="grid gap-2 w-full text-center text-xs">
+                                <span>Unable to load customer information</span>
+                                <span>Something went wrong while fetching data!!</span>
+                                <button onClick={() => getCustomerData()} disabled={getCustomerPending} className={
+                                    `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                                }>
+                                    {getCustomerPending ? 'Refetching...' : 'Try again'}
+                                </button>
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-3 items-start">
+                            {CustomerBasicInformationData.map((item, key) => {
+                                return <div className="grid gap-2">
+                                    <div className="flex gap-2">
+                                        <label htmlFor={item.name}>{item.label}</label>
+                                        {item.required && (<p className="text-red-600">*</p>)}
+                                    </div>
+                                    <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: any) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData} className={`border-border`}
+                                        value={getFormValue(item.name)} type={'text'} />
+                                    {(item.required && (getFormValue(item.name) === undefined || getFormValue(item.name) === '') && required) && (
+                                        <p className="text-red-400">{`Please fill ${item.label}`}</p>
+                                    )}
+                                    {item.name === 'phone' && phoneError && (<p className="text-red-400">{`Please enter valid phone number only!`}</p>)}
+                                </div>
+                            })}
+                        </div>
+                    )
                 )}
             />
 
@@ -242,23 +279,46 @@ function EditCustomer() {
                 detail="Save their commonly used sizes"
                 icon={IoShirtOutline}
                 children={(
-                    <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
-                        {CustomerSizeData.map(item => {
-                            return <div className="grid gap-2" key={item.name}>
-                                <label htmlFor={item.name}>{item.label}</label>
-                                <select name={item.name} value={getFormValue(item.name)}
-                                    onChange={handleFormData}
-                                    className="border-border border p-2 rounded-md">
-                                    <option value="" disabled>
-                                        {item.placeholder}
-                                    </option>
-                                    {item.options.map(val => {
-                                        return <option value={val} key={val}>{val}</option>
-                                    })}
-                                </select>
-                            </div>
-                        })}
-                    </div>
+                    getCustomerPending ? (
+                        <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
+                            {Array.from({ length: 7 }, (_, index) => {
+                                return <div className="grid gap-2" key={index}>
+                                    <div className="flex gap-2 rounded-md h-4 w-20 bg-gray-200 animate-pulse" />
+                                    <div className="flex gap-2 rounded-md h-10 bg-gray-200 animate-pulse" />
+                                </div>
+                            })}
+                        </div>
+                    ) : getCustomerError ? (
+                        <div className="w-full p-4 glass-card grid place-items-center">
+                            <span className="grid gap-2 w-full text-center text-xs">
+                                <span>Unable to load customer information</span>
+                                <span>Something went wrong while fetching data!!</span>
+                                <button onClick={() => getCustomerData()} disabled={getCustomerPending} className={
+                                    `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                                }>
+                                    {getCustomerPending ? 'Refetching...' : 'Try again'}
+                                </button>
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
+                            {CustomerSizeData.map(item => {
+                                return <div className="grid gap-2" key={item.name}>
+                                    <label htmlFor={item.name}>{item.label}</label>
+                                    <select name={item.name} value={getFormValue(item.name)}
+                                        onChange={handleFormData}
+                                        className="border-border border p-2 rounded-md">
+                                        <option value="" disabled>
+                                            {item.placeholder}
+                                        </option>
+                                        {item.options.map(val => {
+                                            return <option value={val} key={val}>{val}</option>
+                                        })}
+                                    </select>
+                                </div>
+                            })}
+                        </div>
+                    )
                 )}
             />
 
@@ -270,20 +330,46 @@ function EditCustomer() {
                 detail="Additional notes about this customer"
                 icon={IoShirtOutline}
                 children={(
-                    <div className="grid gap-4">
-                        {AdditionalInformationData.map(item => {
-                            return <div className="grid gap-2">
-                                <label htmlFor={item.name}>{item.label}</label>
-                                <Input icon={false} item={item} onChange={handleFormData} className={`border-border`}
-                                    value={getFormValue(item.name)} type={'text'} />
-                            </div>
-                        })}
-                    </div>
+                    getCustomerPending ? (
+                        <div className="grid gap-4">
+                            {Array.from({ length: 1 }, (_, index) => {
+                                return <div className="grid gap-2" key={index}>
+                                    <div className="flex gap-2 rounded-md h-4 w-20 bg-gray-200 animate-pulse" />
+                                    <div className="flex gap-2 rounded-md h-10 bg-gray-200 animate-pulse" />
+                                </div>
+                            })}
+                        </div>
+                    ) : getCustomerError ? (
+                        <div className="w-full p-4 glass-card grid place-items-center">
+                            <span className="grid gap-2 w-full text-center text-xs">
+                                <span>Unable to load customer information</span>
+                                <span>Something went wrong while fetching data!!</span>
+                                <button onClick={() => getCustomerData()} disabled={getCustomerPending} className={
+                                    `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                                }>
+                                    {getCustomerPending ? 'Refetching...' : 'Try again'}
+                                </button>
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {AdditionalInformationData.map((item, key) => {
+                                return <div className="grid gap-2">
+                                    <label htmlFor={item.name}>{item.label}</label>
+                                    <Input ref={(el: any) => { inputRef.current[7] = el }} clickKey={7}
+                                        onClick={() => handleFocusInput(7)} icon={false} item={item}
+                                        onChange={handleFormData} className={`border-border`}
+                                        value={getFormValue(item.name)} type={'text'} />
+                                </div>
+                            })}
+                        </div>
+                    )
                 )}
             />
 
             {/* Quick Actions  */}
-            <CustomerPagesFooter btn1Text="Cancel" btn2Text="Update Customer" btn2disabled={!hasChanged}
+            <CustomerPagesFooter btn1Text="Cancel" btn2Text="Update Customer"
+                btn2disabled={!hasChanged || editCustomerError || editCustomerPending || getCustomerPending || getCustomerError}
                 btn1ClickFun={handleCancel} btn2ClickFun={handleUpdateCustomer} />
         </div>
     )

@@ -2,7 +2,7 @@ import Button from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import AuthLayout from "../../features/auth/components/AuthLayout"
 import { LoginData } from '../../static/LoginData'
-import { useState } from "react"
+import { useRef, useState } from "react"
 import type { Data } from "../../static/LoginData"
 import type { IconType } from "react-icons"
 import { Navigate, useNavigate } from "react-router-dom"
@@ -24,6 +24,7 @@ type LoginForm = {
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [isValid, setIsValid] = useState<boolean | null>(null)
+  const inputRef = useRef<HTMLInputElement[]>([])
   const [loginError, setLoginError] = useState('')
   const navigate = useNavigate()
   const { debounceFun } = useDebounceHook()
@@ -68,6 +69,10 @@ function Login() {
     setShowPassword(!showPassword)
   }
 
+  const handleFormInput = (key: number) => {
+    inputRef.current[key].select()
+  }
+
 
   //Handle Submit Login
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -108,7 +113,7 @@ function Login() {
                 <label htmlFor={item.name}>{item.label}</label>
                 <div className="flex relative items-center">
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                  <Input item={item} icon={true}
+                  <Input ref={(el: any)=>{inputRef.current[key] = el}} onClick={()=> handleFormInput(key)} clickKey={key} item={item} icon={true}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
                     className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
                     onChange={(e) => handleFormValue(e)} value={formValue[item.name]}/>
