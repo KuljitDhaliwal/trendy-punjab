@@ -12,6 +12,8 @@ import { useTodayDate } from "../../hooks/TodayDate"
 import type { Customer } from "./Customers"
 import { useFindCustomer } from "../../features/admin/api/admin.mutations"
 import { useGetCustomers, useGetTodayStats } from "../../features/admin/api/admin.queries"
+import { useSelector } from "react-redux"
+import type { RootState } from "../../store/Store"
 
 function Dashboard() {
   const { date } = useTodayDate()
@@ -24,10 +26,20 @@ function Dashboard() {
   const { mutate: findCustomerFun, isPending: findingCustomer } = useFindCustomer()
   const { data: todayStats,
     isLoading: todayStatsLoading,
-    error: todayStatsError } = useGetTodayStats()
+    error: todayStatsError,
+    refetch: refetchTodayStats,
+    isFetching: isFetchingTodayStats,
+    isFetched: todayStatsFetched,
+  } = useGetTodayStats()
   //Get customers
-  const { data: customerData, isLoading: customerLoading, error: customerError } = useGetCustomers(page, 10)
-    console.log('Customer Data', customerData)
+  const { data: customerData, 
+    isLoading: customerLoading, 
+    error: customerError,
+    isFetching: customerIsFetching,
+    isFetched: customerIsFetched,
+    refetch: customerRefetched } = useGetCustomers(page, 10)
+  const admin = useSelector((state: RootState) => state.auth.admin)
+
   useEffect(() => {
     if (!hasSearched) return
     if (search.length <= 3) return
@@ -43,7 +55,8 @@ function Dashboard() {
     })
   }, [search])
 
-  console.log('jhckjabkcasc', todayStats?.stats)
+
+
   //Handle Find Customer
   const findCustomer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
@@ -58,13 +71,18 @@ function Dashboard() {
       setHasSearched(false)
       return
     }
-    if (value.length <= 2) return
+    if (value.length <= 3) return
     setHasSearched(true)
   }
+
   return (
     <div className="grid gap-6">
       <AdminPagesHeader first={date} main={'Dashboard'}
-        third={'Good Morning, Aksh'} right={<Admin />} />
+        third={<span className="flex gap-1 md:flex-row flex-col items-center">Good Morning, <span className="tracking-wider">{admin.fullname !== '' ? admin.fullname : (
+          <div className="w-28 h-4 bg-gray-200 rounded-md animate-pulse"></div>
+        )}</span></span>} right={<Admin show={true} fullname={admin.fullname} role={admin.role} />} />
+
+
       <FindCustomers phoneError={phoneError}
         hasSearched={hasSearched}
         findingCustomer={findingCustomer}
@@ -76,6 +94,9 @@ function Dashboard() {
         todayStatsLoading={todayStatsLoading}
         todayStats={todayStats?.stats}
         todayStatsError={todayStatsError}
+        refetchTodayStats={refetchTodayStats}
+        isFetchingTodayStats={isFetchingTodayStats}
+        todayStatsFetched={todayStatsFetched}
       />
 
 
@@ -83,18 +104,28 @@ function Dashboard() {
         <TodaySales
           todayOrders={todayStats?.stats}
           todayStatsLoading={todayStatsLoading}
-          todayStatsError={todayStatsError} />
-          
+          todayStatsError={todayStatsError}
+          refetchTodayStats={refetchTodayStats}
+          isFetchingTodayStats={isFetchingTodayStats}
+          todayStatsFetched={todayStatsFetched} />
+
         <InventryAlert todayOrders={todayStats?.stats}
           todayStatsLoading={todayStatsLoading}
-          todayStatsError={todayStatsError}/>
+          todayStatsError={todayStatsError}
+          refetchTodayStats={refetchTodayStats}
+          isFetchingTodayStats={isFetchingTodayStats}
+          todayStatsFetched={todayStatsFetched} />
       </div>
 
       <div className="grid md:grid-cols-[1.5fr_1fr] gap-4">
-        <RecentCustomers 
-        customerData={customerData?.customers} 
-        customerLoading={customerLoading}
-        customerError={customerError}/>
+        <RecentCustomers
+          customerData={customerData?.customers}
+          customerLoading={customerLoading}
+          customerError={customerError}
+          customerIsFetching={customerIsFetching}
+          customerIsFetched={customerIsFetched}
+          customerRefetched={customerRefetched}
+           />
         <QuickActions />
       </div>
     </div>

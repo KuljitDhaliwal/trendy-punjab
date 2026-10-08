@@ -1,40 +1,42 @@
 import AdminNavbar from "./AdminNavbar"
-import { IoIosSettings, IoIosCart } from "react-icons/io";
-import { LuLogOut } from "react-icons/lu";
+import { IoIosCart } from "react-icons/io";
 import { FaUser, FaTimes } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setLogout } from "../../auth/slices/authSlice";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLogout } from "../../auth/api/auth.mutations";
-import { toast } from "react-toastify";
 import { useToggleCart } from "../../../context/ToggleCartContext";
-import useModalContext from "../../../context/ModalContext";
+
+import Admin from "./Admin";
+import type { RootState } from "../../../store/Store";
 function AdminSidebar() {
   const [toggleNav, setToggleNav] = useState(false)
-  const dispatch = useDispatch()
+  const [show, setShow] = useState<boolean>(true)
   const navigate = useNavigate()
   const location = useLocation()
   const { setToggleCart } = useToggleCart()
-  const { setModal } = useModalContext()
-  //Logout function hook
-  const { mutate: logout } = useLogout()
 
-  //handle Logout
-  const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: (data) => {
-        dispatch(setLogout())
-        navigate('/', { replace: true })
-        setModal(null)
-        toast.success(data.message)
-      },
-      onError: (error) => {
-        toast.error(error.message)
+  //Logout function hook
+  const admin = useSelector((state: RootState) => state.auth.admin)
+
+  useEffect(() => {
+    const resizeFun = () => {
+      if (window.innerWidth <= 1023) {
+        setShow(false)
+      }else{
+        setShow(true)
       }
-    })
-  }
+    }
+
+    window.addEventListener('resize', resizeFun)
+
+    return ()=> {
+      window.removeEventListener('resize', resizeFun)
+    }
+
+  }, [])
+
+  console.log('Show', show)
 
   return (
     <div className={`
@@ -54,30 +56,15 @@ function AdminSidebar() {
       </div>
 
 
+
       {/* Sidebar Footer */}
       <div className="md:grid hidden gap-4 ">
-        <button className="flex gap-2 cursor-pointer active:scale-95">
-          <IoIosSettings className="text-xl" />
-          <p className="lg:block hidden">Settings</p>
-        </button>
-        <button className="flex gap-2 cursor-pointer active:scale-95"
-          onClick={() => setModal({
-            type: "logout",
-            data: {
-              header: 'Logout',
-              subHeading: (<p>Are you sure you want to logout from your account?
-                <br />
-                You will need to sign in again to access the dashboard.</p>),
-              actionBtn: ()=> handleLogout(),
-              actionBtnText: 'Logout'
-            }
-          })}>
-          <LuLogOut className="text-xl" />
-          <p className="lg:block hidden">Logout</p>
-        </button>
+        <Admin show={show} fullname={admin.fullname} role={admin.role} />
       </div>
       <div className="md:hidden flex self-start gap-4 text-xl">
-        <FaUser className="cursor-pointer" />
+        <button onClick={() => {navigate('/dashboard/admin-profile'), setToggleNav(false)}}>
+          <FaUser className={`cursor-pointer ${window.location.pathname.includes('admin-profile') ? 'text-orange-dark' : ''}`} />
+        </button>
         {location.pathname.includes('create-order') && (
           <button>
             <IoIosCart className="cursor-pointer md:hidden flex" onClick={() => setToggleCart((prev: boolean) => !prev)} />
@@ -93,7 +80,6 @@ function AdminSidebar() {
               <GiHamburgerMenu className="cursor-pointer" onClick={() => setToggleNav(true)} />
             </button>
           )}
-
       </div>
     </div>
   )

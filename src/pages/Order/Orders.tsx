@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import StatsCard from "../../features/admin/components/StatsCard"
 import Pagination from "../../components/Pagination"
 import FindOrder from "../../features/admin/components/FindOrder"
+import SkeletonCard from "../../components/ui/SkeletonCard"
 
 
 type OrderStatsType = {
@@ -18,8 +19,12 @@ function Orders() {
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(10)
   const [search, setSearch] = useState<string | number>("")
-  const { data, isLoading, error } = useGetOrders({ page, limit, search })
-  const {data: orderStats, isLoading: orderStatsLoading, error: orderStatsError} = useGetOrdersStats()
+  const { data, isLoading, error, isFetched, isFetching, refetch } = useGetOrders({ page, limit, search })
+  const { data: orderStats, isLoading: orderStatsLoading,
+    error: orderStatsError,
+    isFetched: orderStatsIsFetched,
+    isFetching: orderStatsIsFetching,
+    refetch: orderStatsRefetch } = useGetOrdersStats()
   const navigate = useNavigate()
 
   //handleViewCustomer
@@ -62,19 +67,46 @@ function Orders() {
     setSearch(e.target.value)
   }
 
-  console.log('Order stats', ordersStats)
 
   return (
     <div className="grid gap-6">
       <AdminPagesHeader first={'Orders Management'}
-        main={'Orders'} third={'Manage customer orders, payments and billing.'}
-        right={('')} />
+        main={'Orders'} third={'Manage customer orders, payments and billing and create new order.'}
+        right={(
+          <Button children={'+ Create Order'} onClick={() => navigate('/dashboard/customers')}
+            className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
+        )} />
 
-      <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-        {orderStats && orderStats.stats.map((item: OrderStatsType, key: number) => {
-          return <StatsCard item={item} key={key}/>
-        })}
+
+      <div>
+        {orderStatsLoading && !orderStatsIsFetched ? (
+          <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
+            {Array.from({ length: 3 }, () => {
+              return <SkeletonCard />
+            })}
+          </div>
+        ) : orderStatsError || (orderStatsIsFetching && !orderStats) ? (
+          <div className="w-full p-4 glass-card grid place-items-center">
+            <span className="grid gap-2 w-full text-center text-xs">
+              <span>Unable to load order's stats</span>
+              <span>Something went wrong while fetching data!!</span>
+              <button onClick={() => orderStatsRefetch()} disabled={orderStatsIsFetching} className={
+                `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+              }>
+                {orderStatsIsFetching ? 'Refetching...' : 'Try again'}
+              </button>
+            </span>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
+
+            {orderStats?.stats?.map((item: OrderStatsType, key: number) => {
+              return <StatsCard item={item} key={key} />
+            })}
+          </div>
+        )}
       </div>
+
 
 
       <FindOrder handleFindOrder={handleFindOrder} />
@@ -85,39 +117,53 @@ function Orders() {
         <div className="flex md:flex-row gap-4 flex-col justify-between">
           <div className="grid gap-2">
             <p className="font-bold">All Orders</p>
-            <p className="text-[12px] text-secondary-text">{data?.pagination?.totalOrders} order records</p>
+            {isLoading ? (
+              <div className="h-3 w-22 rounded-md bg-gray-200 animate-pulse" />
+            ) : (
+              <p className="text-[12px] text-secondary-text">{data?.pagination?.totalOrders} order records</p>
+            )}
           </div>
         </div>
         <div className="overflow-x-auto w-full">
           <table className="table-auto min-w-120 w-full">
             <thead className="text-left text-white text-[12px] bg-orange-dark uppercase">
               <tr>
-                <th className="p-4 rounded-l-lg">#</th>
-                <th className="p-4">customer</th>
-                <th className="p-4">items</th>
-                <th className="p-4">total amount</th>
-                <th className="p-4">payment</th>
-                <th className="p-4">payment status</th>
-                <th className="p-4">date</th>
-                <th className="p-4 rounded-r-lg">action</th>
+                <th className="md:p-4 p-2 whitespace-nowrap rounded-l-lg">#</th>
+                <th className="md:p-4 p-2 whitespace-nowrap">customer</th>
+                <th className="md:p-4 p-2 whitespace-nowrap">items</th>
+                <th className="md:p-4 p-2 whitespace-nowrap">total amount</th>
+                <th className="md:p-4 p-2 whitespace-nowrap">payment</th>
+                <th className="md:p-4 p-2 whitespace-nowrap">payment status</th>
+                <th className="md:p-4 p-2 whitespace-nowrap">date</th>
+                <th className="md:p-4 p-2 whitespace-nowrap rounded-r-lg">action</th>
               </tr>
             </thead>
             <tbody className="text-xs">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="py-10 text-center">
-                    Loading...
-                  </td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={7} className="py-10 text-center">
-                    Something error
+              {isLoading && !isFetched ? (
+                Array.from({ length: 10 }, (_, index) => {
+                  return <tr key={index} className="py-4 animate-pulse">
+                    <td className="py-4" colSpan={8}>
+                      <div className="bg-gray-200 rounded-md h-4 w-full" />
+                    </td>
+                  </tr>
+                })
+              ) : error || (isFetching && !data) ? (
+                <tr className="w-full">
+                  <td colSpan={8} className="py-10">
+                    <span className="grid gap-2 w-full text-center text-xs">
+                      <span>Unable to load today's stats</span>
+                      <span>Something went wrong while fetching data!!</span>
+                      <button onClick={() => refetch()} disabled={isFetching} className={
+                        `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                      }>
+                        {isFetching ? 'Refetching...' : 'Try again'}
+                      </button>
+                    </span>
                   </td>
                 </tr>
               ) : data && data?.pagination?.orders?.length === 0 ? (
                 <tr>
-                  <td colSpan={7}>
+                  <td colSpan={8}>
                     <span className="grid gap-2 py-10">
                       <p className="text-center">No Order! Please add</p>
                       <Button children={'+ Add Order'} onClick={() => navigate('/dashboard/customers/')}
@@ -128,12 +174,12 @@ function Orders() {
               ) :
                 data?.pagination?.orders?.map((item: any, key: number) => {
                   return <tr key={item._id} className="py-2 border-b border-secondary-text/20">
-                    <td className="p-3">{(Number(page) - 1) * limit + key + 1}</td>
-                    <td className="p-4">{item.customerId.fullname}</td>
-                    <td className="p-4">{item.items.length}</td>
-                    <td className="p-4">₹{item.totalAmount}</td>
-                    <td className="p-4">{item.paymentMethod}</td>
-                    <td className="p-4">
+                    <td className="md:p-4 p-2 py-4">{(Number(page) - 1) * limit + key + 1}</td>
+                    <td className="md:p-4 p-2 py-4">{item.customerId.fullname}</td>
+                    <td className="md:p-4 p-2 py-4">{item.items.length}</td>
+                    <td className="md:p-4 p-2 py-4">₹{item.totalAmount}</td>
+                    <td className="md:p-4 p-2 py-4">{item.paymentMethod}</td>
+                    <td className="md:p-4 p-2 py-4">
                       <span className="bg-green-600 px-2 py-1 text-white rounded-lg">
                         {item.paymentStatus}
                       </span>
@@ -148,7 +194,7 @@ function Orders() {
             </tbody>
           </table>
         </div>
-        {data?.pagination?.orders?.length > 0 && (
+        {data?.pagination?.orders?.length > 0 && !error && (
           <Pagination pagination={data?.pagination} onClick={handlePage} />
         )}
       </div>

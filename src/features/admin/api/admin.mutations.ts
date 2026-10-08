@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query"
-import { createProduct, deactiveProduct, editProduct, editCustomer, findCustomer, getCustomer, getProduct, setCustomer, getSearchSingleProduct, createOrder } from "./admin.api"
+import { createProduct, deactiveProduct, editProduct, editCustomer, findCustomer, getCustomer, getProduct, setCustomer, getSearchSingleProduct, createOrder, updateAdminProfile, updateAdminPassword } from "./admin.api"
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
-import type { FormValueType } from "../../../pages/Admin/Products/AddProduct"
 import type { OrderType } from "../../../pages/Order/CreateOrder"
+import type { FormValueType } from "../../../pages/Products/AddProduct"
+import type { AdminProfilePasswordType, AdminProfileType } from "../../../types/AdminProfile"
 
 export const useCreateCustomer = () => {
     return useMutation({mutationFn: setCustomer})
@@ -73,4 +74,23 @@ type createOrderType = {
 //Create Order
 export const useCreateOrder = () => {
     return useMutation({mutationKey: ['order'], mutationFn: ({customerID, data}: createOrderType) => createOrder(customerID, data)})
+}
+
+
+
+//Update Admin Profile
+export const useUpdateAdminData = () => {
+    return useMutation({mutationKey: ['update'], mutationFn: (data: AdminProfileType)=> updateAdminProfile(data)})
+}
+
+
+export type UpdatePasswordType = {
+    currentPassword: string,
+    newPassword: string
+}
+
+
+//Update Admin Password
+export const useUpdateAdminPassword = () => {
+    return useMutation({mutationKey: ['update'], mutationFn: (data: UpdatePasswordType)=> updateAdminPassword(data)})
 }

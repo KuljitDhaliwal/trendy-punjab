@@ -1,17 +1,17 @@
 import { IoIosArrowRoundBack } from "react-icons/io"
-import Button from "../../../components/ui/Button"
-import AdminPagesHeader from "../../../features/admin/components/AdminPagesHeader"
+import Button from "../../components/ui/Button"
+import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useNavigate } from "react-router-dom"
-import TodayActivityLayout from "../../../features/admin/components/TodayActivityLayout"
+import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout"
 import { FaRegUser } from "react-icons/fa"
-import { addProductData, productVariantData, type AddProductType } from "../../../static/AddProductData"
-import { Input } from "../../../components/ui/Input"
+import { addProductData, productVariantData, type AddProductType } from "../../static/AddProductData"
+import { Input } from "../../components/ui/Input"
 import { FaBorderNone } from "react-icons/fa6";
 import { useEffect, useState } from "react"
-import CustomerPagesFooter from "../../../features/admin/components/CustomerPagesFooter"
-import { useCreateProduct } from "../../../features/admin/api/admin.mutations"
+import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter"
+import { useCreateProduct } from "../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
-import type { ProductVariantType } from "../../../types/Product"
+import type { ProductVariantType } from "../../types/Product"
 import { FaRegTrashAlt } from "react-icons/fa";
 
 

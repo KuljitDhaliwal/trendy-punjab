@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../store/Store"
-import { setAccessToken, setIsAuthInitialized, setIsAuthLoading } from "../slices/authSlice"
+import { setAccessToken, setAdmin, setIsAuthInitialized, setIsAuthLoading } from "../slices/authSlice"
 import { useRefreshToken } from "./auth.queries"
 import { useEffect } from "react"
+import { useGetAdminInfo } from "../../admin/api/admin.queries"
 
 function AuthInitializer() {
 
@@ -13,16 +14,19 @@ function AuthInitializer() {
     const isAuthInitialized = useSelector(
         (state: RootState) => state.auth.isAuthInitialized
     )
-    const { data, isLoading } = useRefreshToken(!isAuthInitialized)
+    const { data, isLoading, error } = useRefreshToken(!isAuthInitialized)
 
     useEffect(() => {
         if (isLoading) return
-        if (data) {
+        if (data?.accessToken) {
             dispatch(setAccessToken(data.accessToken))
         }
         dispatch(setIsAuthLoading(false))
         dispatch(setIsAuthInitialized(true))
     }, [dispatch, accesstoken, data, isLoading])
+
+
+
 
     return null
 

@@ -5,7 +5,7 @@ import TodayActivityLayout from "../../features/admin/components/TodayActivityLa
 import { FaRegUser } from "react-icons/fa";
 import { AdditionalInformationData, CustomerBasicInformationData, CustomerSizeData } from "../../static/CustomerBasicInformation";
 import { Input } from "../../components/ui/Input";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoShirtOutline } from "react-icons/io5";
 import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
@@ -16,10 +16,11 @@ function AddCustomer() {
     const navigate = useNavigate()
     const [formValue, setFormValue] = useState<Record<string, string>>({});
     const [required, setRequired] = useState(false)
+    const inputRef = useRef<HTMLInputElement[]>([])
     const [phoneError, setPhoneError] = useState(false)
     const phoneRegex = /^[0-9]{0,10}$/
     //Create Customer API Call
-    const { mutate: createCustomer } = useCreateCustomer()
+    const { mutate: createCustomer, isPending } = useCreateCustomer()
     //FormData
     const handleFormData = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -58,7 +59,7 @@ function AddCustomer() {
             return
         }
 
-        if(formValue.phone.length < 10){
+        if (formValue.phone.length < 10) {
             setPhoneError(true)
             return
         }
@@ -75,6 +76,17 @@ function AddCustomer() {
         })
 
     }
+
+
+    const handleFocusInput = (key: number) => {
+        console.log()
+        inputRef.current[key].select()
+    }
+
+
+    useEffect(()=>{
+        window.scrollTo(0,0)
+    },[])
 
     return (
         <div className="flex flex-col gap-6 w-full h-full">
@@ -98,13 +110,13 @@ function AddCustomer() {
                     icon={FaRegUser}
                     children={(
                         <div className="grid gap-4 md:grid-cols-3">
-                            {CustomerBasicInformationData.map(item => {
+                            {CustomerBasicInformationData.map((item, key) => {
                                 return <div className="grid gap-2 self-start" key={item.name}>
                                     <div className="flex gap-2">
                                         <label htmlFor={item.name}>{item.label}</label>
                                         {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input icon={false} item={item} onChange={handleFormData}
+                                    <Input clickKey={key} ref={(el: any)=> {inputRef.current[key] = el}} onClick={() => handleFocusInput(key)} icon={false} item={item} onChange={handleFormData}
                                         className={`${(item.required && (formValue[item.name] === undefined || formValue[item.name] === '') && required) ? 'border-red-500' : 'border-border'}`}
                                         value={formValue[item.name] || ''} type={'text'} />
                                     {(item.required && (formValue[item.name] === undefined || formValue[item.name] === '') && required) && (
@@ -152,10 +164,10 @@ function AddCustomer() {
                     icon={IoShirtOutline}
                     children={(
                         <div className="grid gap-4 ">
-                            {AdditionalInformationData.map(item => {
+                            {AdditionalInformationData.map((item, key) => {
                                 return <div className="grid gap-2" key={item.name}>
                                     <label htmlFor={item.name}>{item.label}</label>
-                                    <Input icon={false} item={item} onChange={handleFormData}
+                                    <Input clickKey={8} ref={(el: any)=> {inputRef.current[8] = el}} onClick={() => handleFocusInput(8)} icon={false} item={item} onChange={handleFormData}
                                         value={formValue[item.name] || ''} className="border-border" type={'text'} />
                                 </div>
                             })}
@@ -163,7 +175,7 @@ function AddCustomer() {
                     )}
                 />
             </div>
-            <CustomerPagesFooter btn1Text={'Cancel'} btn1ClickFun={handleCancel}
+            <CustomerPagesFooter btn2disabled={isPending} btn1Text={'Cancel'} btn1ClickFun={handleCancel}
                 btn2Text={'Add Customer'} btn2ClickFun={handleAddCustomer} />
         </div>
     )

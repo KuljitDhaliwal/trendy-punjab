@@ -1,26 +1,33 @@
 import { useNavigate } from "react-router-dom"
-import Button from "../../../components/ui/Button"
-import AdminPagesHeader from "../../../features/admin/components/AdminPagesHeader"
-import { type ProductSummaryDataType } from "../../../static/ProductsStats"
-import StatsCard from "../../../features/admin/components/StatsCard"
-import FindProducts from "../../../features/admin/components/FindProducts"
-import { useGetProducts, useGetProductsStats } from "../../../features/admin/api/admin.queries"
-import type { ProductType } from "../../../types/Product"
-import Pagination from "../../../components/Pagination"
+
+
+import StatsCard from "../../features/admin/components/StatsCard"
+import FindProducts from "../../features/admin/components/FindProducts"
+import { useGetProducts, useGetProductsStats } from "../../features/admin/api/admin.queries"
+import type { ProductType } from "../../types/Product"
+import Pagination from "../../components/Pagination"
 import { useState } from "react"
-import { useDeactivateProduct } from "../../../features/admin/api/admin.mutations"
+import { useDeactivateProduct } from "../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
-import useModalContext from "../../../context/ModalContext"
+import useModalContext from "../../context/ModalContext"
+import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
+import Button from "../../components/ui/Button"
+import type { ProductSummaryDataType } from "../../static/ProductsStats"
+import SkeletonCard from "../../components/ui/SkeletonCard"
 // import { useState } from "react"
 
 function Products() {
     const [page, setPage] = useState<number>(1)
     const [search, setSearch] = useState<string>('')
     const [limit, setLimit] = useState<number>(10)
-    const { data, isLoading, error } = useGetProducts(page, search, limit)
+    const { data, isLoading, error, isFetching, isFetched, refetch } = useGetProducts(page, search, limit)
     const { mutate: deactiveProduct, isPending } = useDeactivateProduct()
-    const { data: productsStats, isLoading: productsStatsLoading, error: productsStatsError } = useGetProductsStats()
+    const { data: productsStats, isLoading: productsStatsLoading,
+        error: productsStatsError,
+        refetch: productStatsRefetch,
+        isFetched: productStatsFetched,
+        isFetching: productStatsIsFetching } = useGetProductsStats()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const { setModal } = useModalContext()
@@ -74,16 +81,26 @@ function Products() {
 
             {/* //Prodcuts Stats */}
             <div>
-                {productsStatsLoading ? (
-                    <div className="glass-card w-full h-20 animate-pulse grid place-items-center">
-                        <p>Loading...</p>
+                {productsStatsLoading && !productStatsFetched ? (
+                    <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
+                        {Array.from({ length: 3 }, () => {
+                            return <SkeletonCard />
+                        })}
                     </div>
-                ) : productsStatsError ? (<div>
-                    <div className="glass-card w-full h-20 animate-pulse grid place-items-center">
-                        <p>Something went wrong!!</p>
+                ) : productsStatsError || (productStatsIsFetching && !productsStats) ? (
+                    <div className="w-full p-4 glass-card grid place-items-center">
+                        <span className="grid gap-2 w-full text-center text-xs">
+                            <span>Unable to load product's stats</span>
+                            <span>Something went wrong while fetching data!!</span>
+                            <button onClick={() => productStatsRefetch()} disabled={productStatsIsFetching} className={
+                                `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                            }>
+                                {productStatsIsFetching ? 'Refetching...' : 'Try again'}
+                            </button>
+                        </span>
                     </div>
-                </div>) : (
-                    <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                ) : (
+                    <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
                         {productsStats?.productsStats?.map((item: ProductSummaryDataType) => {
                             return <StatsCard key={item.label} item={item} />
                         })}
@@ -101,37 +118,52 @@ function Products() {
                 <div className="flex md:flex-row gap-4 flex-col justify-between">
                     <div className="grid gap-2">
                         <p className="font-bold">All Products</p>
-                        <p className="text-[12px] text-secondary-text">{data?.pagination?.totalProducts} product records</p>
+                        {isLoading ? (
+                            <div className="h-3 w-22 rounded-md bg-gray-200 animate-pulse" />
+                        ) : (
+                            <p className="text-[12px] text-secondary-text">{data?.pagination?.totalProducts} product records</p>
+                        )}
+
                     </div>
                 </div>
                 <div className="overflow-x-auto w-full">
                     <table className="table-auto min-w-120 w-full">
                         <thead className="text-left text-white bg-orange-dark uppercase text-[12px]">
                             <tr>
-                                <th className="p-4 rounded-l-lg">#</th>
-                                <th className="p-4">product</th>
-                                <th className="p-4">product code</th>
-                                <th className="p-4">category</th>
-                                <th className="p-4">price</th>
-                                <th className="p-4 rounded-r-lg">Actions</th>
+                                <th className="md:p-4 p-2 rounded-l-lg whitespace-nowrap">#</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap">product</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap">product code</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap">category</th>
+                                <th className="md:p-4 p-2 whitespace-nowrap">price</th>
+                                <th className="md:p-4 p-2 rounded-r-lg whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="text-xs">
-                            {isLoading ? (
-                                <tr>
+                            {isLoading && !isFetched ? (
+                                Array.from({ length: 10 }, (_, index) => {
+                                    return <tr key={index} className="animate-pulse py-4">
+                                        <td className="py-4" colSpan={6}>
+                                            <div className="bg-gray-200 h-4 rounded-md w-full" />
+                                        </td>
+                                    </tr>
+                                })
+                            ) : error || (isFetching && !data) ? (
+                                <tr className="w-full">
                                     <td colSpan={7} className="py-10">
-                                        Loading...
-                                    </td>
-                                </tr>
-                            ) : error ? (
-                                <tr>
-                                    <td colSpan={7} className="py-10">
-                                        Something error
+                                        <span className="grid gap-2 w-full text-center text-xs">
+                                            <span>Unable to load products</span>
+                                            <span>Something went wrong while fetching data!!</span>
+                                            <button onClick={() => refetch()} disabled={isFetching} className={
+                                                `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
+                                            }>
+                                                {isFetching ? 'Refetching...' : 'Try again'}
+                                            </button>
+                                        </span>
                                     </td>
                                 </tr>
                             ) : data && data.products.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7}>
+                                    <td colSpan={6}>
                                         <span className="grid gap-2 py-10">
                                             <p className="text-center">No Product! Please add</p>
                                             <Button children={'+ Add Product'} onClick={() => navigate('/dashboard/products/add-product/')}
@@ -142,11 +174,11 @@ function Products() {
                             ) :
                                 data.products.map((item: ProductType, key: number) => {
                                     return <tr key={item.productCode} className="py-2 border-b border-border">
-                                        <td className="p-4">{(page - 1) * limit + key + 1}</td>
-                                        <td className="p-4">{item.productName}</td>
-                                        <td className="p-4">{item.productCode}</td>
-                                        <td className="p-4">{item.category}</td>
-                                        <td className="p-4">₹{item.price}</td>
+                                        <td className="md:p-4 p-2 py-4">{(page - 1) * limit + key + 1}</td>
+                                        <td className="md:p-4 p-2 py-4">{item.productName}</td>
+                                        <td className="md:p-4 p-2 py-4">{item.productCode}</td>
+                                        <td className="md:p-4 p-2 py-4">{item.category}</td>
+                                        <td className="md:p-4 p-2 py-4">₹{item.price}</td>
                                         <td className="flex gap-2 items-center p-4">
                                             <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
                                                 onClick={() => handleViewProduct(item._id)}>View</button>
@@ -166,7 +198,9 @@ function Products() {
                         </tbody>
                     </table>
                 </div>
-                <Pagination pagination={data?.pagination} onClick={handlePage} />
+                {data?.products?.length > 0 && !error && (
+                    <Pagination pagination={data?.pagination} onClick={handlePage} />
+                )}
             </div>
 
         </div>

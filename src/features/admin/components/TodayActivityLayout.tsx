@@ -19,18 +19,18 @@ function TodayActivityLayout({ head, detail, icon, children, btn, btnData, btnFu
     return (
         <div className="text-sm rounded-lg glass-card p-4 
         grid gap-6 items-start grid-rows-[auto_1fr] relative">
-            <div className="flex justify-between items-center w-full">
+            <div className="flex justify-between items-start w-full">
                 <div className="flex gap-2">
                     <div className="rounded-full p-1 shadow bg-orange-dark h-fit">
                         <Icon className="text-white" />
                     </div>
-                    <div>
+                    <div className="grid gap-1">
                         <p className="font-bold">{head}</p>
                         <p className="text-[12px] text-secondary-text">{detail}</p>
                     </div>
                 </div>
                 {btn === 'show' && (
-                    <button onClick={btnFun} className="flex gap-1 underline cursor-pointer acitve:scale-95">
+                    <button onClick={btnFun} className="flex mt-0.5 gap-1 underline cursor-pointer acitve:scale-95">
                         <p className="text-[12px] font-semibold">
                             {btnData}
                         </p>

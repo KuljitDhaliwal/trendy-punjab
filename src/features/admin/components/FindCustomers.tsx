@@ -41,25 +41,6 @@ function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, p
                         </div>
                     </div>
                 </div>
-
-                {/* {findCustomer ? (
-                    <button onClick={() => navigate(`/dashboard/customers/${findCustomer._id}`)}
-                        className="absolute p-4 rounded-lg cursor-pointer shadow bg-orange-dark text-white tracking-wider right-40 -bottom-20">
-                        <div className="grid justify-start gap-2">
-                            <div className="text-sm">{findCustomer.fullname}</div>
-                            <div className="text-sm">Phone: {findCustomer.phone}</div>
-                        </div>
-                        <div className="absolute bg-orange-dark w-5 rotate-45 -top-2.5 h-5"></div>
-                    </button>
-
-                ) : (
-                    <div className="absolute p-4 rounded-lg shadow bg-gray-200 tracking-wider right-40 -bottom-10">
-                        <div className="grid justify-start gap-2">
-                            <div className="text-sm">Not found!</div>
-                        </div>
-                        <div className="absolute bg-gray-200 w-5 rotate-45 -top-2.5 h-5"></div>
-                    </div>
-                )} */}
             </div>
             {hasSearched && (
                 <div className="absolute p-4 z-10 transition-all duration-300 rounded-lg shadow 
