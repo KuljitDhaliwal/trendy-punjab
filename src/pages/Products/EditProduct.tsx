@@ -1,4 +1,4 @@
-import { IoIosArrowRoundBack } from "react-icons/io"
+import { IoIosArrowBack } from "react-icons/io"
 import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useNavigate, useParams } from "react-router-dom"
@@ -126,7 +126,7 @@ function EditProduct() {
 
   //Handle Remove variant
   const handleRemoveVariant = (variantIndex: number) => {
-    let newVariants = variants.filter((_, index) => index !== variantIndex)
+    const newVariants = variants.filter((_, index) => index !== variantIndex)
     setVariants(newVariants)
 
     setFormValue(prev => ({
@@ -138,6 +138,7 @@ function EditProduct() {
 
   }
 
+  console.log(formValue, original)
 
 
   //Handle FormData
@@ -198,7 +199,7 @@ function EditProduct() {
     if (e.target.name === 'stock') {
 
 
-      let newError = stockError.filter(item => item !== variantIndex)
+      const newError = stockError.filter(item => item !== variantIndex)
       setStockError(newError)
 
 
@@ -233,7 +234,7 @@ function EditProduct() {
 
   //Handle Cancel Form
   const handleCancel = () => {
-
+    null
   }
 
   const handleEditProduct = () => {
@@ -299,7 +300,7 @@ function EditProduct() {
   const handleFocusInput = (key: number) => {
     inputRef.current[key].select()
   }
-  
+
   const handleFocusVarinatInput = (key: string) => {
     inputVariantRef.current[key]?.select()
   }
@@ -312,9 +313,10 @@ function EditProduct() {
         main={'Edit Product'} third={'Edit product with details, sizes and stock information.'}
         right={(
           <Button children={
-            <p className="flex items-center gap-1">
-              <IoIosArrowRoundBack /> Back to Products
-            </p>
+            <span className="flex gap-2 items-center">
+              <IoIosArrowBack />
+              Back to Products
+            </span>
           } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
         )} />
 
@@ -357,7 +359,7 @@ function EditProduct() {
                         <label htmlFor={item.name}>{item.label}</label>
                         {item.required && (<p className="text-red-600">*</p>)}
                       </div>
-                      <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: any) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData}
+                      <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData}
                         className={`${error[
                           item.name === "price"
                             ? "price"
@@ -439,7 +441,7 @@ function EditProduct() {
                       </h3>
                       <div className="flex w-full gap-4">
                         {
-                          variant.map((item, key) => (
+                          variant.map((item) => (
                             <div className="grid gap-4 w-full" key={item.name}>
                               {
                                 item.name === 'size' ? (
@@ -465,7 +467,7 @@ function EditProduct() {
                                       <label htmlFor={item.name}>{item.label}</label>
                                       {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: any) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                    <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
                                       value={formValue.variants[index].stock ?? 0} className={`${stockError.includes(index) ? 'border-red-500' : 'border-border'} w-full`} />
                                     <p className={`text-sm ${stockError.includes(index) ? 'block' : 'hidden'} text-red-500`}>Please add stock</p>
                                   </div>
@@ -476,7 +478,7 @@ function EditProduct() {
                                         <label htmlFor={item.name}>{item.label}</label>
                                         {item.required && (<p className="text-red-600">*</p>)}
                                       </div>
-                                      <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: any) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                      <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
                                         value={formValue.variants[index].color || ''} className={'border-border'} />
                                     </div>
                                   )
@@ -497,9 +499,14 @@ function EditProduct() {
         </div>
       </div>
 
-      <CustomerPagesFooter btn1Text={'Cancel'} 
-      btn2disabled={editProductPending || isPending || isError || editProductError} 
-      btn1ClickFun={handleCancel}
+      <CustomerPagesFooter btn1Text={'Cancel'}
+        btn2disabled={editProductPending ||
+          isPending ||
+          isError ||
+          editProductError ||
+          JSON.stringify(formValue) === JSON.stringify(original)
+        }
+        btn1ClickFun={handleCancel}
         btn2Text={'Update Product'} btn2ClickFun={handleEditProduct} />
     </div >
   )

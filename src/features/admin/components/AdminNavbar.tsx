@@ -13,7 +13,7 @@ function AdminNavbar({ toggleNav, setToggleNav }: AdminNavbarProps) {
             {AdminRoutesData.map((item, key) => {
                 const Icon: IconType = item.icon
                 return (
-                    <div>
+                    <div key={key}>
                         <NavLink onClick={() => setToggleNav(false)} key={item.name} to={item.route}
                             end={item.route === ''}
                             className={({ isActive }) =>

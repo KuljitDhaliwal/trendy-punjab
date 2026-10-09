@@ -1,29 +1,30 @@
 import { Router } from "express";
 import { createCustomer, customerStats, editCustomer, findCustomer, getCustomer, getCustomers } from '../controllers/customerController.js'
+import { checkAuth } from "../middlewares/checkAuth.js";
 
 const router = Router()
 
 
 //Create Customers
-router.post("/create-customer", createCustomer)
+router.post("/create-customer", checkAuth, createCustomer)
 
 
 //All customers
-router.get("/", getCustomers)
+router.get("/", checkAuth, getCustomers)
 
 //Get Customer Stats
-router.get('/customer-stats', customerStats)
+router.get('/customer-stats', checkAuth, customerStats)
 
 //Find Customer
-router.get('/find-customer', findCustomer)
+router.get('/find-customer', checkAuth, findCustomer)
 
 
 //Get Customer
-router.get('/:customerID', getCustomer)
+router.get('/:customerID', checkAuth, getCustomer)
 
 
 //Edit Customer
-router.patch('/edit-customer/:customerID', editCustomer)
+router.patch('/edit-customer/:customerID', checkAuth, editCustomer)
 
 
 

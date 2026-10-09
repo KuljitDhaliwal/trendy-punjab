@@ -1,4 +1,4 @@
-import { FaBuilding, FaKey, FaSun, FaUser } from "react-icons/fa";
+import { FaKey, FaUser } from "react-icons/fa";
 
 export const SettingsNavbarData = [
     {

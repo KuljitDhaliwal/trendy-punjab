@@ -1,13 +1,31 @@
 import type { Request, Response } from "express"
 import Customer from "../models/Customer.js"
-import Order from "../models/Order.js"
+import { checkRequired } from "../utils/checkRequired.js"
+import mongoose from "mongoose"
 
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await Customer.create(req.body)
-    console.log('Customer', customer)
+    const data = req.body
+    const missingFields = checkRequired(data, Customer)
+    if (Object.keys(missingFields).length > 0) {
+      return res.status(400).json({
+        status: 400,
+        message: missingFields
+      })
+    }
+    const customer = await Customer.create(data)
+
     return res.status(201).json({ status: 201, message: 'Customer details saved!', customer })
-  } catch (error) {
+  } catch (error: unknown) {
+    if (typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === 11000) {
+      return res.status(409).json({
+        status: 409,
+        message: "Customer with this phone number already exists."
+      })
+    }
     return res.status(500).json({
       message: "Failed to create customer",
     })
@@ -24,7 +42,7 @@ export const getCustomers = async (req: Request, res: Response) => {
     const limit: number = Number(req.query.limit) || 10
 
     const skip = (page - 1) * limit
-    let customerQuery = Customer.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).populate("orders")
+    const customerQuery = Customer.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).populate("orders")
 
     const [customers, totalCustomers] = await Promise.all([
       customerQuery,
@@ -40,7 +58,7 @@ export const getCustomers = async (req: Request, res: Response) => {
         totalPages
       }
     })
-  } catch (error) {
+  } catch {
     return res.status(500).json({ status: 500, message: 'Failed to get customers' })
   }
 }
@@ -67,7 +85,7 @@ export const findCustomer = async (req: Request, res: Response) => {
 
     return res.status(200).json({ status: 200, message: 'Customer found', customer })
 
-  } catch (error) {
+  } catch {
     return res.status(500).json({ status: 500, message: 'Customer finding error!' })
   }
 }
@@ -77,7 +95,13 @@ export const findCustomer = async (req: Request, res: Response) => {
 //Each Customer 
 export const getCustomer = async (req: Request, res: Response) => {
   try {
-    const customerID = req.params.customerID
+    const customerID = String(req.params.customerID)
+    if (!mongoose.Types.ObjectId.isValid(customerID)) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid customer ID"
+      })
+    }
     const customer = await Customer.findById(customerID).populate("orders")
     if (!customer) {
       return res.status(404).json({
@@ -86,7 +110,7 @@ export const getCustomer = async (req: Request, res: Response) => {
       })
     }
     return res.status(200).json({ status: 200, message: 'Got Customer details', customer })
-  } catch (error) {
+  } catch {
     return res.status(500).json({ status: 500, message: 'Customer details fetch error!' })
   }
 }
@@ -101,7 +125,7 @@ export const customerStats = async (req: Request, res: Response) => {
       return res.status(404).json({ status: 404, message: 'Customers not found!' })
     }
     //Total Customers
-    let totalCustomers = customers.length
+    const totalCustomers = customers.length
 
     //New this Calculate
     const currentMonth = new Date().getMonth()
@@ -126,8 +150,8 @@ export const customerStats = async (req: Request, res: Response) => {
 
     return res.status(200).json({ status: 200, message: 'Customer stats', customerStats })
 
-  } catch (error) {
-    return res.status(500).json({ status: 500, message: error })
+  } catch {
+    return res.status(500).json({ status: 500, message: 'Error to get customer stats' })
   }
 }
 
@@ -136,10 +160,23 @@ export const customerStats = async (req: Request, res: Response) => {
 //Edit Customer
 export const editCustomer = async (req: Request, res: Response) => {
   try {
-    const customerID = req.params.customerID
-    const value = req.body
-    console.log('Value from Frontend', value)
-    const customer = await Customer.findByIdAndUpdate(customerID, value,
+    const customerID = String(req.params.customerID)
+    if (!mongoose.Types.ObjectId.isValid(customerID)) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid customer ID"
+      })
+    }
+    const data = req.body
+    const missingFields = checkRequired(data, Customer)
+
+    if (Object.keys(missingFields).length > 0) {
+      return res.status(400).json({
+        status: 400,
+        message: missingFields
+      })
+    }
+    const customer = await Customer.findByIdAndUpdate(customerID, data,
       {
         returnDocument: "after",
         runValidators: true
@@ -151,7 +188,7 @@ export const editCustomer = async (req: Request, res: Response) => {
     }
     return res.status(200).json({ status: 200, message: 'Customer edited!', customer })
 
-  } catch (error) {
+  } catch {
     return res.status(500).json({ status: 500, message: 'Edit Customer error!' })
   }
 }

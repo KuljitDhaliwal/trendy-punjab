@@ -1,7 +1,7 @@
 import type { CustomerFormData } from "../../../pages/Admin/EditCustomer"
 import type { OrderType } from "../../../pages/Order/CreateOrder"
 import type { FormValueType } from "../../../pages/Products/AddProduct"
-import type { AdminProfilePasswordType, AdminProfileType } from "../../../types/AdminProfile"
+import type { AdminProfileType } from "../../../types/AdminProfile"
 import { api } from "../../../utils/api"
 import type { UpdatePasswordType } from "./admin.mutations"
 

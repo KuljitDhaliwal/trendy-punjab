@@ -28,14 +28,16 @@ function Settings() {
 
     useEffect(() => {
         if (!data) return
-        setFormValue({
-            fullname: data.admin.fullname,
-            role: data.admin.role
-        })
+        const initialValues = {
+            fullname: data.admin.fullname ?? "",
+            role: data.admin.role ?? "",
+        };
+        setFormValue(initialValues)
         setOriginal({
             fullname: data.admin.fullname,
             role: data.admin.role
         })
+        // eslint-disable-next-line react-hooks/set-state-in-effect
     }, [data])
 
     const handleFormValue = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -75,7 +77,7 @@ function Settings() {
             <AdminPagesHeader first={'Inventery Management'}
                 main={'Settings'} third={'Manage your profile, store information and app preferences.'}
                 right={(
-                    <Button children={<span className="flex items-center gap-1"><FaUser /> Check Profile</span>} onClick={() => navigate('/dashboard/admin-profile')}
+                    <Button children={<span className="flex items-center gap-2"><FaUser /> Check Profile</span>} onClick={() => navigate('/dashboard/admin-profile')}
                         className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
                 )} />
             <SettingsLayout children={

@@ -15,12 +15,13 @@ import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import Button from "../../components/ui/Button"
 import type { ProductSummaryDataType } from "../../static/ProductsStats"
 import SkeletonCard from "../../components/ui/SkeletonCard"
+import { FaCirclePlus } from "react-icons/fa6"
 // import { useState } from "react"
 
 function Products() {
     const [page, setPage] = useState<number>(1)
     const [search, setSearch] = useState<string>('')
-    const [limit, setLimit] = useState<number>(10)
+    const limit = 10
     const { data, isLoading, error, isFetching, isFetched, refetch } = useGetProducts(page, search, limit)
     const { mutate: deactiveProduct, isPending } = useDeactivateProduct()
     const { data: productsStats, isLoading: productsStatsLoading,
@@ -38,7 +39,7 @@ function Products() {
 
     //handleFindProduct
     const handleFindProduct = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let searchVal = e.target.value
+        const searchVal = e.target.value
         if (searchVal.length > 2) {
             setSearch(searchVal.trim())
         }
@@ -75,7 +76,10 @@ function Products() {
             <AdminPagesHeader first={'Inventery Management'}
                 main={'Products'} third={'Manage your product catalog, sizes, stock and prices.'}
                 right={(
-                    <Button children={'+ Add Product'} onClick={() => navigate('add-product')}
+                    <Button children={<span className="flex gap-2 items-center">
+                                <FaCirclePlus/>
+                                Add Product
+                              </span>} onClick={() => navigate('add-product')}
                         className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
                 )} />
 

@@ -2,11 +2,13 @@ import { useNavigate } from "react-router-dom"
 import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useGetOrders, useGetOrdersStats } from "../../features/admin/api/admin.queries"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import StatsCard from "../../features/admin/components/StatsCard"
 import Pagination from "../../components/Pagination"
 import FindOrder from "../../features/admin/components/FindOrder"
 import SkeletonCard from "../../components/ui/SkeletonCard"
+import type { OrderType } from "../../types/Order"
+import { FaCirclePlus } from "react-icons/fa6"
 
 
 type OrderStatsType = {
@@ -15,9 +17,8 @@ type OrderStatsType = {
 }
 
 function Orders() {
-  const [ordersStats, setOrdersStats] = useState<OrderStatsType[]>([])
   const [page, setPage] = useState<number>(1)
-  const [limit, setLimit] = useState<number>(10)
+  const limit = 10
   const [search, setSearch] = useState<string | number>("")
   const { data, isLoading, error, isFetched, isFetching, refetch } = useGetOrders({ page, limit, search })
   const { data: orderStats, isLoading: orderStatsLoading,
@@ -32,26 +33,7 @@ function Orders() {
     navigate(`/dashboard/orders/order/${orderID}`)
   }
 
-  useEffect(() => {
-    if (!data?.orders) return
-    let totalOrders = data?.orders?.length
-    let completedOrders = data?.orders?.map((item: any) => {
-      if (item.paymentStatus === 'Paid') {
-        return item
-      }
-    })
 
-    setOrdersStats([
-      {
-        label: 'Total Orders',
-        value: totalOrders,
-      },
-      {
-        label: 'Completed',
-        value: completedOrders.length,
-      }
-    ])
-  }, [data])
 
 
   //Handle Page
@@ -73,7 +55,12 @@ function Orders() {
       <AdminPagesHeader first={'Orders Management'}
         main={'Orders'} third={'Manage customer orders, payments and billing and create new order.'}
         right={(
-          <Button children={'+ Create Order'} onClick={() => navigate('/dashboard/customers')}
+          <Button children={
+            <span className="flex gap-2 items-center">
+              <FaCirclePlus />
+              Add Order
+            </span>
+          } onClick={() => navigate('/dashboard/customers')}
             className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
         )} />
 
@@ -172,10 +159,10 @@ function Orders() {
                   </td>
                 </tr>
               ) :
-                data?.pagination?.orders?.map((item: any, key: number) => {
+                data?.pagination?.orders?.map((item: OrderType, key: number) => {
                   return <tr key={item._id} className="py-2 border-b border-secondary-text/20">
                     <td className="md:p-4 p-2 py-4">{(Number(page) - 1) * limit + key + 1}</td>
-                    <td className="md:p-4 p-2 py-4">{item.customerId.fullname}</td>
+                    <td className="md:p-4 p-2 py-4">{item.customerId?.fullname}</td>
                     <td className="md:p-4 p-2 py-4">{item.items.length}</td>
                     <td className="md:p-4 p-2 py-4">₹{item.totalAmount}</td>
                     <td className="md:p-4 p-2 py-4">{item.paymentMethod}</td>
@@ -184,10 +171,10 @@ function Orders() {
                         {item.paymentStatus}
                       </span>
                     </td>
-                    <td className="p-4">{new Date(item.createdAt).toLocaleDateString()}</td>
+                    <td className="p-4">{new Date(item.createdAt ?? '').toLocaleDateString()}</td>
                     <td className="fl4x gap-4 items-center p-4">
                       <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
-                        onClick={() => handleViewOrder(item._id)}>View</button>
+                        onClick={() => handleViewOrder(item._id ?? '')}>View</button>
                     </td>
                   </tr>
                 })}

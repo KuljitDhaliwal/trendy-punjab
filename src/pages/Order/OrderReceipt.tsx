@@ -32,6 +32,7 @@ function OrderReceipt() {
                 console.log('Customer find error!!')
             }
         })
+        
     }, [data])
 
 

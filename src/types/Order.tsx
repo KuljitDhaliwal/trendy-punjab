@@ -26,7 +26,7 @@ export type OrderType = {
   items: OrderItemType[],
   subtotal?: number,
   discount?: number,
-  totalAmount?: number,
+  totalAmount: number,
   paymentMethod?: "Cash" | "UPI",
   paymentStatus?: "Pending" | "Paid" | "Partially Paid" | "Refunded",
   orderStatus?: "Pending" | "Completed" | "Cancelled" | "Returned",

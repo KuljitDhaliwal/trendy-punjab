@@ -11,7 +11,7 @@ import { handleFormValidation } from "../../utils/FormValidation"
 import { useLogin } from "../../features/auth/api/auth.mutations"
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux"
-import { setAccessToken } from "../../features/auth/slices/authSlice"
+import { setAccessToken, setIsAuthInitialized } from "../../features/auth/slices/authSlice"
 import type { RootState } from "../../store/Store"
 
 
@@ -24,14 +24,15 @@ type LoginForm = {
 function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [isValid, setIsValid] = useState<boolean | null>(null)
-  const inputRef = useRef<HTMLInputElement[]>([])
   const [loginError, setLoginError] = useState('')
-  const navigate = useNavigate()
-  const { debounceFun } = useDebounceHook()
   const [formValue, setFormValue] = useState<LoginForm>({
     email: '',
     password: ''
   })
+  const inputRef = useRef<HTMLInputElement[]>([])
+  const navigate = useNavigate()
+  const { debounceFun } = useDebounceHook()
+  const {mutate: login, isPending} = useLogin()
   const accessToken = useSelector((state: RootState)=> state.auth.accessToken)
   const dispatch = useDispatch()
 
@@ -39,8 +40,7 @@ function Login() {
     return <Navigate to="/dashboard" replace />
   }
 
-  //React Query
-  const {mutate: login, isPending} = useLogin()
+
 
 
   //Handle Formvalue 
@@ -84,9 +84,10 @@ function Login() {
           email: '',
           password: ''
         })
-        toast.success("Login Successful!")
         dispatch(setAccessToken(data.accesstoken))
-        return navigate('/dashboard', {replace: true})
+        dispatch(setIsAuthInitialized(true))
+        toast.success("Login Successful!")
+        navigate('/dashboard', {replace: true})
       },
       onError: (error) => {
         setLoginError(error.message)
@@ -113,7 +114,7 @@ function Login() {
                 <label htmlFor={item.name}>{item.label}</label>
                 <div className="flex relative items-center">
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                  <Input ref={(el: any)=>{inputRef.current[key] = el}} onClick={()=> handleFormInput(key)} clickKey={key} item={item} icon={true}
+                  <Input ref={(el: HTMLInputElement)=>{inputRef.current[key] = el}} onClick={()=> handleFormInput(key)} clickKey={key} item={item} icon={true}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
                     className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
                     onChange={(e) => handleFormValue(e)} value={formValue[item.name]}/>

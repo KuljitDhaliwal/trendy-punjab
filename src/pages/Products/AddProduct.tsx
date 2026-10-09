@@ -1,4 +1,4 @@
-import { IoIosArrowRoundBack } from "react-icons/io"
+import { IoIosArrowBack } from "react-icons/io"
 import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useNavigate } from "react-router-dom"
@@ -7,7 +7,7 @@ import { FaRegUser } from "react-icons/fa"
 import { addProductData, productVariantData, type AddProductType } from "../../static/AddProductData"
 import { Input } from "../../components/ui/Input"
 import { FaBorderNone } from "react-icons/fa6";
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter"
 import { useCreateProduct } from "../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
@@ -53,6 +53,8 @@ function AddProduct() {
         ]
     })
     const [variants, setVariants] = useState<AddProductType[][]>([])
+    const inputRef = useRef<HTMLInputElement[]>([])
+    const inputVariantRef = useRef<{ [inputName: string]: HTMLInputElement | null }>({})
     const [error, setError] = useState<Partial<ErrorType>>({})
     const [stockError, setStockError] = useState<number[]>([])
     const { mutate: createProduct } = useCreateProduct()
@@ -90,7 +92,7 @@ function AddProduct() {
     //Handle Remove variant
     const handleRemoveVariant = (variantIndex: number) => {
         console.log('variant Index', variantIndex)
-        let newVariants = variants.filter((_, index) => index !== variantIndex)
+        const newVariants = variants.filter((_, index) => index !== variantIndex)
         setVariants(newVariants)
 
         setFormValue(prev => ({
@@ -164,7 +166,7 @@ function AddProduct() {
         if (e.target.name === 'stock') {
 
 
-            let newError = stockError.filter(item => item !== variantIndex)
+            const newError = stockError.filter(item => item !== variantIndex)
             setStockError(newError)
 
 
@@ -271,15 +273,24 @@ function AddProduct() {
     }
 
 
+    const handleInputFocus = (key: number) => {
+        inputRef.current[key].select()
+    }
+
+    const handleFocusVarinatInput = (key: string) => {
+        inputVariantRef.current[key]?.select()
+    }
+
     return (
         <div className="flex flex-col gap-6 w-full min-h-[calc(100vh-48px)] ">
             <AdminPagesHeader first={'Products / Add Product'}
                 main={'Add Product'} third={'Create new product with details, sizes and stock information.'}
                 right={(
                     <Button children={
-                        <p className="flex items-center gap-1">
-                            <IoIosArrowRoundBack /> Back to Products
-                        </p>
+                        <span className="flex gap-2 items-center">
+                            <IoIosArrowBack />
+                            Back to Products
+                        </span>
                     } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/products/')} />
                 )} />
 
@@ -293,13 +304,15 @@ function AddProduct() {
                         icon={FaRegUser}
                         children={(
                             <div className="grid gap-4 md:grid-cols-3">
-                                {addProductData.map((item: AddProductType) => {
+                                {addProductData.map((item: AddProductType, key: number) => {
                                     return <div className="grid gap-2 self-start" key={item.name}>
                                         <div className="flex gap-2">
                                             <label htmlFor={item.name}>{item.label}</label>
                                             {item.required && (<p className="text-red-600">*</p>)}
                                         </div>
-                                        <Input icon={false} item={item} onChange={handleFormData}
+                                        <Input clickKey={key} onClick={() => handleInputFocus(key)}
+                                            ref={(el: HTMLInputElement) => { inputRef.current[key] = el }}
+                                            icon={false} item={item} onChange={handleFormData}
                                             className={`${error[
                                                 item.name === "price"
                                                     ? "price"
@@ -380,7 +393,7 @@ function AddProduct() {
                                                                         <label htmlFor={item.name}>{item.label}</label>
                                                                         {item.required && (<p className="text-red-600">*</p>)}
                                                                     </div>
-                                                                    <Input icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                                                    <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
                                                                         value={formValue.variants[index].stock ?? 0} className={`${stockError.includes(index) ? 'border-red-500' : 'border-border'} w-full`} />
                                                                     <p className={`text-sm ${stockError.includes(index) ? 'block' : 'hidden'} text-red-500`}>Please add stock</p>
                                                                 </div>
@@ -391,7 +404,7 @@ function AddProduct() {
                                                                             <label htmlFor={item.name}>{item.label}</label>
                                                                             {item.required && (<p className="text-red-600">*</p>)}
                                                                         </div>
-                                                                        <Input icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                                                        <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
                                                                             value={formValue.variants[index].color || ''} className={'border-border'} />
                                                                     </div>
                                                                 )

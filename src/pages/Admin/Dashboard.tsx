@@ -18,7 +18,7 @@ import type { RootState } from "../../store/Store"
 function Dashboard() {
   const { date } = useTodayDate()
   const [phoneError, setPhoneError] = useState(false)
-  const [page, setPage] = useState<number>(1)
+  const page = 1
   const [search, setSearch] = useState<string>('')
   const [hasSearched, setHasSearched] = useState(false)
   const [getCustomer, setGetCustomer] = useState<Customer[] | undefined>()
@@ -78,9 +78,9 @@ function Dashboard() {
   return (
     <div className="grid gap-6">
       <AdminPagesHeader first={date} main={'Dashboard'}
-        third={<span className="flex gap-1 md:flex-row flex-col items-center">Good Morning, <span className="tracking-wider">{admin.fullname !== '' ? admin.fullname : (
+        third={<span className="flex gap-1 md:flex-row flex-col items-center">Good Morning, <span className="tracking-wider">{admin?.fullname !== '' ? admin?.fullname : (
           <div className="w-28 h-4 bg-gray-200 rounded-md animate-pulse"></div>
-        )}</span></span>} right={<Admin show={true} fullname={admin.fullname} role={admin.role} />} />
+        )}</span></span>} right={<Admin show={true} fullname={admin?.fullname} role={admin?.role} />} />
 
 
       <FindCustomers phoneError={phoneError}

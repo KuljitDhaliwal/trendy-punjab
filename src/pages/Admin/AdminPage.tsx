@@ -10,7 +10,6 @@ import { useLogout } from "../../features/auth/api/auth.mutations"
 import { setLogout } from "../../features/auth/slices/authSlice"
 import { toast } from "react-toastify"
 import { LuLogOut } from "react-icons/lu"
-import { nameInitials } from "../../utils/NameInitials"
 import Admin from "../../features/admin/components/Admin"
 
 

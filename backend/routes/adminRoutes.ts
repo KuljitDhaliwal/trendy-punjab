@@ -4,7 +4,7 @@ import { checkAuth } from "../middlewares/checkAuth.js";
 
 const router = Router()
 
-router.get('/today-stats', todayStats)
+router.get('/today-stats', checkAuth, todayStats)
 
 router.get('/admin-info', checkAuth, getAdminInfo)
 

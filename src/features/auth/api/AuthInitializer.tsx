@@ -3,14 +3,11 @@ import type { RootState } from "../../../store/Store"
 import { setAccessToken, setAdmin, setIsAuthInitialized, setIsAuthLoading } from "../slices/authSlice"
 import { useRefreshToken } from "./auth.queries"
 import { useEffect } from "react"
-import { useGetAdminInfo } from "../../admin/api/admin.queries"
 
 function AuthInitializer() {
 
     const dispatch = useDispatch()
-    const accesstoken = useSelector(
-        (state: RootState) => state.auth.accessToken
-    )
+
     const isAuthInitialized = useSelector(
         (state: RootState) => state.auth.isAuthInitialized
     )
@@ -18,13 +15,18 @@ function AuthInitializer() {
 
     useEffect(() => {
         if (isLoading) return
+        console.log('Dattttttaaa', data)
         if (data?.accessToken) {
             dispatch(setAccessToken(data.accessToken))
+        } else if (error) {
+            dispatch(setAccessToken(null));
+            dispatch(setAdmin(null));
         }
+
+
         dispatch(setIsAuthLoading(false))
         dispatch(setIsAuthInitialized(true))
-    }, [dispatch, accesstoken, data, isLoading])
-
+    }, [dispatch, error, data, isLoading])
 
 
 

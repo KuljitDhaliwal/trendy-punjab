@@ -19,10 +19,10 @@ import ProductDetails from "../pages/Products/ProductDetails"
 import EditProduct from "../pages/Products/EditProduct"
 import DashboardSettingsLayout from "../layout/DashboardSettingsLayout"
 import Settings from "../pages/Settings/Settings"
-import ProfileSettings from "../pages/Settings/ProfileSettings"
 import ChangePassword from "../pages/Settings/ChangePassword"
 import AdminPage from "../pages/Admin/AdminPage"
 import AdminInfo from "../features/admin/components/AdminInfo"
+import NotFound from "../pages/auth/NotFound"
 
 
 function Index() {
@@ -59,6 +59,7 @@ function Index() {
                 </Route>
               </Route>
             </Route>
+            <Route path="*" element={<NotFound />} />
         </Routes>
     </div>
   )

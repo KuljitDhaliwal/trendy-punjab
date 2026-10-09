@@ -2,12 +2,21 @@ import type { Request, Response } from "express";
 import Customer from "../models/Customer.js";
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
+import { checkRequired } from "../utils/checkRequired.js";
+import mongoose from "mongoose";
 
 //Create Order
 export const createOrder = async (req: Request, res: Response) => {
     try {
         const data = req.body
         const { customerID } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(String(customerID))) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid customer ID"
+            })
+        }
 
         if (!customerID || Array.isArray(customerID)) {
             return res.status(400).json({
@@ -21,6 +30,15 @@ export const createOrder = async (req: Request, res: Response) => {
         //Check if data exists
         if (!data || Object.keys(data).length === 0) {
             return res.status(400).json({ status: 400, message: 'No data!!' })
+        }
+
+        const missingFields = checkRequired(data, Order)
+
+        if (Object.keys(missingFields).length > 0) {
+            return res.status(400).json({
+                status: 400,
+                message: missingFields
+            })
         }
 
         //Check if customer exists
@@ -47,13 +65,14 @@ export const createOrder = async (req: Request, res: Response) => {
 
         //Validate products from order
         for (const product of products) {
-            console.log('Product Before', product)
             if (!product) {
                 return res.status(404).json({
                     status: 404,
                     message: "Product not found!!"
                 })
             }
+
+
 
             const item = data.items.find(
                 (item: any) =>
@@ -63,6 +82,7 @@ export const createOrder = async (req: Request, res: Response) => {
             if (!item) {
                 continue
             }
+
             const variant = product.variants.find(
                 (variant: any) =>
                     variant.size === item.size &&
@@ -72,6 +92,15 @@ export const createOrder = async (req: Request, res: Response) => {
             if (!variant) {
                 return res.status(400).json({ status: 400, message: 'Product variant is missing!!' })
             }
+
+            if (variant.stock < item.quantity) {
+                return res.status(400).json({ status: 400, message: 'Product quantity is exceeded!!' })
+            }
+
+            if(product.price !== item.price){
+                return res.status(400).json({status: 400, message: 'Price not matching!!'})
+            }
+
 
             variant.stock = variant.stock - item.quantity
 
@@ -103,9 +132,14 @@ export const createOrder = async (req: Request, res: Response) => {
             order
         })
 
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ status: 500, message: 'Order create error' })
+    } catch (error: any) {
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                status: 400,
+                message: error.message
+            });
+        }
+        return res.status(500).json({ status: 500, message: 'Order create failed!!' })
     }
 }
 
@@ -115,6 +149,12 @@ export const createOrder = async (req: Request, res: Response) => {
 export const getOrder = async (req: Request, res: Response) => {
     try {
         const orderID = req.params.orderID
+        if (!mongoose.Types.ObjectId.isValid(String(orderID))) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid order ID"
+            })
+        }
         const order = await Order.findById(orderID)
         if (!order) {
             return res.status(404).json({ status: 404, message: 'Order not found!!' })
@@ -122,7 +162,7 @@ export const getOrder = async (req: Request, res: Response) => {
 
         return res.status(200).json({ status: 200, message: 'Order found!!', order })
 
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Error in getting order!!' })
     }
 }
@@ -137,13 +177,10 @@ export const getOrders = async (req: Request, res: Response) => {
             : ""
         const page: number = Number(req.query.page || 1)
         const limit: number = Number(req.query.limit || 10)
-        console.log('Search', search, page, limit)
         const skip = (page - 1) * limit
 
         const isPhone: boolean = /^[0-9]/.test(search)
-        console.log('isPhone', isPhone)
         const query = isPhone ? "phone" : "fullname"
-        console.log('Query', query)
         const customers = search === "" ? [] : await Customer.find({
             [query]: {
                 $regex: search,
@@ -168,7 +205,7 @@ export const getOrders = async (req: Request, res: Response) => {
         }
 
         return res.status(200).json({ status: 200, message: 'Orders found!!', pagination })
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Error in getting orders!!' })
     }
 }
@@ -177,14 +214,14 @@ export const getOrders = async (req: Request, res: Response) => {
 
 ///Order Stats
 
-export const getOrderStats = async(req: Request, res: Response) => {
+export const getOrderStats = async (req: Request, res: Response) => {
     try {
         const orders = await Order.find({})
         const completed = orders.filter(order => order.paymentStatus === 'Paid')
         const totalAmount = completed.map(order => order.totalAmount)
-        const totalSales = totalAmount.reduce((acc, cur)=>{
+        const totalSales = totalAmount.reduce((acc, cur) => {
             return acc + cur
-        },0)
+        }, 0)
         const stats = [
             {
                 label: 'Total Orders',
@@ -201,8 +238,8 @@ export const getOrderStats = async(req: Request, res: Response) => {
         ]
 
 
-        return res.status(200).json({status: 200, message: 'Order stats', stats})
-    } catch (error) {
+        return res.status(200).json({ status: 200, message: 'Order stats', stats })
+    } catch {
         return res.status(500).json({ status: 500, message: 'Error in getting order stats!!' })
     }
 }

@@ -85,6 +85,7 @@ function CreateOrder() {
   const { mutate: getSearchSingleProduct, isPending, error } = useGetSearchSingleProduct()
   const { toggleCart, setToggleCart } = useToggleCart()
   const { mutate: getCreateOrder } = useCreateOrder()
+
   //Handle Toggle button false on window resize
   useEffect(() => {
 
@@ -93,6 +94,7 @@ function CreateOrder() {
         setToggleCart(false)
       }
     }
+    handleResize()
 
     window.addEventListener('resize', handleResize)
 
@@ -185,7 +187,7 @@ function CreateOrder() {
 
     setSubTotal(total || 0)
     const discountAmount = ((total || 0) * ((discount || 0) / 100))
-    let val = discount === null ? (total || 0) : ((total || 0) - discountAmount)
+    const val = discount === null ? (total || 0) : ((total || 0) - discountAmount)
     setTotalAmount(Number(val))
   }, [order, discount])
 

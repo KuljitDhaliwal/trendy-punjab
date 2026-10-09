@@ -28,6 +28,9 @@ function AdminSidebar() {
       }
     }
 
+    resizeFun()
+
+
     window.addEventListener('resize', resizeFun)
 
     return ()=> {
@@ -36,7 +39,6 @@ function AdminSidebar() {
 
   }, [])
 
-  console.log('Show', show)
 
   return (
     <div className={`
@@ -46,9 +48,9 @@ function AdminSidebar() {
     `}>
 
       {/* Logo */}
-      <div className="logo">
-        <p>Trendy <span className="text-orange-dark font-bold">Punjab</span></p>
-      </div>
+      <button className="logo flex justify-start cursor-pointer" onClick={()=>navigate('/dashboard')}>
+        <span>Trendy <span className="text-orange-dark font-bold">Punjab</span></span>
+      </button>
 
       {/* Routes */}
       <div className="flex-1">
@@ -59,7 +61,7 @@ function AdminSidebar() {
 
       {/* Sidebar Footer */}
       <div className="md:grid hidden gap-4 ">
-        <Admin show={show} fullname={admin.fullname} role={admin.role} />
+        <Admin show={show} fullname={admin?.fullname} role={admin?.role} />
       </div>
       <div className="md:hidden flex self-start gap-4 text-xl">
         <button onClick={() => {navigate('/dashboard/admin-profile'), setToggleNav(false)}}>

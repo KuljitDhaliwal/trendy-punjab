@@ -258,7 +258,7 @@ function EditCustomer() {
                                         <label htmlFor={item.name}>{item.label}</label>
                                         {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: any) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData} className={`border-border`}
+                                    <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData} className={`border-border`}
                                         value={getFormValue(item.name)} type={'text'} />
                                     {(item.required && (getFormValue(item.name) === undefined || getFormValue(item.name) === '') && required) && (
                                         <p className="text-red-400">{`Please fill ${item.label}`}</p>
@@ -353,10 +353,10 @@ function EditCustomer() {
                         </div>
                     ) : (
                         <div className="grid gap-4">
-                            {AdditionalInformationData.map((item, key) => {
+                            {AdditionalInformationData.map((item) => {
                                 return <div className="grid gap-2">
                                     <label htmlFor={item.name}>{item.label}</label>
-                                    <Input ref={(el: any) => { inputRef.current[7] = el }} clickKey={7}
+                                    <Input ref={(el: HTMLInputElement) => { inputRef.current[7] = el }} clickKey={7}
                                         onClick={() => handleFocusInput(7)} icon={false} item={item}
                                         onChange={handleFormData} className={`border-border`}
                                         value={getFormValue(item.name)} type={'text'} />

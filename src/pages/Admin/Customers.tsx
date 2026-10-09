@@ -9,6 +9,7 @@ import { useFindCustomer } from "../../features/admin/api/admin.mutations"
 import StatsCard from "../../features/admin/components/StatsCard"
 import { calculateOrderAmount } from "../../utils/CalculateTotal"
 import SkeletonCard from "../../components/ui/SkeletonCard"
+import { FaCirclePlus } from "react-icons/fa6"
 
 
 
@@ -89,7 +90,7 @@ function Customers() {
   const [getCustomer, setGetCustomer] = useState<Customer[] | undefined>()
   const [phoneError, setPhoneError] = useState(false)
   const [search, setSearch] = useState<string>('')
-  const [limit, setLimit] = useState<number>(10)
+  const limit = 10
   const [hasSearched, setHasSearched] = useState(false)
   const navigate = useNavigate()
   const [page, setPage] = useState<number>(1)
@@ -167,7 +168,10 @@ function Customers() {
       <AdminPagesHeader first={'Customer records'}
         main={'Customers'} third={'Manage customer information, sizes, measurements and order history.'}
         right={(
-          <Button children={'+ Add Customer'} onClick={() => navigate('add-customer')}
+          <Button children={<span className="flex gap-2 items-center">
+            <FaCirclePlus/>
+            Add Customer
+          </span>} onClick={() => navigate('add-customer')}
             className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
         )} />
 

@@ -16,7 +16,7 @@ type TodayOrdersType = {
 }
 
 
-function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading,refetchTodayStats, isFetchingTodayStats, todayStatsFetched}: TodayOrdersType) {
+function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading,refetchTodayStats, isFetchingTodayStats}: TodayOrdersType) {
     const navigate = useNavigate()
     return (
         <TodayActivityLayout

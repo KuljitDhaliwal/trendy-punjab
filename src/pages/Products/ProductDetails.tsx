@@ -1,4 +1,4 @@
-import { IoIosArrowRoundBack } from "react-icons/io"
+import { IoIosArrowBack } from "react-icons/io"
 import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useNavigate, useParams } from "react-router-dom"
@@ -65,9 +65,6 @@ function ProductDetails() {
         navigate(`/dashboard/products/edit-product/${productID}`)
     }
 
-    const handleCancel = () => {
-
-    }
 
 
 
@@ -93,9 +90,10 @@ function ProductDetails() {
                 main={'Product Details'} third={'Check product information, sizes, measurements and order history.'}
                 right={(
                     <Button children={
-                        <p className="flex items-center gap-1">
-                            <IoIosArrowRoundBack /> Back to Products
-                        </p>
+                        <span className="flex gap-2 items-center">
+                            <IoIosArrowBack />
+                            Back to Products
+                        </span>
                     } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/products/')} />
                 )} />
 

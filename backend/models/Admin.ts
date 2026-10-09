@@ -28,6 +28,11 @@ const adminSchema = new mongoose.Schema(
             type: String,
             default: "",
             trim: true,
+        },
+        
+        tokenVersion: {
+            type: Number,
+            default: 0
         }
 
     },

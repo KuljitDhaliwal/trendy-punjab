@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
-import { IoIosArrowRoundBack } from "react-icons/io";
+import { IoIosArrowBack } from "react-icons/io";
 import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout";
 import { FaRegUser } from "react-icons/fa";
 import { AdditionalInformationData, CustomerBasicInformationData, CustomerSizeData } from "../../static/CustomerBasicInformation";
@@ -84,9 +84,9 @@ function AddCustomer() {
     }
 
 
-    useEffect(()=>{
-        window.scrollTo(0,0)
-    },[])
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return (
         <div className="flex flex-col gap-6 w-full h-full">
@@ -94,9 +94,10 @@ function AddCustomer() {
                 main={'Add Customer'} third={'Create new customer profile with sizes and measurements.'}
                 right={(
                     <Button children={
-                        <p className="flex items-center gap-1">
-                            <IoIosArrowRoundBack /> Back to Customers
-                        </p>
+                        <span className="flex gap-2 items-center">
+                            <IoIosArrowBack />
+                            Back to Customers
+                        </span>
                     } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
                 )} />
 
@@ -116,7 +117,7 @@ function AddCustomer() {
                                         <label htmlFor={item.name}>{item.label}</label>
                                         {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input clickKey={key} ref={(el: any)=> {inputRef.current[key] = el}} onClick={() => handleFocusInput(key)} icon={false} item={item} onChange={handleFormData}
+                                    <Input clickKey={key} ref={(el: any) => { inputRef.current[key] = el }} onClick={() => handleFocusInput(key)} icon={false} item={item} onChange={handleFormData}
                                         className={`${(item.required && (formValue[item.name] === undefined || formValue[item.name] === '') && required) ? 'border-red-500' : 'border-border'}`}
                                         value={formValue[item.name] || ''} type={'text'} />
                                     {(item.required && (formValue[item.name] === undefined || formValue[item.name] === '') && required) && (
@@ -165,9 +166,9 @@ function AddCustomer() {
                     children={(
                         <div className="grid gap-4 ">
                             {AdditionalInformationData.map((item, key) => {
-                                return <div className="grid gap-2" key={item.name}>
+                                return <div className="grid gap-2" key={key}>
                                     <label htmlFor={item.name}>{item.label}</label>
-                                    <Input clickKey={8} ref={(el: any)=> {inputRef.current[8] = el}} onClick={() => handleFocusInput(8)} icon={false} item={item} onChange={handleFormData}
+                                    <Input clickKey={8} ref={(el: any) => { inputRef.current[8] = el }} onClick={() => handleFocusInput(8)} icon={false} item={item} onChange={handleFormData}
                                         value={formValue[item.name] || ''} className="border-border" type={'text'} />
                                 </div>
                             })}

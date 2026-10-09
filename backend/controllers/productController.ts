@@ -1,5 +1,7 @@
 import type { Response, Request } from "express";
 import Product from "../models/Product.js";
+import { checkRequired } from "../utils/checkRequired.js";
+import mongoose from "mongoose";
 
 
 //Create Products
@@ -8,6 +10,15 @@ export const createProduct = async (req: Request, res: Response) => {
         const data = req.body
         if (!data || Object.keys(data).length === 0) {
             return res.status(400).json({ status: 400, message: 'Product data missing!' })
+        }
+
+        const missingFields = checkRequired(data, Product)
+
+        if (Object.keys(missingFields).length > 0) {
+            return res.status(400).json({
+                status: 400,
+                message: missingFields
+            })
         }
 
         const lastProduct = await Product.findOne().sort({ productCode: -1 })
@@ -28,8 +39,19 @@ export const createProduct = async (req: Request, res: Response) => {
 
 
         return res.status(201).json({ status: 201, message: 'Product created!', product })
-    } catch (error) {
-        console.log(error)
+    } catch (error: any) {
+        if (error.name === "ValidationError") {
+            const errors: Record<string, string> = {}
+
+            for (const [key, value] of Object.entries(error.errors)) {
+                errors[key] = (value as any).message
+            }
+
+            return res.status(400).json({
+                status: 400,
+                message: errors
+            })
+        }
         return res.status(500).json({ status: 500, message: 'Product create error!' })
     }
 }
@@ -41,7 +63,7 @@ export const getProducts = async (req: Request, res: Response) => {
         const products = await Product.find({ isActive: true })
 
         return res.status(200).json({ status: 200, message: 'All products fetched!', products })
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Products fetch error!' })
 
     }
@@ -55,7 +77,12 @@ export const getProduct = async (
 ) => {
     try {
         const productID = req.params.productID
-
+        if (!mongoose.Types.ObjectId.isValid(String(productID))) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid product ID"
+            })
+        }
         const product = await Product.findById({
             _id: productID,
             isActive: true
@@ -73,7 +100,7 @@ export const getProduct = async (
             message: "Product found!",
             product,
         })
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             status: 500,
             message: "Failed to get product!",
@@ -87,7 +114,21 @@ export const getProduct = async (
 export const editProduct = async (req: Request, res: Response) => {
     try {
         const productID = req.params.productID
-        const value = req.body
+        if (!mongoose.Types.ObjectId.isValid(String(productID))) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid product ID"
+            })
+        }
+        const data = req.body
+        const missingFields = checkRequired(data, Product)
+
+        if (Object.keys(missingFields).length > 0) {
+            return res.status(400).json({
+                status: 400,
+                message: missingFields
+            })
+        }
         if (!productID) {
             return res.status(400).json({
                 status: 400,
@@ -97,7 +138,7 @@ export const editProduct = async (req: Request, res: Response) => {
         const product = await Product.findByIdAndUpdate({
             _id: productID,
             isActive: true,
-        }, value, {
+        }, data, {
             returnDocument: "after",
             runValidators: true
         })
@@ -107,7 +148,7 @@ export const editProduct = async (req: Request, res: Response) => {
         }
 
         return res.status(201).json({ status: 201, message: 'Product details updated!', product })
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Edit product error!' })
     }
 }
@@ -117,6 +158,12 @@ export const editProduct = async (req: Request, res: Response) => {
 export const deactivateProduct = async (req: Request, res: Response) => {
     try {
         const productID = req.params.productID
+        if (!mongoose.Types.ObjectId.isValid(String(productID))) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid order ID"
+            })
+        }
         if (!productID) {
             return res.status(400).json({
                 status: 400,
@@ -138,7 +185,7 @@ export const deactivateProduct = async (req: Request, res: Response) => {
         }
 
         return res.status(200).json({ status: 200, message: 'Product deactivated!', product })
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Product deactivate error!' })
     }
 }
@@ -155,7 +202,7 @@ export const searchProduct = async (req: Request, res: Response) => {
         const skip = (page - 1) * limit
         const isProductCode = search?.slice(0, 2)
         const searchProduct = isProductCode.toUpperCase() === 'P-' ? 'productCode' : 'productName'
-        let filter = search ? {
+        const filter = search ? {
             [searchProduct]: {
                 $regex: search,
                 $options: 'i'
@@ -182,8 +229,7 @@ export const searchProduct = async (req: Request, res: Response) => {
         return res.status(200).json({ status: 200, message: 'Product found!', products, pagination })
 
 
-    } catch (error) {
-        console.error("Product search error:", error)
+    } catch {
         return res.status(500).json({ status: 500, message: 'Product search error!' })
     }
 }
@@ -194,7 +240,13 @@ export const searchProduct = async (req: Request, res: Response) => {
 export const getProductStats = async (req: Request, res: Response) => {
     try {
         const productID = req.params.productID
-        console.log(productID)
+        if (!mongoose.Types.ObjectId.isValid(String(productID))) {
+            return res.status(400).json({
+                status: 400,
+                message: "Invalid product ID"
+            })
+        }
+
         const product = await Product.findOne({
             _id: productID,
             isActive: true
@@ -204,7 +256,7 @@ export const getProductStats = async (req: Request, res: Response) => {
         }
 
         let totalStocks = 0
-        let totalVariants = product.variants.length
+        const totalVariants = product.variants.length
         let outOfStock = 0
         let inStocks = 0
         product.variants.map(variant => {
@@ -215,7 +267,7 @@ export const getProductStats = async (req: Request, res: Response) => {
                 inStocks += 1
             }
         })
-        console.log('Out of stock', outOfStock)
+
 
         const productStats = [
             {
@@ -239,7 +291,7 @@ export const getProductStats = async (req: Request, res: Response) => {
         return res.status(200).json({ status: 200, message: 'Product Stats!', productStats })
 
 
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Product details error' })
     }
 }
@@ -281,7 +333,7 @@ export const getProductsStats = async (req: Request, res: Response) => {
             },
         ]
         return res.status(200).json({ status: 200, message: 'Products stats', productsStats })
-    } catch (error) {
+    } catch {
         return res.status(500).json({ status: 500, message: 'Products Stats error' })
 
     }
@@ -293,7 +345,6 @@ export const getProductsStats = async (req: Request, res: Response) => {
 export const searchSingleProduct = async (req: Request, res: Response) => {
     try {
         const search: string = String(req.query.search)
-        console.log('Search', search)
         const isValid = search?.slice(0, 2).toUpperCase() === 'P-'
         const searchProduct = isValid ? 'productCode' : 'productName'
         const product = await Product.find({
@@ -303,14 +354,14 @@ export const searchSingleProduct = async (req: Request, res: Response) => {
             },
             isActive: true
         })
-        console.log('Product', product)
+
         if (!product) {
             return res.status(404).json({ status: 404, message: 'Product not found!' })
         }
 
         return res.status(200).json({ status: 200, message: 'Product found!', product })
 
-    } catch (error) {
-        return res.status(500).json({ status: 500, message: error })
+    } catch (error: any) {
+        return res.status(500).json({ status: 500, message: error.message })
     }
 }

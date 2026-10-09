@@ -20,7 +20,6 @@ function AdminInfo() {
         }
 
 
-        if (!adminData?.admin) return
         dispatch(setAdmin({
             email: adminData.admin.email,
             fullname: adminData.admin.fullname,

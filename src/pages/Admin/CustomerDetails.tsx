@@ -7,7 +7,7 @@ import { MdOutlineHandshake } from "react-icons/md";
 import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout";
 import { IoShirtOutline } from "react-icons/io5";
 import { MdHistory } from "react-icons/md";
-import { IoIosArrowRoundBack } from "react-icons/io";
+import { IoIosArrowBack } from "react-icons/io";
 import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
 import { useGetCustomer } from "../../features/admin/api/admin.mutations";
@@ -17,6 +17,7 @@ import type { Customer } from "./Customers";
 import { nameInitials } from "../../utils/NameInitials";
 import { calculateOrderAmount } from "../../utils/CalculateTotal";
 import { FaAddressCard } from "react-icons/fa";
+import { FaCirclePlus } from "react-icons/fa6";
 
 function CustomerDetails() {
     const { id } = useParams()
@@ -61,9 +62,10 @@ function CustomerDetails() {
                 main={'Customer Details'} third={'Check customer information, sizes, measurements and order history.'}
                 right={(
                     <Button children={
-                        <p className="flex items-center gap-1">
-                            <IoIosArrowRoundBack /> Back to Customers
-                        </p>
+                        <span className="flex gap-2 items-center">
+                            <IoIosArrowBack />
+                            Back to Customers
+                        </span>
                     } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
                 )} />
 
@@ -147,9 +149,10 @@ function CustomerDetails() {
 
 
                         <Button children={
-                            <p className="flex items-center gap-1">
-                                + Create Order
-                            </p>
+                            <span className="flex gap-2 items-center">
+                                <FaCirclePlus />
+                                Create Order
+                            </span>
                         } className="text-[12px] md:w-auto w-full px-4 py-2 bg-orange-dark text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
                     </div>
 
@@ -390,10 +393,11 @@ function CustomerDetails() {
                                                             <span className="text-center">No Orders!!</span>
                                                             <span>
                                                                 <Button children={
-                                                                    <p className="flex items-center gap-1">
-                                                                        + Create Order
-                                                                    </p>
-                                                                } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+                                                                    <span className="flex gap-2 items-center">
+                                                                        <FaCirclePlus />
+                                                                        Create Order
+                                                                    </span>
+                                                                } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
                                                             </span>
                                                         </span>
                                                     </td>

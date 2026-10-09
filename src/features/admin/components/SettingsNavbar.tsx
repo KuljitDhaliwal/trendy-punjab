@@ -9,7 +9,7 @@ function SettingsNavbar() {
             {SettingsNavbarData.map(item => {
                 const Icon: IconType = item.icon
                 return <NavLink to={item.route} end
-                className={({isActive, isPending})=> `${isActive ? 'bg-[#fe7f2d] text-white' : 'text-white'} flex gap-2 items-center p-4 rounded-2xl`}>
+                className={({isActive})=> `${isActive ? 'bg-[#fe7f2d] text-white' : 'text-white'} flex gap-2 items-center p-4 rounded-2xl`}>
                     <Icon/>
                     <p>{item.label}</p>
                 </NavLink>
