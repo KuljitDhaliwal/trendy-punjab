@@ -352,12 +352,14 @@ function CustomerDetails() {
                     <div className="w-full overflow-x-auto">
                         <table className="w-full min-w-120 table-auto">
                             <thead className="text-left text-white bg-orange-dark">
-                                <th className="md:p-4 p-2 whitespace-nowrap rounded-l-lg">#</th>
-                                <th className="md:p-4 p-2 whitespace-nowrap ">Order ID</th>
-                                <th className="md:p-4 p-2 whitespace-nowrap ">Date</th>
-                                <th className="md:p-4 p-2 whitespace-nowrap ">Items</th>
-                                <th className="md:p-4 p-2 whitespace-nowrap">Amount</th>
-                                <th className="md:p-4 p-2 whitespace-nowrap rounded-r-lg">Receipt</th>
+                                <tr>
+                                    <th className="md:p-4 p-2 whitespace-nowrap rounded-l-lg">#</th>
+                                    <th className="md:p-4 p-2 whitespace-nowrap ">Order ID</th>
+                                    <th className="md:p-4 p-2 whitespace-nowrap ">Date</th>
+                                    <th className="md:p-4 p-2 whitespace-nowrap ">Items</th>
+                                    <th className="md:p-4 p-2 whitespace-nowrap">Amount</th>
+                                    <th className="md:p-4 p-2 whitespace-nowrap rounded-r-lg">Receipt</th>
+                                </tr>
                             </thead>
                             <tbody>
 
@@ -409,8 +411,8 @@ function CustomerDetails() {
                                                     <td className="md:p-4 p-2 py-4 border-b border-border">{item.orderNumber}</td>
                                                     <td className="md:p-4 p-2 py-4 border-b border-border">{new Date(item.createdAt).toLocaleDateString()}</td>
                                                     <td className="md:p-4 p-2 py-4 border-b border-border">{
-                                                        item.items.map(product => {
-                                                            return <span>{product.productName}</span>
+                                                        item.items.map((product, index) => {
+                                                            return <span key={index}>{product.productName}</span>
                                                         })
                                                     }</td>
                                                     <td className="md:p-4 p-2 py-4 border-b border-border">₹{item.totalAmount}</td>

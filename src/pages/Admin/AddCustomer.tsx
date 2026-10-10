@@ -11,6 +11,7 @@ import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
 import { useCreateCustomer } from "../../features/admin/api/admin.mutations";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
 
 function AddCustomer() {
     const navigate = useNavigate()
@@ -19,6 +20,7 @@ function AddCustomer() {
     const inputRef = useRef<HTMLInputElement[]>([])
     const [phoneError, setPhoneError] = useState(false)
     const phoneRegex = /^[0-9]{0,10}$/
+    const queryClient = useQueryClient()
     //Create Customer API Call
     const { mutate: createCustomer, isPending } = useCreateCustomer()
     //FormData
@@ -67,6 +69,9 @@ function AddCustomer() {
 
         createCustomer(formValue, {
             onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['getCustomers']
+                })
                 toast.success(data.message)
                 setFormValue({})
             },

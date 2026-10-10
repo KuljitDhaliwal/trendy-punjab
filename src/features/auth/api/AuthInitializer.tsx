@@ -15,7 +15,6 @@ function AuthInitializer() {
 
     useEffect(() => {
         if (isLoading) return
-        console.log('Dattttttaaa', data)
         if (data?.accessToken) {
             dispatch(setAccessToken(data.accessToken))
         } else if (error) {

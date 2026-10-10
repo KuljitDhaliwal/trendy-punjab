@@ -6,7 +6,7 @@ import type { FormValueType } from "../../../pages/Products/AddProduct"
 import type { AdminProfileType } from "../../../types/AdminProfile"
 
 export const useCreateCustomer = () => {
-    return useMutation({mutationFn: setCustomer})
+    return useMutation({mutationKey: ['add-customer'], mutationFn: setCustomer})
 }
 
 
@@ -20,7 +20,7 @@ export const useFindCustomer = () => {
 
 
 export const useEditCustomer = () => {
-    return useMutation({mutationFn: ({customerID, value}: {customerID: string, value: CustomerFormData}) => editCustomer(customerID, value)})
+    return useMutation({mutationKey: ['edit-customer'], mutationFn: ({customerID, value}: {customerID: string, value: CustomerFormData}) => editCustomer(customerID, value)})
 }
 
 

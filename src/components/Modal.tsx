@@ -28,9 +28,9 @@ function Modal({ header, actionBtn, actionBtnText, subHeading, actionBtnDisabled
                     <p className="text-2xl text-center font-bold tracking-wider">
                         {header}
                     </p>
-                    <p className="text-secondary-text text-sm text-center">
+                    <div className="text-secondary-text text-sm text-center">
                         {subHeading}
-                    </p>
+                    </div>
                 </div>
                 <div className="flex justify-center gap-4">
                     <button onClick={handleCancel} className="px-6 bg-white border py-3 rounded-lg shadow cursor-pointer active:scale-95 border-border">Cancel</button>
