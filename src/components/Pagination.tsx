@@ -7,7 +7,6 @@ type PaginationTypeProps = {
 }
 
 function Pagination({pagination, onClick}: PaginationTypeProps) {
-    console.log('pageination', pagination)
     //Handle Page
     const handlePage = (pageNumber: number) => {
         onClick(pageNumber)

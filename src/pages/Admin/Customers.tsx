@@ -97,7 +97,7 @@ function Customers() {
   const phoneRegex = /^[0-9]*$/
   //Get customers
   const { data, isLoading, error, refetch, isFetched, isFetching } = useGetCustomers(page, limit)
-  console.log('Customer Page', data?.customers)
+
   //Get customers stats
   const {
     data: customerStatsData,
@@ -115,7 +115,7 @@ function Customers() {
     findCustomerFun(search, {
       onSuccess: (data) => {
         setGetCustomer(data.customer)
-        console.log('Success', data.customer)
+
         setGetCustomer(data.customer)
       },
       onError: () => {
@@ -129,7 +129,7 @@ function Customers() {
   const findCustomer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     if (!phoneRegex.test(value)) {
-      console.log('Runnnn')
+
       setPhoneError(true)
       return
     }
@@ -178,8 +178,8 @@ function Customers() {
       <div>
         {customerStatsIsLoading && !customerStatsRefetched ? (
           <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
-            {Array.from({ length: 2 }, () => {
-              return <SkeletonCard />
+            {Array.from({ length: 2 }, (_,index) => {
+              return <SkeletonCard key={index}/>
             })}
           </div>
         ) : customerStatsError || (customerStatsRefetching && !customerStatsData) ? (
@@ -196,8 +196,8 @@ function Customers() {
           </div>
         ) : (
           <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
-            {customerStatsData?.customerStats?.map((item: CustomerStats) => {
-              return <StatsCard item={item} />
+            {customerStatsData?.customerStats?.map((item: CustomerStats, key:number) => {
+              return <StatsCard key={key} item={item} />
             })}
           </div>
         )}

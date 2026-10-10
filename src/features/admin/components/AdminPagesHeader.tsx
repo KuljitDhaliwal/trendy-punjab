@@ -16,7 +16,7 @@ function AdminPagesHeader({first, main, third, right}: AdminPageHeaderType) {
                     {first}
                 </p>
                 <p className="md:text-2xl text-lg font-bold">{main}</p>
-                <p className="text-secondary-text text-wrap text-[14px]">{third}</p>
+                <div className="text-secondary-text text-wrap text-[14px]">{third}</div>
             </div>
             {right}
         </div>

@@ -87,8 +87,8 @@ function Products() {
             <div>
                 {productsStatsLoading && !productStatsFetched ? (
                     <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
-                        {Array.from({ length: 3 }, () => {
-                            return <SkeletonCard />
+                        {Array.from({ length: 3 }, (_,index) => {
+                            return <SkeletonCard key={index} />
                         })}
                     </div>
                 ) : productsStatsError || (productStatsIsFetching && !productsStats) ? (

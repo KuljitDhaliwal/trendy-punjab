@@ -80,16 +80,16 @@ function AdminPage() {
                                         <FaEnvelope />
                                     </div>
                                     <p className="font-semibold">Email</p>
-                                    <p className="text-secondary-text">
+                                    <div className="text-secondary-text">
                                         {admin.email ? (
-                                            <p className="text-secondary-text">
+                                            <span className="text-secondary-text">
                                                 {admin.email}
-                                            </p>
+                                            </span>
 
                                         ) : (
                                             <div className="w-30 h-3 bg-gray-200 rounded-md"></div>
                                         )}
-                                    </p>
+                                    </div>
                                 </div>
                                 <hr className="text-border" />
                                 <div className="flex gap-3 items-center">
@@ -97,16 +97,16 @@ function AdminPage() {
                                         <FaUser />
                                     </div>
                                     <p className="font-semibold">Role</p>
-                                    <p className="text-secondary-text">
+                                    <div className="text-secondary-text">
                                         {admin.role ? (
-                                            <p className="text-secondary-text">
+                                            <span className="text-secondary-text">
                                                 {admin.role}
-                                            </p>
+                                            </span>
 
                                         ) : (
                                             <div className="w-30 h-3 bg-gray-200 rounded-md"></div>
                                         )}
-                                    </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

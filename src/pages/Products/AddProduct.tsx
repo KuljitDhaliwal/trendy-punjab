@@ -13,7 +13,8 @@ import { useCreateProduct } from "../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
 import type { ProductVariantType } from "../../types/Product"
 import { FaRegTrashAlt } from "react-icons/fa";
-
+import AddVariantColorPallete from "../../features/admin/components/AddVariantColorPallete"
+import { COLOR_OPTIONS } from "../../static/ColorPallete"
 
 
 
@@ -56,6 +57,7 @@ function AddProduct() {
     const inputRef = useRef<HTMLInputElement[]>([])
     const inputVariantRef = useRef<{ [inputName: string]: HTMLInputElement | null }>({})
     const [error, setError] = useState<Partial<ErrorType>>({})
+    const [selectedColor, setSelectedColor] = useState("")
     const [stockError, setStockError] = useState<number[]>([])
     const { mutate: createProduct } = useCreateProduct()
     const navigate = useNavigate()
@@ -91,7 +93,7 @@ function AddProduct() {
 
     //Handle Remove variant
     const handleRemoveVariant = (variantIndex: number) => {
-        console.log('variant Index', variantIndex)
+
         const newVariants = variants.filter((_, index) => index !== variantIndex)
         setVariants(newVariants)
 
@@ -104,7 +106,7 @@ function AddProduct() {
 
     }
 
-    console.log('fromValVar', variants)
+
 
 
     //Handle FormData
@@ -147,12 +149,12 @@ function AddProduct() {
         })
     }
 
-    console.log('FormValue', formValue)
+
 
 
     const handleVariantChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, variantIndex: number) => {
 
-        if (e.target.name === 'size' || e.target.name === 'color') {
+        if (e.target.name === 'size') {
             setFormValue(prev => (
                 {
                     ...prev,
@@ -196,6 +198,19 @@ function AddProduct() {
             ))
             return
         }
+    }
+
+
+    const handleVariantColor = (color: string, variantIndex: number) => {
+        setSelectedColor(color)
+        setFormValue(prev => (
+            {
+                ...prev,
+                'variants': prev.variants.map((variant, index) =>
+                index === variantIndex ? { ...variant, 'color': color } : variant
+            )
+            }
+        ))
     }
 
 
@@ -294,6 +309,7 @@ function AddProduct() {
                     } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/products/')} />
                 )} />
 
+
             <div className="flex-1 gap-6 min-h-0 flex flex-col">
                 <div className="grid gap-6">
                     {/* Basic Information */}
@@ -365,7 +381,7 @@ function AddProduct() {
                                         <h3 className="font-semibold text-[14px]">
                                             Variant {index + 1}
                                         </h3>
-                                        <div className="flex w-full gap-4">
+                                        <div className="grid md:grid-cols-3 w-full gap-4">
                                             {
                                                 variant.map((item) => (
                                                     <div className="grid gap-4 w-full" key={item.name}>
@@ -400,12 +416,7 @@ function AddProduct() {
                                                             ) :
                                                                 (
                                                                     <div className="grid gap-2 w-full self-start" key={item.name}>
-                                                                        <div className="flex gap-2">
-                                                                            <label htmlFor={item.name}>{item.label}</label>
-                                                                            {item.required && (<p className="text-red-600">*</p>)}
-                                                                        </div>
-                                                                        <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
-                                                                            value={formValue.variants[index].color || ''} className={'border-border'} />
+                                                                        <AddVariantColorPallete selectedColor={selectedColor} onClick={(color: string) => handleVariantColor(color, index)} colorOptions={COLOR_OPTIONS} />
                                                                     </div>
                                                                 )
                                                         }

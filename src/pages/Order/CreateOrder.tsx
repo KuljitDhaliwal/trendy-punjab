@@ -14,6 +14,7 @@ import { IoShirtOutline } from "react-icons/io5"
 import type { ProductType } from "../../types/Product"
 import { FaRegTrashAlt } from "react-icons/fa"
 import { useToggleCart } from "../../context/ToggleCartContext"
+import { useQueryClient } from "@tanstack/react-query"
 
 
 export type OrderItemType = {
@@ -74,6 +75,7 @@ function CreateOrder() {
   const [errorValidation, setErrorValidation] = useState<Record<number, string | undefined>>({})
   const [subTotal, setSubTotal] = useState<number | null>(null)
   const [discount, setDiscount] = useState<number | null>(null)
+  const [discountPrice, setDiscountPrice] = useState<number | null>(null)
   const [orderDisable, setOrderDisabled] = useState(false)
   const [orderNotes, setOrderNotes] = useState('')
   const [payment, setPayment] = useState<PaymentType>({
@@ -85,6 +87,7 @@ function CreateOrder() {
   const { mutate: getSearchSingleProduct, isPending, error } = useGetSearchSingleProduct()
   const { toggleCart, setToggleCart } = useToggleCart()
   const { mutate: getCreateOrder } = useCreateOrder()
+  const queryClient = useQueryClient()
 
   //Handle Toggle button false on window resize
   useEffect(() => {
@@ -147,7 +150,6 @@ function CreateOrder() {
 
   //Handle Item
   const handleItem = (product: ProductType, productIndex: number) => {
-    console.log(sizeBtn[productIndex], color[productIndex])
     //Validate Size and Color
     if (sizeBtn[productIndex] === undefined || color[productIndex] === undefined) {
       setErrorValidation(prev => ({ ...prev, [productIndex]: `Please select color and size` }))
@@ -187,6 +189,7 @@ function CreateOrder() {
 
     setSubTotal(total || 0)
     const discountAmount = ((total || 0) * ((discount || 0) / 100))
+    setDiscountPrice(discountAmount)
     const val = discount === null ? (total || 0) : ((total || 0) - discountAmount)
     setTotalAmount(Number(val))
   }, [order, discount])
@@ -233,7 +236,6 @@ function CreateOrder() {
   const handleSizeBtn = (productIndex: number, variantSize: string) => {
     setColor(prev => ({ ...prev, [productIndex]: undefined }))
     setSizeBtn(prev => ({ ...prev, [productIndex]: variantSize }))
-    console.log('This is color before', color[productIndex])
     if (color[productIndex] === undefined) return
     //Reset Validator
     setErrorValidation(prev => ({
@@ -302,6 +304,7 @@ function CreateOrder() {
       customerId: customerID,
       items: order.items,
       subtotal: subTotal ?? 0,
+      discount: discountPrice ?? 0,
       totalAmount: totalAmount ?? 0,
       paymentMethod: payment.payment,
       paymentStatus: payment.status,
@@ -320,6 +323,9 @@ function CreateOrder() {
 
     getCreateOrder({ customerID, data }, {
       onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: ['getCustomers']
+        })
         toast.success('Order Created!!')
         setOrder(
           {
@@ -342,7 +348,6 @@ function CreateOrder() {
   }
 
 
-  console.log('Final Order', order)
 
   return (
     <div className="grid gap-6">
@@ -400,24 +405,24 @@ function CreateOrder() {
             detail="Search by productID or product name"
             icon={IoShirtOutline}
             children={(
-              <div className="grid gap-4 relative">
+              <div className="grid items-start gap-4 relative min-h-98">
                 <div className="relative">
                   <input type="search" name="search-product" onChange={(e) => handleSearchProduct(e)}
                     className="w-full py-2 px-4 border-border border rounded-lg bg-white" placeholder="Search product..." />
                   <div className={`
-                    min-h-30 w-full top-[calc(100%+8px)] shadow rounded-lg 
-                    bg-white absolute p-4 ${product.length === 0 ? 'hidden' : 'grid'
-                    } place-items-center`}>
+                    max-h-80 z-1000 w-full top-12 shadow rounded-lg 
+                    bg-white overflow-y-auto absolute p-4 ${product.length === 0 ? 'hidden' : 'grid'
+                    }`}>
                     {isPending ? (
                       <p className="animate-pulse">Searching...</p>
                     ) : error ? (
                       <p>Something went wrong!</p>
                     ) : (
-                      <div className="grid gap-2 w-full">
+                      <div className="grid items-start gap-2 w-full">
                         {
                           product?.map((pro: ProductType) => {
                             return <button key={pro._id} onClick={() => handleSelectProduct(pro)}
-                              className="bg-orange-light cursor-pointer p-4 w-full">
+                              className="glass-card cursor-pointer p-4 w-full">
                               <span className="flex justify-between items-center">
                                 <span className="grid gap-1 text-left justify-start">
                                   <span className="text-xs text-secondary-text">{pro.productCode}</span>
@@ -463,8 +468,8 @@ function CreateOrder() {
                               <p className="font-bold">Size</p>
                               <div className="flex gap-2 items-start">
                                 {product && (
-                                  [...new Set(product.variants.map(variant => variant.size))].map(size => {
-                                    return <button onClick={() => handleSizeBtn(productIndex, String(size))}
+                                  [...new Set(product.variants.map(variant => variant.size))].map((size, key) => {
+                                    return <button key={key} onClick={() => handleSizeBtn(productIndex, String(size))}
                                       disabled={Number(product.variants.find(variant => variant.size === size)?.stock) <= 0}
                                       className={`p-2 border-2 self-start disabled:bg-border disabled:active:scale-100 disabled:cursor-not-allowed
                                       ${sizeBtn[productIndex] === String(size) ? 'border-blue-700' :
@@ -491,8 +496,8 @@ function CreateOrder() {
                                         value={inColor} onClick={() => handleColor(productIndex, (String(inColor)))} />
                                       <button disabled={!product.variants.some(
                                         variant => variant.size === sizeBtn[productIndex] && variant.color === inColor
-                                      )} className={`${color[productIndex] === inColor ? 'border-blue-700' : 'border-transparent'} 
-                                    border-4 absolute top-0 left-0 h-6 w-6 pointer-events-none
+                                      )} className={`${color[productIndex] === inColor ? 'border-[#D9D9D9]' : 'border-transparent'} 
+                                    border-6 absolute top-0 left-0 h-6 w-6 pointer-events-none
                                   cursor-pointer rounded-full`} style={{
                                           backgroundColor: inColor
                                         }}></button>

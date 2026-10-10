@@ -19,7 +19,6 @@ export const api = async(endPoint: string, options: RequestInit = {}) => {
         throw new Error(data.message || "Something went wrong")
     }
 
-    console.log('Data from API', data)
     return data
 
 }

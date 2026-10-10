@@ -28,8 +28,7 @@ const authSlice = createSlice({
                 email: '',
                 fullname: '',
                 role: ''
-            },
-            state.isAuthInitialized = false;
+            }
         },
         setIsAuthInitialized: (state, action) => {
             state.isAuthInitialized = action.payload

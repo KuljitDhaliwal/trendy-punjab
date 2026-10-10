@@ -32,8 +32,8 @@ function TodayActivity({ todayStats,
             <div>
                 {todayStatsLoading && !todayStatsFetched ? (
                     <div className="grid md:grid-cols-4 grid-cols-2 gap-4 justify-between items-center">
-                        {Array.from({ length: 4 }, () => {
-                            return <SkeletonCard />
+                        {Array.from({ length: 4 }, (_,index) => {
+                            return <SkeletonCard key={index}/>
                         })}
                     </div>
                 ) : todayStatsError || (isFetchingTodayStats && !todayStats)  ? (
@@ -52,7 +52,6 @@ function TodayActivity({ todayStats,
                     (
                         <div className="grid md:grid-cols-4 grid-cols-2 gap-4 justify-between items-center">
                             {todayStats?.map((item: any, key) => {
-                                console.log('Value', item)
                                 return <StatsCard key={key} item={item.label === 'Order Created' || item.label === 'Inventory Alert' ? { ...item, ['value']: item.value.length } : item} />
                             })}
                         </div>

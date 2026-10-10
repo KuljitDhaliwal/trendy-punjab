@@ -103,10 +103,10 @@ function ChangePassword() {
                         icon={FaKey}
                         children={(
                             <div className="grid gap-4">
-                                {PasswordUpdateData.map((item) => {
+                                {PasswordUpdateData.map((item, key) => {
                                     const Show: IconType = item.show
                                     const Hide: IconType = item.hide
-                                    return <div className={`grid gap-2`}>
+                                    return <div key={key} className={`grid gap-2`}>
                                         <label htmlFor={item.name}>{item.label}</label>
                                         <div className="relative">
                                             <input type={passwordShow[item.name as keyof AdminProfilePasswordType] ? 'text' : 'password'} value={formValue[item.name as keyof AdminProfilePasswordType]} name={item.name} onChange={handleFormValue}

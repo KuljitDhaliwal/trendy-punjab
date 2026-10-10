@@ -16,7 +16,7 @@ interface FindCustomersProps {
 
 function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, phoneError }: FindCustomersProps) {
     const navigate = useNavigate()
-    console.log('Phone Error', phoneError)
+
     return (
         <div className="relative">
             <div className="glass-card md:p-6 p-4">

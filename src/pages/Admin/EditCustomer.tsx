@@ -11,6 +11,7 @@ import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
 import { useEditCustomer, useGetCustomer } from "../../features/admin/api/admin.mutations";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 export type CustomerFormData = {
@@ -61,7 +62,7 @@ function EditCustomer() {
     const { mutate: editCustomer, isPending: editCustomerPending,
         isError: editCustomerError } = useEditCustomer()
     const phoneRegex = /^[0-9]{0,10}$/
-
+    const queryClient = useQueryClient()
 
     const getCustomerData = () => {
         if (customerID) {
@@ -187,6 +188,9 @@ function EditCustomer() {
             value: formValue
         }, {
             onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['getCustomers']
+                })
                 toast.success('Customer details updated!', {
                     autoClose: 1800
                 })

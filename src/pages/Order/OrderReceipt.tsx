@@ -32,47 +32,84 @@ function OrderReceipt() {
                 console.log('Customer find error!!')
             }
         })
-        
+
     }, [data])
 
 
     //HandleDownload
+
     const handleDownload = async () => {
-        if (!receiptRef.current) return
+        if (!receiptRef.current) return;
 
-        const canvas = await html2canvas(receiptRef.current, {
-            scale: 2,
-            backgroundColor: "#ffffff",
-        })
+        try {
+            const canvas = await html2canvas(receiptRef.current, {
+                scale: 2,
+                backgroundColor: "#ffffff",
 
-        const imageData = canvas.toDataURL("image/png")
+                onclone: (clonedDocument) => {
+                    const receipt = clonedDocument.querySelector(".receipt-download");
 
+                    if (!receipt) return;
 
-        const pdfWidth = 190
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+                    const elements = [
+                        receipt,
+                        ...Array.from(receipt.querySelectorAll("*")),
+                    ];
 
-        const margin = 10
+                    elements.forEach((element) => {
+                        const htmlElement = element as HTMLElement;
+                        const styles =
+                            clonedDocument.defaultView?.getComputedStyle(htmlElement);
 
-        const pdf = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: [
-                pdfWidth + margin * 2,
-                pdfHeight + margin * 2,
-            ],
-        })
+                        if (!styles) return;
 
-        pdf.addImage(
-            imageData,
-            "PNG",
-            margin,
-            margin,
-            pdfWidth,
-            pdfHeight
-        )
+                        if (styles.color.includes("oklch")) {
+                            htmlElement.style.color = "#171717";
+                        }
 
-        pdf.save(`${data?.order?.orderNumber}.pdf`)
-    }
+                        if (styles.backgroundColor.includes("oklch")) {
+                            htmlElement.style.backgroundColor = "#ffffff";
+                        }
+
+                        if (styles.borderColor.includes("oklch")) {
+                            htmlElement.style.borderColor = "#e2e2de";
+                        }
+
+                        // Remove shadows that may use unsupported color functions.
+                        if (styles.boxShadow.includes("oklch")) {
+                            htmlElement.style.boxShadow = "none";
+                        }
+                    });
+                },
+            });
+
+            const imageData = canvas.toDataURL("image/png");
+
+            const pdfWidth = 190;
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            const margin = 10;
+
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: [pdfWidth + margin * 2, pdfHeight + margin * 2],
+            });
+
+            pdf.addImage(
+                imageData,
+                "PNG",
+                margin,
+                margin,
+                pdfWidth,
+                pdfHeight
+            );
+
+            pdf.save(`${data?.order?.orderNumber ?? "receipt"}.pdf`);
+        } catch (error) {
+            console.error("Failed to download receipt:", error);
+        }
+    };
+
 
 
 
@@ -85,7 +122,7 @@ function OrderReceipt() {
     return (
         <div className="grid gap-6 p-4">
             {isLoading || data ? (
-                <div ref={receiptRef} className={`grid gap-4 font-mono w-113 text-xs ticket p-4 bg-orange-100 mx-auto shadow-2xl`}>
+                <div ref={receiptRef} className={`grid receipt-download gap-4 font-mono w-113 text-xs ticket p-4 bg-orange-100 mx-auto shadow-2xl`}>
                     <div className="grid gap-4 mb-4">
                         <img src={Trendy} alt="Website Logo" className="h-20 mx-auto" />
                         <address className="text-secondary-text text-center max-w-60 mx-auto text-xs">
@@ -149,16 +186,20 @@ function OrderReceipt() {
                                             <span className="grid gap-2 w-full text-center text-xs">
                                                 <span>Unable to load order</span>
                                                 <span>Something went wrong while fetching data!!</span>
-                                                <button onClick={() => refetch()} disabled={isFetching} className={
-                                                    `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
-                                                }>
+                                                <button onClick={() => refetch()} disabled={isFetching}
+                                                    className={
+                                                        `px-4 w-full disabled:cursor-not-allowed 
+                                                    cursor-pointer rounded-md bg-white 
+                                                    active:scale-95 py-3 text-xs border 
+                                                    border-border`
+                                                    }>
                                                     {isFetching ? 'Refetching...' : 'Try again'}
                                                 </button>
                                             </span>
                                         </td>
                                     </tr>
                                 ) : data && data?.order?.items?.map((item: OrderItemType, key: number) => {
-                                    return <tr className="border-b border-border">
+                                    return <tr key={key} className="border-b border-border">
                                         <td className="p-2">{key + 1}</td>
                                         <td className="p-2">{item.productName}</td>
                                         <td className="p-2">{item.size}</td>
@@ -185,7 +226,7 @@ function OrderReceipt() {
                             {isLoading ? (
                                 <div className="bg-gray-200 h-2 mt-0.5 rounded-md w-8 shadow" />
                             ) : (
-                                <p>{data?.order?.discount === 0 ? '--' : data?.order?.discount}</p>
+                                <p>{data?.order?.discount === 0 ? '--' : `₹${data?.order?.discount}`}</p>
                             )}
                         </div>
                     </div>

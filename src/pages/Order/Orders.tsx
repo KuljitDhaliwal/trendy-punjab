@@ -38,7 +38,7 @@ function Orders() {
 
   //Handle Page
   const handlePage = (currentPage: number) => {
-    console.log('CurrentPage', currentPage)
+
     setPage(currentPage)
   }
 
@@ -68,8 +68,8 @@ function Orders() {
       <div>
         {orderStatsLoading && !orderStatsIsFetched ? (
           <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
-            {Array.from({ length: 3 }, () => {
-              return <SkeletonCard />
+            {Array.from({ length: 3 }, (_,index) => {
+              return <SkeletonCard key={index}/>
             })}
           </div>
         ) : orderStatsError || (orderStatsIsFetching && !orderStats) ? (
