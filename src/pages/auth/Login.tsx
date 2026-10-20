@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux"
 import { setAccessToken, setIsAuthInitialized } from "../../features/auth/slices/authSlice"
 import type { RootState } from "../../store/Store"
-
+import Spinner from "../../components/ui/Spinner"
 
 type LoginForm = {
   email: string;
@@ -98,6 +98,7 @@ function Login() {
     })
   }
 
+  const disabled = formValue.email === '' || formValue.password === '';
 
   return (
     <div className="text-sm">
@@ -119,7 +120,7 @@ function Login() {
                   <Input id={item.name} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()}
                     ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} onClick={() => handleFormInput(key)} clickKey={key} item={item} icon={true}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
-                    className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
+                    className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === true ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
                     onChange={(e) => handleFormValue(e)} value={formValue[item.name]} />
                   {showPassword && EyeSlash ? (
                     <button
@@ -149,15 +150,21 @@ function Login() {
                 )}
               </div>
             })}
+            {/* <img src={LoadingGif} alt="Loading" /> */}
             <Button
-              disabled={
-                formValue.email === '' || 
-                formValue.password === '' || 
+              disabled={disabled ||
                 isPending}
-              children={`${isPending ? 'Signing...' : 'Sign In'}`} className={`text-white bg-linear-45 px-10 py-3 from-orange-dark
+              children={isPending ? (
+                <span className="flex gap-1 justify-center items-center">Signing In 
+                <Spinner/> </span>
+              ) : (
+                'Sign In'
+              )}
+              className={`text-white bg-linear-45 ${disabled ?
+                'bg-gray-200 disabled:opacity-40' : 'bg-linear-45 from-orange-dark to-orange-600'}
+                px-10 py-3 from-orange-dark
              to-orange-600`}
               onClick={handleSubmit} />
-
           </div>
           <div>
           </div>

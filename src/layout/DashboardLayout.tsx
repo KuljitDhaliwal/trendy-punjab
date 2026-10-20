@@ -11,6 +11,7 @@ function DashboardLayout() {
       subHeading={modal.data.subHeading}
       actionBtn={modal.data.actionBtn}
       actionBtnText={modal.data.actionBtnText}
+      actionBtnDisabled={modal.data.actionBtnDisabled}
       />}
       <AdminSidebar />
       <main className="md:pt-4 pt-18 lg:ml-70 md:ml-20 md:w-auto w-full transition-all duration-300 lg:p-6 p-4">

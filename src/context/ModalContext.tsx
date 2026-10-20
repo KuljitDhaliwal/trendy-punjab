@@ -15,6 +15,8 @@ type ModalType = {
 type InitialDataType = {
     modal: ModalType | null,
     setModal: React.Dispatch<React.SetStateAction<ModalType | null>>
+    isActionPending: boolean;
+    setIsActionPending: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
@@ -22,9 +24,10 @@ export const ModalContext = createContext<InitialDataType | undefined>(undefined
 
 
 export const ModalProvider = ({ children }: ChildrenType) => {
+    const [isActionPending, setIsActionPending] = useState(false);
     const [modal, setModal] = useState<ModalType | null>(null)
     return (
-        <ModalContext.Provider value={{ modal, setModal }}>{children}</ModalContext.Provider>
+        <ModalContext.Provider value={{ modal, setModal, isActionPending, setIsActionPending }}>{children}</ModalContext.Provider>
     )
 }
 

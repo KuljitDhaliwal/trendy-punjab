@@ -13,25 +13,29 @@ import { LuLogOut } from "react-icons/lu"
 import Admin from "../../features/admin/components/Admin"
 
 
+
 function AdminPage() {
 
     const navigate = useNavigate()
     const admin = useSelector((state: RootState) => state.auth.admin)
     const { mutate: logout, isPending } = useLogout()
-    const { setModal } = useModalContext()
+    const { setModal, setIsActionPending } = useModalContext()
     const dispatch = useDispatch()
 
 
     //handle Logout
     const handleLogout = () => {
+        setIsActionPending(true)
         logout(undefined, {
             onSuccess: (data) => {
                 dispatch(setLogout())
+                setIsActionPending(false)
                 setModal(null)
                 navigate('/', { replace: true })
                 toast.success(data.message)
             },
             onError: (error) => {
+                setIsActionPending(false)
                 toast.error(error.message)
             }
         })
