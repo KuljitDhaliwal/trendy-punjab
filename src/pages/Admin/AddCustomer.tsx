@@ -122,7 +122,7 @@ function AddCustomer() {
                                         <label htmlFor={item.name}>{item.label}</label>
                                         {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input clickKey={key} ref={(el: any) => { inputRef.current[key] = el }} onClick={() => handleFocusInput(key)} icon={false} item={item} onChange={handleFormData}
+                                    <Input id={item.name} clickKey={key} ref={(el: any) => { inputRef.current[key] = el }} onClick={() => handleFocusInput(key)} icon={false} item={item} onChange={handleFormData}
                                         className={`${(item.required && (formValue[item.name] === undefined || formValue[item.name] === '') && required) ? 'border-red-500' : 'border-border'}`}
                                         value={formValue[item.name] || ''} type={'text'} />
                                     {(item.required && (formValue[item.name] === undefined || formValue[item.name] === '') && required) && (
@@ -173,7 +173,7 @@ function AddCustomer() {
                             {AdditionalInformationData.map((item, key) => {
                                 return <div className="grid gap-2" key={key}>
                                     <label htmlFor={item.name}>{item.label}</label>
-                                    <Input clickKey={8} ref={(el: any) => { inputRef.current[8] = el }} onClick={() => handleFocusInput(8)} icon={false} item={item} onChange={handleFormData}
+                                    <Input id={item.name} clickKey={8} ref={(el: any) => { inputRef.current[8] = el }} onClick={() => handleFocusInput(8)} icon={false} item={item} onChange={handleFormData}
                                         value={formValue[item.name] || ''} className="border-border" type={'text'} />
                                 </div>
                             })}

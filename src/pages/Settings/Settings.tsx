@@ -115,12 +115,21 @@ function Settings() {
                                 <div className="grid md:grid-cols-2 gap-2">
                                     <div className="grid gap-2">
                                         <label htmlFor="fullname">Full Name</label>
-                                        <input onClick={handleInputActive} ref={inputRef} type="text" value={formValue.fullname} name="fullname" onChange={handleFormValue}
-                                            placeholder="Enter your name" className="border border-border p-3 px-4 rounded-md" />
+                                        <input 
+                                        onClick={handleInputActive} 
+                                        ref={inputRef}
+                                        id={"fullname"}
+                                        type="text" 
+                                        value={formValue.fullname} 
+                                        name="fullname" 
+                                        onChange={handleFormValue}
+                                        placeholder="Enter your name" 
+                                        className="border border-border p-3 px-4 rounded-md" />
                                     </div>
                                     <div className="grid gap-2">
                                         <label htmlFor="role">Role</label>
-                                        <select disabled name="role" value={formValue.role} onChange={handleFormValue}
+                                        <select disabled id="role"
+                                        name="role" value={formValue.role} onChange={handleFormValue}
                                             className="border border-border p-3 px-3 rounded-md">
                                             <option value="Owner">Owner</option>
                                             <option value="Manager">Manager</option>

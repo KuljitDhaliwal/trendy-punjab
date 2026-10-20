@@ -6,7 +6,6 @@ import { useRef, useState } from "react"
 import type { Data } from "../../static/LoginData"
 import type { IconType } from "react-icons"
 import { Navigate, useNavigate } from "react-router-dom"
-import { useDebounceHook } from "../../hooks/DebounceHook"
 import { handleFormValidation } from "../../utils/FormValidation"
 import { useLogin } from "../../features/auth/api/auth.mutations"
 import { toast } from "react-toastify";
@@ -31,12 +30,11 @@ function Login() {
   })
   const inputRef = useRef<HTMLInputElement[]>([])
   const navigate = useNavigate()
-  const { debounceFun } = useDebounceHook()
-  const {mutate: login, isPending} = useLogin()
-  const accessToken = useSelector((state: RootState)=> state.auth.accessToken)
+  const { mutate: login, isPending } = useLogin()
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken)
   const dispatch = useDispatch()
 
-  if(accessToken){
+  if (accessToken) {
     return <Navigate to="/dashboard" replace />
   }
 
@@ -51,17 +49,6 @@ function Login() {
       ...prev,
       [name]: value
     }))
-
-    if (name === "email") {
-      if (value.trim() === "") {
-        setIsValid(true);
-        return;
-      }
-      debounceFun(() => handleFormValidation(value), 1000, (result) => {
-        setIsValid(result)
-      })
-    }
-
   }
 
   //Handle Show/hide Password
@@ -77,6 +64,21 @@ function Login() {
   //Handle Submit Login
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
+
+    if (formValue.email) {
+      if (formValue.email.trim() === "") {
+        setIsValid(true);
+        return;
+      }
+      if (!handleFormValidation(formValue.email)) {
+        setIsValid(true);
+        return;
+      }
+      setIsValid(false)
+    }
+
+
+
     //Login Funtion
     login(formValue, {
       onSuccess: (data) => {
@@ -87,7 +89,7 @@ function Login() {
         dispatch(setAccessToken(data.accesstoken))
         dispatch(setIsAuthInitialized(true))
         toast.success("Login Successful!")
-        navigate('/dashboard', {replace: true})
+        navigate('/dashboard', { replace: true })
       },
       onError: (error) => {
         setLoginError(error.message)
@@ -114,10 +116,11 @@ function Login() {
                 <label htmlFor={item.name}>{item.label}</label>
                 <div className="flex relative items-center">
                   <Icon className='absolute text-[22px] top-1/2 left-2 -translate-y-1/2' />
-                  <Input ref={(el: HTMLInputElement)=>{inputRef.current[key] = el}} onClick={()=> handleFormInput(key)} clickKey={key} item={item} icon={true}
+                  <Input id={item.name} onCopy={(e) => e.preventDefault()} onCut={(e) => e.preventDefault()}
+                    ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} onClick={() => handleFormInput(key)} clickKey={key} item={item} icon={true}
                     type={item.name === 'password' && !showPassword ? 'password' : 'text'}
                     className={item.name !== 'email' ? 'border-secondary-text/20' : `${isValid === false ? 'outline-red-600 border-red-600' : 'border-secondary-text/20'}`}
-                    onChange={(e) => handleFormValue(e)} value={formValue[item.name]}/>
+                    onChange={(e) => handleFormValue(e)} value={formValue[item.name]} />
                   {showPassword && EyeSlash ? (
                     <button
                       type="button"
@@ -139,7 +142,7 @@ function Login() {
                   )}
                 </div>
                 {item.name === 'email' && formValue.email.trim() !== '' && (
-                  <small className={`text-red-400 text-[12px] ${isValid === false ? 'block' : 'hidden'}`}>Please fill email or phone properly.</small>
+                  <small className={`text-red-400 text-[12px] ${isValid === true ? 'block' : 'hidden'}`}>Please fill email or phone properly.</small>
                 )}
                 {item.name === 'password' && (
                   <small className={`text-[12px] text-red-400`}>{loginError}</small>
@@ -147,10 +150,13 @@ function Login() {
               </div>
             })}
             <Button
-              disabled={formValue.email === '' || formValue.password === '' || isPending}
-              children={'Sign In'} className={`text-white bg-linear-45 px-10 py-3 from-orange-dark
-             to-orange-600`} 
-             onClick={handleSubmit} />
+              disabled={
+                formValue.email === '' || 
+                formValue.password === '' || 
+                isPending}
+              children={`${isPending ? 'Signing...' : 'Sign In'}`} className={`text-white bg-linear-45 px-10 py-3 from-orange-dark
+             to-orange-600`}
+              onClick={handleSubmit} />
 
           </div>
           <div>

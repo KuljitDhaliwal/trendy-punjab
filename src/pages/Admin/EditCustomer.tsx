@@ -9,9 +9,10 @@ import { IoShirtOutline } from "react-icons/io5";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
-import { useEditCustomer, useGetCustomer } from "../../features/admin/api/admin.mutations";
+import { useEditCustomer } from "../../features/admin/api/admin.mutations";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetCustomer } from "../../features/admin/api/admin.queries";
 
 
 export type CustomerFormData = {
@@ -58,53 +59,64 @@ function EditCustomer() {
     const inputRef = useRef<HTMLInputElement[]>([])
     const navigate = useNavigate()
     const { id: customerID } = useParams()
-    const { mutate: getCustomer, isPending: getCustomerPending, isError: getCustomerError } = useGetCustomer()
+    // const { mutate: getCustomer, isPending: getCustomerPending, isError: getCustomerError } = useGetCustomer()
+    const {
+        data,
+        isLoading,
+        isError,
+        isFetched,
+        isFetching,
+        refetch
+    } = useGetCustomer(String(customerID))
     const { mutate: editCustomer, isPending: editCustomerPending,
         isError: editCustomerError } = useEditCustomer()
     const phoneRegex = /^[0-9]{0,10}$/
     const queryClient = useQueryClient()
 
-    const getCustomerData = () => {
-        if (customerID) {
-            getCustomer(customerID, {
-                onSuccess: (data) => {
-                    const customer = data.customer
-                    const customerData: CustomerFormData = {
-                        fullname: customer.fullname ?? "",
-                        phone: customer.phone ?? "",
-                        email: customer.email ?? "",
-                        address: customer.address ?? "",
-                        city: customer.city ?? "",
-                        state: customer.state ?? "",
-                        pincode: customer.pincode ?? "",
-                        shirtSize: customer.shirtSize ?? "",
-                        shirtFit: customer.shirtFit ?? "",
-                        tshirtSize: customer.tshirtSize ?? "",
-                        jeansSize: customer.jeansSize ?? "",
-                        jeansFit: customer.jeansFit ?? "",
-                        jacketSize: customer.jacketSize ?? "",
-                        shoeSize: customer.shoeSize ?? "",
-                        notes: customer.notes ?? "",
-                    }
-                    setFormValue(customerData)
-                    setOriginal(customerData)
-                },
-                onError: (error) => {
-                    console.log(error.message)
-                }
-            })
-        }
-    }
+    // const getCustomerData = () => {
+    //     if (customerID) {
+    //         getCustomer(customerID, {
+    //             onSuccess: (data) => {
+    //                 const customer = data.customer
+    //                 const customerData: CustomerFormData = {
+    //                     fullname: customer.fullname ?? "",
+    //                     phone: customer.phone ?? "",
+    //                     email: customer.email ?? "",
+    //                     address: customer.address ?? "",
+    //                     city: customer.city ?? "",
+    //                     state: customer.state ?? "",
+    //                     pincode: customer.pincode ?? "",
+    //                     shirtSize: customer.shirtSize ?? "",
+    //                     shirtFit: customer.shirtFit ?? "",
+    //                     tshirtSize: customer.tshirtSize ?? "",
+    //                     jeansSize: customer.jeansSize ?? "",
+    //                     jeansFit: customer.jeansFit ?? "",
+    //                     jacketSize: customer.jacketSize ?? "",
+    //                     shoeSize: customer.shoeSize ?? "",
+    //                     notes: customer.notes ?? "",
+    //                 }
+    //                 setFormValue(customerData)
+    //                 setOriginal(customerData)
+    //             },
+    //             onError: (error) => {
+    //                 console.log(error.message)
+    //             }
+    //         })
+    //     }
+    // }
 
 
     //Get User Details
     useEffect(() => {
-        getCustomerData()
-    }, [customerID, getCustomer])
+        setFormValue(data?.customer)
+        setOriginal(data?.customer)
+    }, [
+        data?.customer
+    ])
 
 
     const getFormValue = (name: string) => {
-        return formValue[name as keyof CustomerFormData] || ""
+        return formValue?.[name as keyof CustomerFormData] || ""
     }
 
     const hasChanged = JSON.stringify(formValue) !== JSON.stringify(original)
@@ -139,34 +151,7 @@ function EditCustomer() {
     }
 
     const handleCancel = () => {
-        if (customerID) {
-            getCustomer(customerID, {
-                onSuccess: (data) => {
-                    const customer = data.customer
-                    setFormValue({
-                        fullname: customer.fullname ?? "",
-                        phone: customer.phone ?? "",
-                        email: customer.email ?? "",
-                        address: customer.address ?? "",
-                        city: customer.city ?? "",
-                        state: customer.state ?? "",
-                        pincode: customer.pincode ?? "",
-                        shirtSize: customer.shirtSize ?? "",
-                        shirtFit: customer.shirtFit ?? "",
-                        tshirtSize: customer.tshirtSize ?? "",
-                        jeansSize: customer.jeansSize ?? "",
-                        jeansFit: customer.jeansFit ?? "",
-                        jacketSize: customer.jacketSize ?? "",
-                        shoeSize: customer.shoeSize ?? "",
-                        notes: customer.notes ?? "",
-                    })
-
-                },
-                onError: (error) => {
-                    console.log(error.message)
-                }
-            })
-        }
+        setFormValue(data)
     }
 
 
@@ -190,6 +175,9 @@ function EditCustomer() {
             onSuccess: () => {
                 queryClient.invalidateQueries({
                     queryKey: ['getCustomers']
+                })
+                queryClient.invalidateQueries({
+                    queryKey: ['getCustomer', customerID],
                 })
                 toast.success('Customer details updated!', {
                     autoClose: 1800
@@ -233,7 +221,7 @@ function EditCustomer() {
                 detail="Enter the customer's basic details"
                 icon={FaRegUser}
                 children={(
-                    getCustomerPending ? (
+                    isLoading && !isFetched ? (
                         <div className="grid gap-4 md:grid-cols-3 items-start">
                             {Array.from({ length: 7 }, (_, index) => {
                                 return <div className="grid gap-2" key={index}>
@@ -242,27 +230,27 @@ function EditCustomer() {
                                 </div>
                             })}
                         </div>
-                    ) : getCustomerError ? (
+                    ) : isError || (isFetching && !data) ? (
                         <div className="w-full p-4 glass-card grid place-items-center">
                             <span className="grid gap-2 w-full text-center text-xs">
                                 <span>Unable to load customer information</span>
                                 <span>Something went wrong while fetching data!!</span>
-                                <button onClick={() => getCustomerData()} disabled={getCustomerPending} className={
+                                <button onClick={() => refetch()} disabled={isLoading} className={
                                     `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                                 }>
-                                    {getCustomerPending ? 'Refetching...' : 'Try again'}
+                                    {isLoading ? 'Refetching...' : 'Try again'}
                                 </button>
                             </span>
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-3 items-start">
                             {CustomerBasicInformationData.map((item, key) => {
-                                return <div className="grid gap-2">
+                                return <div key={key} className="grid gap-2">
                                     <div className="flex gap-2">
                                         <label htmlFor={item.name}>{item.label}</label>
                                         {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData} className={`border-border`}
+                                    <Input id={item.name} clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData} className={`border-border`}
                                         value={getFormValue(item.name)} type={'text'} />
                                     {(item.required && (getFormValue(item.name) === undefined || getFormValue(item.name) === '') && required) && (
                                         <p className="text-red-400">{`Please fill ${item.label}`}</p>
@@ -283,7 +271,7 @@ function EditCustomer() {
                 detail="Save their commonly used sizes"
                 icon={IoShirtOutline}
                 children={(
-                    getCustomerPending ? (
+                    isLoading && !isFetched ? (
                         <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
                             {Array.from({ length: 7 }, (_, index) => {
                                 return <div className="grid gap-2" key={index}>
@@ -292,15 +280,15 @@ function EditCustomer() {
                                 </div>
                             })}
                         </div>
-                    ) : getCustomerError ? (
+                    ) : isError || (isFetching && !data) ? (
                         <div className="w-full p-4 glass-card grid place-items-center">
                             <span className="grid gap-2 w-full text-center text-xs">
                                 <span>Unable to load customer information</span>
                                 <span>Something went wrong while fetching data!!</span>
-                                <button onClick={() => getCustomerData()} disabled={getCustomerPending} className={
+                                <button onClick={() => refetch()} disabled={isLoading} className={
                                     `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                                 }>
-                                    {getCustomerPending ? 'Refetching...' : 'Try again'}
+                                    {isLoading ? 'Refetching...' : 'Try again'}
                                 </button>
                             </span>
                         </div>
@@ -334,7 +322,7 @@ function EditCustomer() {
                 detail="Additional notes about this customer"
                 icon={IoShirtOutline}
                 children={(
-                    getCustomerPending ? (
+                    isLoading && !isFetched ? (
                         <div className="grid gap-4">
                             {Array.from({ length: 1 }, (_, index) => {
                                 return <div className="grid gap-2" key={index}>
@@ -343,24 +331,24 @@ function EditCustomer() {
                                 </div>
                             })}
                         </div>
-                    ) : getCustomerError ? (
+                    ) : isError || (isFetching && !data) ? (
                         <div className="w-full p-4 glass-card grid place-items-center">
                             <span className="grid gap-2 w-full text-center text-xs">
                                 <span>Unable to load customer information</span>
                                 <span>Something went wrong while fetching data!!</span>
-                                <button onClick={() => getCustomerData()} disabled={getCustomerPending} className={
+                                <button onClick={() => refetch()} disabled={isLoading} className={
                                     `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                                 }>
-                                    {getCustomerPending ? 'Refetching...' : 'Try again'}
+                                    {isLoading ? 'Refetching...' : 'Try again'}
                                 </button>
                             </span>
                         </div>
                     ) : (
                         <div className="grid gap-4">
-                            {AdditionalInformationData.map((item) => {
-                                return <div className="grid gap-2">
+                            {AdditionalInformationData.map((item, key) => {
+                                return <div key={key} className="grid gap-2">
                                     <label htmlFor={item.name}>{item.label}</label>
-                                    <Input ref={(el: HTMLInputElement) => { inputRef.current[7] = el }} clickKey={7}
+                                    <Input id={item.name} ref={(el: HTMLInputElement) => { inputRef.current[7] = el }} clickKey={7}
                                         onClick={() => handleFocusInput(7)} icon={false} item={item}
                                         onChange={handleFormData} className={`border-border`}
                                         value={getFormValue(item.name)} type={'text'} />
@@ -373,7 +361,7 @@ function EditCustomer() {
 
             {/* Quick Actions  */}
             <CustomerPagesFooter btn1Text="Cancel" btn2Text="Update Customer"
-                btn2disabled={!hasChanged || editCustomerError || editCustomerPending || getCustomerPending || getCustomerError}
+                btn2disabled={!hasChanged || editCustomerError || editCustomerPending || isLoading || isError}
                 btn1ClickFun={handleCancel} btn2ClickFun={handleUpdateCustomer} />
         </div>
     )

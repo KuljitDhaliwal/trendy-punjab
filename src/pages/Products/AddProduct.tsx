@@ -12,9 +12,9 @@ import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFo
 import { useCreateProduct } from "../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
 import type { ProductVariantType } from "../../types/Product"
-import { FaRegTrashAlt } from "react-icons/fa";
 import AddVariantColorPallete from "../../features/admin/components/AddVariantColorPallete"
 import { COLOR_OPTIONS } from "../../static/ColorPallete"
+import { useQueryClient } from "@tanstack/react-query"
 
 
 
@@ -57,11 +57,12 @@ function AddProduct() {
     const inputRef = useRef<HTMLInputElement[]>([])
     const inputVariantRef = useRef<{ [inputName: string]: HTMLInputElement | null }>({})
     const [error, setError] = useState<Partial<ErrorType>>({})
-    const [selectedColor, setSelectedColor] = useState("")
+    const [selectedColor, setSelectedColor] = useState<Record<number, string>>({})
+
     const [stockError, setStockError] = useState<number[]>([])
     const { mutate: createProduct } = useCreateProduct()
     const navigate = useNavigate()
-
+    const queryClient = useQueryClient()
 
     //AddVariant
     useEffect(() => {
@@ -202,13 +203,17 @@ function AddProduct() {
 
 
     const handleVariantColor = (color: string, variantIndex: number) => {
-        setSelectedColor(color)
+        setSelectedColor(prev => ({
+            ...prev,
+            [variantIndex]: color
+        }
+        ))
         setFormValue(prev => (
             {
                 ...prev,
                 'variants': prev.variants.map((variant, index) =>
-                index === variantIndex ? { ...variant, 'color': color } : variant
-            )
+                    index === variantIndex ? { ...variant, 'color': color } : variant
+                )
             }
         ))
     }
@@ -263,6 +268,10 @@ function AddProduct() {
         setError({})
         createProduct(formValue, {
             onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['products']
+                })
+                setSelectedColor({})
                 toast.success(data.message)
                 setFormValue(
                     {
@@ -296,6 +305,7 @@ function AddProduct() {
         inputVariantRef.current[key]?.select()
     }
 
+
     return (
         <div className="flex flex-col gap-6 w-full min-h-[calc(100vh-48px)] ">
             <AdminPagesHeader first={'Products / Add Product'}
@@ -326,7 +336,7 @@ function AddProduct() {
                                             <label htmlFor={item.name}>{item.label}</label>
                                             {item.required && (<p className="text-red-600">*</p>)}
                                         </div>
-                                        <Input clickKey={key} onClick={() => handleInputFocus(key)}
+                                        <Input id={item.name} clickKey={key} onClick={() => handleInputFocus(key)}
                                             ref={(el: HTMLInputElement) => { inputRef.current[key] = el }}
                                             icon={false} item={item} onChange={handleFormData}
                                             className={`${error[
@@ -375,12 +385,17 @@ function AddProduct() {
                         detail="Add sizes and stock for this product"
                         icon={FaBorderNone}
                         children={(
-                            <div className="grid gap-6 items-start">
+                            <div className="grid gap-10 items-start">
                                 {variants && variants.map((variant, index) => (
-                                    <div key={index} className="grid gap-4">
-                                        <h3 className="font-semibold text-[14px]">
-                                            Variant {index + 1}
-                                        </h3>
+                                    <div key={index} className="grid glass-card gap-4 p-4">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="font-semibold text-[14px]">
+                                                Variant {index + 1}
+                                            </h3>
+                                            <button
+                                                onClick={() => handleRemoveVariant(index)}
+                                                className={`underline cursor-pointer text-xs text-red-500 ${index === 0 ? 'hidden' : 'block'}`}>Delete</button>
+                                        </div>
                                         <div className="grid md:grid-cols-3 w-full gap-4">
                                             {
                                                 variant.map((item) => (
@@ -392,7 +407,7 @@ function AddProduct() {
                                                                         <label htmlFor={item.name}>{item.label}</label>
                                                                         {item.required && (<p className="text-red-600">*</p>)}
                                                                     </div>
-                                                                    <select name={item.name} value={formValue.variants[index].size || ""}
+                                                                    <select id={item.name} name={item.name} value={formValue.variants[index].size || ""}
                                                                         onChange={(e) => handleVariantChange(e, index)}
                                                                         className="border-border w-full border px-2 py-3 rounded-md">
                                                                         <option value="" disabled>
@@ -409,14 +424,14 @@ function AddProduct() {
                                                                         <label htmlFor={item.name}>{item.label}</label>
                                                                         {item.required && (<p className="text-red-600">*</p>)}
                                                                     </div>
-                                                                    <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                                                    <Input id={item.name} onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
                                                                         value={formValue.variants[index].stock ?? 0} className={`${stockError.includes(index) ? 'border-red-500' : 'border-border'} w-full`} />
                                                                     <p className={`text-sm ${stockError.includes(index) ? 'block' : 'hidden'} text-red-500`}>Please add stock</p>
                                                                 </div>
                                                             ) :
                                                                 (
                                                                     <div className="grid gap-2 w-full self-start" key={item.name}>
-                                                                        <AddVariantColorPallete selectedColor={selectedColor} onClick={(color: string) => handleVariantColor(color, index)} colorOptions={COLOR_OPTIONS} />
+                                                                        <AddVariantColorPallete selectedColor={selectedColor[index]} onClick={(color: string) => handleVariantColor(color, index)} colorOptions={COLOR_OPTIONS} />
                                                                     </div>
                                                                 )
                                                         }
@@ -424,8 +439,7 @@ function AddProduct() {
                                                 ))
                                             }
 
-                                            <Button children={<FaRegTrashAlt />} onClick={() => handleRemoveVariant(index)}
-                                                className={`self-end bg-red-500 text-white px-4 py-4 ${index === 0 ? 'hidden' : 'block'}`} />
+
                                         </div>
                                     </div>
                                 ))}

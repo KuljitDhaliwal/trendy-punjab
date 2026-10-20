@@ -18,7 +18,7 @@ function TodayActivityLayout({ head, detail, icon, children, btn, btnData, btnFu
     const Icon: IconType = icon
     return (
         <div className="text-sm rounded-lg glass-card p-4 
-        grid gap-6 items-start grid-rows-[auto_1fr] relative">
+        grid gap-6 items-start grid-rows-[auto_1fr] flex-1 h-full relative">
             <div className="flex justify-between items-start w-full">
                 <div className="flex gap-2">
                     <div className="rounded-full p-1 shadow bg-orange-dark h-fit">

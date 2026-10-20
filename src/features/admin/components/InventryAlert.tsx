@@ -53,8 +53,8 @@ function InventryAlert({ todayOrders, todayStatsError, todayStatsLoading,refetch
                             </span>
                         </div>
                     ) :
-                        todayOrders && todayOrders.map((item: any) => {
-                            return item.label === 'Inventory Alert' && (item.value.length === 0 ? (<div className="grid place-items-center text-xs h-30">
+                        todayOrders && todayOrders.map((item: any, key: number) => {
+                            return item.label === 'Inventory Alert' && (item.value.length === 0 ? (<div key={key} className="grid place-items-center text-xs h-30">
                                 No Alerts!!
                             </div>) : item.value.map((product: any) => {
                                 return product.variants.map((variant: any, key: number) => {

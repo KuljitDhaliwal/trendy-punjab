@@ -73,8 +73,8 @@ function TodaySales({ todayOrders,
                                             </span>
                                         </td>
                                     </tr>) :
-                                    todayOrders?.map(stats => {
-                                        return stats.label === 'Order Created' && (stats.value.length === 0 ? (<tr>
+                                    todayOrders?.map((stats, key) => {
+                                        return stats.label === 'Order Created' && (stats.value.length === 0 ? (<tr key={key}>
                                             <td colSpan={6} className="py-10 text-center">
                                                 No orders yet!!
                                             </td>

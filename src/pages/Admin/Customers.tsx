@@ -224,13 +224,13 @@ function Customers() {
           <table className="table-auto min-w-120 w-full">
             <thead className="text-left rounded-lg text-white uppercase text-[12px]">
               <tr className="bg-orange-dark p-4">
-                <th className="md:p-4 p-2 rounded-l-lg">#</th>
-                <th className="md:p-4 p-2">customer</th>
-                <th className="md:p-4 p-2">phone</th>
-                <th className="md:p-4 p-2 whitespace-nowrap">last visit</th>
-                <th className="md:p-4 p-2">orders</th>
-                <th className="md:p-4 p-2 whitespace-nowrap">total spent</th>
-                <th className="md:p-4 p-2 rounded-r-lg">Actions</th>
+                <th className="md:p-4 whitespace-nowrap p-2 rounded-l-lg">#</th>
+                <th className="md:p-4 whitespace-nowrap p-2">customer</th>
+                <th className="md:p-4 whitespace-nowrap p-2">phone</th>
+                <th className="md:p-4 whitespace-nowrap p-2">last visit</th>
+                <th className="md:p-4 whitespace-nowrap p-2">orders</th>
+                <th className="md:p-4 whitespace-nowrap p-2">total spent</th>
+                <th className="md:p-4 whitespace-nowrap p-2 rounded-r-lg">Actions</th>
               </tr>
             </thead>
             <tbody className="text-xs">
@@ -269,13 +269,13 @@ function Customers() {
               ) :
                 data.customers.map((item: Customer, key: number) => {
                   return <tr key={item._id} className="p-4 border-b border-border">
-                    <td className="md:p-4 p-2 py-4">{(page - 1) * limit + key + 1}</td>
-                    <td className="md:p-4 p-2 py-4">{item.fullname}</td>
-                    <td className="md:p-4 p-2 py-4">{item.phone}</td>
-                    <td className="md:p-4 p-2 py-4">{item.lastVisit ? new Date(item.lastVisit).toLocaleDateString() : '--'}</td>
-                    <td className="md:p-4 p-2 py-4">{item.orders?.length ?? '--'}</td>
-                    <td className="md:p-4 p-2 py-4">₹{calculateOrderAmount(item.orders)}</td>
-                    <td className="md:p-4 p-2 py-4">
+                    <td className="md:p-4  whitespace-nowrap p-2 py-4">{(page - 1) * limit + key + 1}</td>
+                    <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.fullname}</td>
+                    <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.phone}</td>
+                    <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.lastVisit ? new Date(item.lastVisit).toLocaleDateString() : '--'}</td>
+                    <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.orders?.length ?? '--'}</td>
+                    <td className="md:p-4 whitespace-nowrap p-2 py-4">₹{calculateOrderAmount(item.orders)}</td>
+                    <td className="md:p-4 whitespace-nowrap p-2 py-4">
                       <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
                         onClick={() => handleViewCustomer(item._id)}>
                         View

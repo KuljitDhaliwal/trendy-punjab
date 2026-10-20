@@ -14,7 +14,7 @@ function AdminSidebar() {
   const [show, setShow] = useState<boolean>(true)
   const navigate = useNavigate()
   const location = useLocation()
-  const { setToggleCart } = useToggleCart()
+  const { setToggleCart, toggleCart, cartValue } = useToggleCart()
 
   //Logout function hook
   const admin = useSelector((state: RootState) => state.auth.admin)
@@ -43,7 +43,7 @@ function AdminSidebar() {
   return (
     <div className={`
     fixed left-0 top-0 md:h-screen ${toggleNav ? 'h-screen' : 'h-14'}  
-    z-1 backdrop-blur-2xl w-full lg:w-70 md:w-20 gap-10 overflow-hidden
+    z-10 backdrop-blur-2xl w-full lg:w-70 md:w-20 gap-10 overflow-hidden
     transition-all duration-300 lg:p-6 p-4 flex md:flex-col justify-start print:hidden
     `}>
 
@@ -68,8 +68,13 @@ function AdminSidebar() {
           <FaUser className={`cursor-pointer ${window.location.pathname.includes('admin-profile') ? 'text-orange-dark' : ''}`} />
         </button>
         {location.pathname.includes('create-order') && (
-          <button>
-            <IoIosCart className="cursor-pointer md:hidden flex" onClick={() => setToggleCart((prev: boolean) => !prev)} />
+          <button className="relative">
+            <IoIosCart className={`cursor-pointer md:hidden flex
+              ${toggleCart ? 'text-orange-dark' : ''}`} onClick={() => setToggleCart((prev: boolean) => !prev)} />
+            {cartValue !== 0 && (
+              <p className="absolute bg-orange-dark rounded-full w-4 h-4
+            text-white -top-2 text-xs -right-2">{cartValue}</p>
+            )}
           </button>
         )}
         {toggleNav ? (

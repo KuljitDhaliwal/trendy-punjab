@@ -11,6 +11,7 @@ import type { OrderType } from "../../types/Order"
 import { FaCirclePlus } from "react-icons/fa6"
 
 
+
 type OrderStatsType = {
   label: string,
   value: number
@@ -27,6 +28,7 @@ function Orders() {
     isFetching: orderStatsIsFetching,
     refetch: orderStatsRefetch } = useGetOrdersStats()
   const navigate = useNavigate()
+
 
   //handleViewCustomer
   const handleViewOrder = (orderID: string) => {
