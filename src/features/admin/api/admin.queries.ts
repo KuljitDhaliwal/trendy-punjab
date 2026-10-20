@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { findCustomer, getAdminInfo, getCustomers, getCustomersStats, getOrder, getOrders, getOrderStats, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
+import { findCustomer, getAdminInfo, getCustomer, getCustomers, getCustomersStats, getOrder, getOrders, getOrderStats, getProduct, getProducts, getProductsStats, getProductStats, getTodayStats } from "./admin.api"
 
 export const useGetCustomers = (page: number, limit: number = 10) => {
     return useQuery({
@@ -8,6 +8,17 @@ export const useGetCustomers = (page: number, limit: number = 10) => {
         staleTime: 5 * 60 * 1000,
     })
 }
+
+
+export const useGetCustomer = (customerID: string) => {
+    return useQuery({
+        queryKey: ['getCustomer', customerID],
+        queryFn: ()=> getCustomer(customerID),
+        enabled: Boolean(customerID),
+        staleTime: 5 * 60 * 1000
+    })
+}
+
 
 
 export const useGetCustomersStats = () => {
@@ -22,8 +33,22 @@ export const useFindCustomer = (search: string) => {
 
 ///Products
 export const useGetProducts = (page: number, search: string, limit: number) => {
-    return useQuery({queryKey: ['products',limit, page, search], queryFn: ()=> getProducts(page, search, limit)})
+    return useQuery({
+        queryKey: ['products',limit, page, search], 
+        queryFn: ()=> getProducts(page, search, limit),
+        staleTime: 5 * 60 * 1000,
+    })
 } 
+
+
+export const useGetProduct = (productID: string) => {
+    return useQuery({
+        queryKey: ['getProduct', productID],
+        queryFn: ()=> getProduct(productID),
+        enabled: Boolean(productID),
+        staleTime: 5 * 60 * 1000
+    })
+}
 
 
 //Get Product Stats
@@ -51,7 +76,11 @@ type OrdersType = {
 
 //Get Orders
 export const useGetOrders = ({page, limit, search}: OrdersType) => {
-    return useQuery({queryKey: ['order', page, limit, search], queryFn: ()=> getOrders(page, limit, search)})
+    return useQuery({
+        queryKey: ['getOrders', page, limit, search], 
+        queryFn: ()=> getOrders(page, limit, search),
+        staleTime: 5 * 60 * 1000
+    })
 }
 
 

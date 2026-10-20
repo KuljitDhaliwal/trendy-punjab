@@ -109,8 +109,11 @@ function ChangePassword() {
                                     return <div key={key} className={`grid gap-2`}>
                                         <label htmlFor={item.name}>{item.label}</label>
                                         <div className="relative">
-                                            <input type={passwordShow[item.name as keyof AdminProfilePasswordType] ? 'text' : 'password'} value={formValue[item.name as keyof AdminProfilePasswordType]} name={item.name} onChange={handleFormValue}
-                                                placeholder={item.placeholder} className="border border-border p-3 px-4 pr-10 w-full rounded-md" />
+                                            <input id={item.name} type={passwordShow[item.name as keyof AdminProfilePasswordType] ? 'text' : 'password'} 
+                                            value={formValue[item.name as keyof AdminProfilePasswordType]} 
+                                            name={item.name} onChange={handleFormValue}
+                                            placeholder={item.placeholder} 
+                                            className="border border-border p-3 px-4 pr-10 w-full rounded-md" />
                                             {
                                                 passwordShow[item.name as keyof AdminProfilePasswordType] ? (
                                                     <button className="group" onClick={() => setPasswordShow(prev => ({ ...prev, [item.name]: false }))}>

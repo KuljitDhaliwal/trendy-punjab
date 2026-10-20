@@ -19,7 +19,7 @@ function FindOrder({handleFindOrder}: FindOrderType) {
                 </div>
                 <div className="flex gap-2 md:w-auto w-full items-center">
                     <div className="grid gap-2 w-full">
-                        <input type="search" placeholder="Enter Product code or name" onChange={handleFindOrder}
+                        <input id="search" name="search" type="search" placeholder="Enter Product code or name" onChange={handleFindOrder}
                             className="border border-border rounded-lg bg-white px-4 py-2 md:w-80 w-full" />
                     </div>
                 </div>

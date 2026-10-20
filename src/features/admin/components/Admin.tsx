@@ -11,7 +11,7 @@ function Admin({ fullname, role, show }: AdminType) {
   const navigate = useNavigate()
   return (
     <button className="flex gap-2 cursor-pointer lg:justify-start justify-center" onClick={() => navigate('/dashboard/admin-profile')}>
-      <span className={`rounded-full grid place-items-center md:text-lg text-xs text-white p-2 md:w-10 md:h-10 h-8 w-8 ${fullname === '' ? 'animate-pulse bg-gray-200' : 'bg-orange-dark'}`}>
+      <span className={`rounded-full grid place-items-center md:text-lg text-xs text-white md:w-10 md:h-10 h-8 w-8 ${fullname === '' ? 'animate-pulse bg-gray-200' : 'bg-orange-dark'}`}>
         <span>{nameInitials(fullname || '')}</span>
       </span>
       {show && (

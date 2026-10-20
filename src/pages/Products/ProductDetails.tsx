@@ -3,13 +3,12 @@ import Button from "../../components/ui/Button"
 import AdminPagesHeader from "../../features/admin/components/AdminPagesHeader"
 import { useNavigate, useParams } from "react-router-dom"
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter"
-import { useDeactivateProduct, useGetProduct } from "../../features/admin/api/admin.mutations"
-import { useEffect, useState } from "react"
-import type { ProductType } from "../../types/Product"
+import { useDeactivateProduct } from "../../features/admin/api/admin.mutations"
+import type { ProductVariantType } from "../../types/Product"
 import { toast } from "react-toastify"
 import TodayActivityLayout from "../../features/admin/components/TodayActivityLayout"
 import { IoShirtOutline } from "react-icons/io5"
-import { useGetProductStats } from "../../features/admin/api/admin.queries"
+import { useGetProduct, useGetProductStats } from "../../features/admin/api/admin.queries"
 
 import StatsCard from "../../features/admin/components/StatsCard"
 import { useQueryClient } from "@tanstack/react-query"
@@ -22,7 +21,7 @@ import SkeletonCard from "../../components/ui/SkeletonCard"
 function ProductDetails() {
     const navigate = useNavigate()
     const { productID } = useParams()
-    const { mutate: getProduct, isPending, error } = useGetProduct()
+
     const { mutate: deactiveProduct, isPending: deactiveProductLoading } = useDeactivateProduct()
     const { setModal } = useModalContext()
     const {
@@ -33,28 +32,19 @@ function ProductDetails() {
         isFetching: productStatsIsFetching,
         refetch: productStatsRefetch
     } = useGetProductStats(productID || '')
-    const [product, setProduct] = useState<ProductType>()
+    // const [product, setProduct] = useState<ProductType>()
+
+    //GetProducts
+    const {
+        data,
+        isLoading,
+        isError,
+        isFetched,
+        isFetching,
+        refetch
+    } = useGetProduct(String(productID))
     const queryClient = useQueryClient()
 
-    //Get Product
-    const getProductData = () => {
-        if (productID) {
-            getProduct(productID, {
-                onSuccess: (data) => {
-                    setProduct(data.product)
-                },
-                onError: (error) => {
-                    toast.error(error.message)
-                }
-            })
-        }
-    }
-
-
-    //Get Product
-    useEffect(() => {
-        getProductData()
-    }, [productID])
 
 
 
@@ -70,13 +60,18 @@ function ProductDetails() {
 
     //Handle Deactivate Product
     const handleDeactivateProduct = (productID: string) => {
+
         deactiveProduct(productID, {
             onSuccess: () => {
                 toast.success('Product deleted!')
+                setModal(null)
                 queryClient.invalidateQueries({
                     queryKey: ['products']
                 })
-                navigate('/dashboard/products/')
+                queryClient.invalidateQueries({
+                    queryKey: ['getProduct', productID],
+                })
+                navigate('/dashboard/products')
             },
             onError: () => {
                 toast.error('Delete product error!')
@@ -107,12 +102,12 @@ function ProductDetails() {
                     icon={IoShirtOutline}
                     children={(
                         <div>
-                            {product || isPending ? (
+                            {data || isLoading ? (
                                 <div className="grid gap-4">
                                     {!deactiveProductLoading ? (
                                         <div className="flex gap-4">
-                                            <p className="text-lg">{product?.productName}</p>
-                                            {product?.isActive && (
+                                            <p className="text-lg">{data?.product?.productName}</p>
+                                            {data?.product?.isActive && (
                                                 <span className="bg-success border border-success-subtle text-white text-xs font-medium rounded grid place-items-center px-1">Active</span>
                                             )}
                                         </div>
@@ -128,8 +123,8 @@ function ProductDetails() {
                                         <div className="flex gap-10 justify-between">
                                             <p className="text-secondary-text">Product Code</p>
                                             <div>
-                                                {!isPending ? (
-                                                    <p className="font-semibold">{product?.productCode}</p>
+                                                {!isLoading ? (
+                                                    <p className="font-semibold">{data?.product?.productCode}</p>
                                                 ) : (
                                                     <div className="w-20 h-4 bg-gray-200 rounded-md animate-pulse"></div>
                                                 )}
@@ -140,8 +135,8 @@ function ProductDetails() {
                                         <div className="flex gap-10 justify-between">
                                             <p className="text-secondary-text">Category</p>
                                             <div>
-                                                {!isPending ? (
-                                                    <p className="font-semibold">{product?.category}</p>
+                                                {!isLoading ? (
+                                                    <p className="font-semibold">{data?.product?.category}</p>
 
                                                 ) : (
                                                     <div className="w-20 h-4 bg-gray-200 rounded-md animate-pulse"></div>
@@ -153,8 +148,8 @@ function ProductDetails() {
                                         <div className="flex gap-10 justify-between">
                                             <p className="text-secondary-text">Brand</p>
                                             <div>
-                                                {!isPending ? (
-                                                    <p className="font-semibold">{product?.brand}</p>
+                                                {!isLoading ? (
+                                                    <p className="font-semibold">{data?.product?.brand}</p>
 
                                                 ) : (
                                                     <div className="w-20 h-4 bg-gray-200 rounded-md animate-pulse"></div>
@@ -165,8 +160,8 @@ function ProductDetails() {
                                         <div className="flex gap-10 justify-between">
                                             <p className="text-secondary-text">Price</p>
                                             <div>
-                                                {!isPending ? (
-                                                    <p className="font-semibold">{product?.price}</p>
+                                                {!isLoading ? (
+                                                    <p className="font-semibold">{data?.product?.price}</p>
 
                                                 ) : (
                                                     <div className="w-20 h-4 bg-gray-200 rounded-md animate-pulse"></div>
@@ -177,14 +172,14 @@ function ProductDetails() {
                                     </div>
                                 </div>
 
-                            ) : error ? (<div className="w-full p-4 glass-card grid place-items-center">
+                            ) : isError || (isFetching && !data) ? (<div className="w-full p-4 glass-card grid place-items-center">
                                 <span className="grid gap-2 w-full text-center text-xs">
                                     <span>Unable to load product's stats</span>
                                     <span>Something went wrong while fetching data!!</span>
-                                    <button onClick={getProductData} disabled={productStatsIsFetching} className={
+                                    <button onClick={() => refetch()} disabled={isLoading} className={
                                         `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                                     }>
-                                        {productStatsIsFetching ? 'Refetching...' : 'Try again'}
+                                        {isLoading ? 'Refetching...' : 'Try again'}
                                     </button>
                                 </span>
                             </div>) : ('')}
@@ -247,7 +242,7 @@ function ProductDetails() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {isPending ? (
+                                {isLoading && !isFetched ? (
                                     Array.from({ length: 2 }, (_, index) => {
                                         return <tr key={index} className="py-4 animate-pulse">
                                             <td className="py-4" colSpan={5}>
@@ -255,21 +250,21 @@ function ProductDetails() {
                                             </td>
                                         </tr>
                                     })
-                                ) : error ? (
+                                ) : isError || (isFetching && !data) ? (
                                     <tr className="text-center">
                                         <td colSpan={5} className="py-10 text-center">
                                             <span className="grid gap-2 w-full text-center text-xs">
                                                 <span>Unable to load today's stats</span>
                                                 <span>Something went wrong while fetching data!!</span>
-                                                <button onClick={getProductData} disabled={isPending} className={
+                                                <button onClick={() => refetch()} disabled={isLoading} className={
                                                     `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                                                 }>
-                                                    {isPending ? 'Refetching...' : 'Try again'}
+                                                    {isLoading ? 'Refetching...' : 'Try again'}
                                                 </button>
                                             </span>
                                         </td>
                                     </tr>
-                                ) : product && product?.variants?.length === 0 ? (
+                                ) : data && data?.product?.variants?.length === 0 ? (
                                     <tr>
                                         <td colSpan={5}>
                                             <span className="grid gap-2 py-10">
@@ -280,7 +275,7 @@ function ProductDetails() {
                                         </td>
                                     </tr>
                                 ) :
-                                    product?.variants.map((item, key: number) => {
+                                    data?.product?.variants?.map((item: ProductVariantType, key: number) => {
                                         return <tr key={key} className="border-b border-border text-xs">
                                             <td className="md:p-4 p-2 py-4">{key + 1}</td>
                                             <td className="md:p-4 p-2 py-4">{item.size}</td>
@@ -303,13 +298,13 @@ function ProductDetails() {
             {/* Quick Actions  */}
             <CustomerPagesFooter btn1Color="bg-red-700 text-white" btn1Text="Delete Product" btn2Text="Edit Product"
                 btn1ClickFun={() => {
-                    if (!product) return
+                    if (!data) return
                     setModal({
                         type: 'delete-product',
                         data: {
                             header: 'Remove Product',
-                            subHeading: <p>Do you want to remove {product.productName} product</p>,
-                            actionBtn: () => handleDeactivateProduct(product._id),
+                            subHeading: <p>Do you want to remove {data.product.productName} product</p>,
+                            actionBtn: () => handleDeactivateProduct(data.product._id),
                             actionBtnText: 'Delete'
                         }
                     })

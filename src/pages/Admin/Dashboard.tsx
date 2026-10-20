@@ -46,7 +46,6 @@ function Dashboard() {
     findCustomerFun(search, {
       onSuccess: (data) => {
         setGetCustomer(data.customer)
-        console.log('Success', data.customer)
         setGetCustomer(data.customer)
       },
       onError: () => {
@@ -78,7 +77,8 @@ function Dashboard() {
   return (
     <div className="grid gap-6">
       <AdminPagesHeader first={date} main={'Dashboard'}
-        third={<span className="flex gap-1 md:flex-row flex-col items-center">Good Morning, <span className="tracking-wider">{admin?.fullname !== '' ? admin?.fullname : (
+        third={<span className="flex md:flex-row flex-col text-xs">Good Morning,
+        <span className="tracking-wider">{admin?.fullname !== '' ? admin?.fullname : (
           <div className="w-28 h-4 bg-gray-200 rounded-md animate-pulse"></div>
         )}</span></span>} right={<Admin show={true} fullname={admin?.fullname} role={admin?.role} />} />
 

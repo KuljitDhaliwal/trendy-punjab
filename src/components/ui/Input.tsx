@@ -13,21 +13,26 @@ type InputProps = {
     onChange?: (e: React.ChangeEvent<HTMLInputElement>)=> void | undefined,
     ref: InputEventHandler,
     onClick: (key: number | string) => void,
-    clickKey: number | string
+    clickKey: number | string,
+    id: string,
+    onCopy?: (e: React.ChangeEvent<HTMLInputElement>)=> void,
+    onCut?: (e: React.ChangeEvent<HTMLInputElement>)=> void,
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ value, item, className, onChange, type, icon, onClick, clickKey}, ref) => {
+    ({ value, item, id, className, onChange, type, icon, onClick, clickKey}, ref) => {
     return (
         <input
             onClick={()=>onClick(clickKey)}
             ref={ref}
             value={value}
             type={type}
+            id={id}
             name={item.name}
             placeholder={item.placeholder}
             onChange={onChange}
-            className={`w-full py-3 ${icon ? 'px-10' : 'px-4'} border rounded-md ${className}`} />
+            className={`w-full py-3 ${icon ? 'px-10' : 'px-4'} border 
+            rounded-md ${className} text-base`} />
     )
 }
 );

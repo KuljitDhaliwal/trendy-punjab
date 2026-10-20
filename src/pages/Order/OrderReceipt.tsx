@@ -1,13 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { useGetOrder } from "../../features/admin/api/admin.queries"
+import { useGetCustomer, useGetOrder } from "../../features/admin/api/admin.queries"
 import Trendy from '../../assets/images/logo.webp'
 import Thanks from '../../assets/images/thankyou.png'
-import { useGetCustomer } from "../../features/admin/api/admin.mutations"
-import { useEffect, useState } from "react"
-import type { Customer } from "../Admin/Customers"
 import type { OrderItemType } from "./CreateOrder"
 import Button from "../../components/ui/Button"
-import { IoIosArrowRoundBack, IoIosMail, IoIosPrint, IoMdDownload } from "react-icons/io"
+import { IoIosArrowRoundBack, IoIosPrint, IoMdDownload } from "react-icons/io"
 import { useRef } from "react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
@@ -17,23 +14,20 @@ import jsPDF from "jspdf"
 function OrderReceipt() {
     const { orderID } = useParams()
     const { data, isLoading, error, isFetched, isFetching, refetch } = useGetOrder(String(orderID))
-    const { mutate: getCustomer } = useGetCustomer()
-    const [customer, setCustomer] = useState<Customer>()
+    const customerID = data?.order?.customerId;
+
+    const {
+        data: customerData,
+        isLoading: customerLoading,
+    } = useGetCustomer(customerID ?? "");
+
+    const customer = customerData?.customer
+
+
     const receiptRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (!data?.order?.customerId) return
-        getCustomer(data?.order?.customerId, {
-            onSuccess: (data) => {
-                setCustomer(data.customer)
-            },
-            onError: () => {
-                console.log('Customer find error!!')
-            }
-        })
 
-    }, [data])
 
 
     //HandleDownload
@@ -149,7 +143,7 @@ function OrderReceipt() {
                         </div>
                         <div className="flex justify-between items-start">
                             <p className="font-normal">Customer:</p>
-                            {isLoading ? (
+                            {customerLoading ? (
                                 <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-30 shadow" />
                             ) : (
                                 <p>{customer?.fullname}</p>
@@ -290,10 +284,6 @@ function OrderReceipt() {
                 <Button disabled={isFetching || isLoading || !data} children={<span className="flex items-center gap-1 disabled:bg-gray-200 disabled:cursor-not-allowed" onClick={handleDownload}>
                     <IoMdDownload />
                     Download Receipt
-                </span>} className="px-4 py-2 bg-white" />
-                <Button disabled={isFetching || isLoading || !data} children={<span className="flex items-center gap-1 disabled:bg-gray-200 disabled:cursor-not-allowed">
-                    <IoIosMail />
-                    Send Receipt
                 </span>} className="px-4 py-2 bg-white" />
                 <Button onClick={() => navigate('/dashboard/orders')} children={<span className="flex items-center gap-1 disabled:bg-gray-200 disabled:cursor-not-allowed">
                     <IoIosArrowRoundBack />

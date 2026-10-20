@@ -32,7 +32,7 @@ function AdminNavbar({ toggleNav, setToggleNav }: AdminNavbarProps) {
                                 {item.subRoutes.map((subRoute) => {
                                     const SubIcon = subRoute.icon
                                     return (<NavLink onClick={() => setToggleNav(false)} key={subRoute.name} to={subRoute.route}
-                                        end={subRoute.route === ''}
+                                        end
                                         className={({ isActive }) =>
                                             `flex items-center gap-2 w-full p-4 rounded-lg 
                             lg:justify-start border-l-2 md:justify-center 

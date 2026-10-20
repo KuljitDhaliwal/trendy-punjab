@@ -14,7 +14,7 @@ type Children = {
 
 function AuthLayout({ children }: Children) {
     return (
-        <div className="md:h-screen overflow-hidden w-full grid md:grid-cols-2 bg-white lg:p-8 md:p-6 p-4 relative">
+        <div className="h-screen overflow-hidden w-full grid md:grid-cols-2 bg-white lg:p-8 md:p-6 p-4 relative">
             <div className="absolute bg-linear-360 from-orange-500 to-amber-400
         w-70 h-70 -top-35 -right-35 rounded-full shadow-2xl"></div>
             <div className="absolute bg-linear-90 from-orange-500 to-amber-400
@@ -22,7 +22,7 @@ function AuthLayout({ children }: Children) {
 
             {/* Left Side */}
             <div className="lg:p-8 md:rounded-l-2xl md:rounded-t-none md:h-auto h-100
-            rounded-t-2xl overflow-hidden md:p-6 p-4 z-1 relative">
+            rounded-t-2xl md:grid hidden overflow-hidden md:p-6 p-4 z-1 relative">
                 <img src={Clothes} alt="clothes"
                     className='absolute inset-0 h-full w-full object-cover -z-1' />
                 {/* Left Side Text on image */}
@@ -60,7 +60,7 @@ function AuthLayout({ children }: Children) {
             </div>
 
             {/* Right Side */}
-            <div className="lg:p-8 rounded-r-2xl overflow-hidden md:p-6 p-4 z-1 grid gap-6 relative bg-white/70">
+            <div className="lg:p-8 md:self-stretch self-center rounded-r-2xl overflow-hidden md:p-6 p-4 z-1 grid gap-6 relative bg-white/70">
                 <div className="logo">
                     <img src={Logo} alt="Logo" className='h-15 m-auto' />
                     <LineText lineText={

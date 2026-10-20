@@ -1,9 +1,11 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import React, { createContext, useContext, useState, type ReactNode } from "react";
 
 
 type ToggleCartType = {
     toggleCart: boolean,
-    setToggleCart: React.Dispatch<React.SetStateAction<boolean>>
+    setToggleCart: React.Dispatch<React.SetStateAction<boolean>>,
+    cartValue: number,
+    setCartValue: React.Dispatch<React.SetStateAction<number>>
 }
 
 interface ToggleCartProviderProps {
@@ -14,8 +16,16 @@ export const ToggleCartContext = createContext<ToggleCartType | undefined>(undef
 
 export const ToggleCartProvider = ({children}: ToggleCartProviderProps) => {
     const [toggleCart, setToggleCart] = useState<boolean>(false)
+    const [cartValue, setCartValue] = useState<number>(0)
     return (
-        <ToggleCartContext.Provider value={{toggleCart, setToggleCart}}>{children}</ToggleCartContext.Provider>
+        <ToggleCartContext.Provider value={
+            {
+                toggleCart, 
+                setToggleCart,
+                cartValue,
+                setCartValue
+            }
+        }>{children}</ToggleCartContext.Provider>
     )
 }
 

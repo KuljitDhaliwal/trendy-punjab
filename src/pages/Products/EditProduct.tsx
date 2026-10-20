@@ -9,11 +9,13 @@ import { Input } from "../../components/ui/Input"
 import { FaBorderNone } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react"
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter"
-import { useEditProduct, useGetProduct } from "../../features/admin/api/admin.mutations"
+import { useEditProduct } from "../../features/admin/api/admin.mutations"
 import { toast } from "react-toastify"
 import type { ProductType, ProductVariantType } from "../../types/Product"
-import { FaRegTrashAlt } from "react-icons/fa";
-
+import { useQueryClient } from "@tanstack/react-query"
+import { useGetProduct } from "../../features/admin/api/admin.queries"
+import AddVariantColorPallete from "../../features/admin/components/AddVariantColorPallete"
+import { COLOR_OPTIONS } from "../../static/ColorPallete"
 
 
 
@@ -58,41 +60,43 @@ function EditProduct() {
   const [error, setError] = useState<Partial<ErrorType>>({})
   const [original, setOriginal] = useState<ProductType>()
   const [stockError, setStockError] = useState<number[]>([])
-  const { mutate: getProduct, isPending, isError } = useGetProduct()
+  const [selectedColor, setSelectedColor] = useState<Record<number, string>>({})
+
+  const { productID } = useParams()
+  // const { mutate: getProduct, isPending, isError } = useGetProduct()
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetched,
+    isFetching,
+    refetch
+  } = useGetProduct(String(productID))
   const { mutate: editProduct, isPending: editProductPending, isError: editProductError } = useEditProduct()
   const navigate = useNavigate()
-  const { productID } = useParams()
   const inputRef = useRef<HTMLInputElement[]>([])
   const inputVariantRef = useRef<{ [inputName: string]: HTMLInputElement | null }>({})
-
-
-  const getProductData = () => {
-    if (productID) {
-      getProduct(productID, {
-        onSuccess: (data) => {
-          setProduct(data.product)
-          setFormValue(data.product)
-          setOriginal(data.product)
-        },
-        onError: (error) => {
-          toast.error(error.message)
-        }
-      })
-    }
-  }
+  const queryClient = useQueryClient()
 
 
 
-  // //Get Product
+
   useEffect(() => {
-    getProductData()
-  }, [productID])
+    if (!data?.product || isLoading || isError) return
+    setFormValue(data?.product)
+    setOriginal(data?.product)
+    setProduct(data?.product)
+    setSelectedColor(data?.product?.variants.map((variant: ProductVariantType) => variant.color))
+  }, [data?.product])
+
+
 
 
 
   //AddVariant
   useEffect(() => {
     if (product) {
+
       let localObj: any[] = []
       Array.from({ length: formValue.variants.length }, () => {
         localObj.push(productVariantData)
@@ -137,8 +141,6 @@ function EditProduct() {
     }))
 
   }
-
-  console.log(formValue, original)
 
 
   //Handle FormData
@@ -284,6 +286,12 @@ function EditProduct() {
       value: formValue
     }, {
       onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: ['products']
+        })
+        queryClient.invalidateQueries({
+          queryKey: ['getProduct', productID],
+        })
         toast.success(data.message)
 
         setStockError([])
@@ -305,6 +313,21 @@ function EditProduct() {
     inputVariantRef.current[key]?.select()
   }
 
+  const handleVariantColor = (color: string, variantIndex: number) => {
+    setSelectedColor(prev => ({
+      ...prev,
+      [variantIndex]: color
+    }
+    ))
+    setFormValue(prev => (
+      {
+        ...prev,
+        'variants': prev.variants.map((variant, index) =>
+          index === variantIndex ? { ...variant, 'color': color } : variant
+        )
+      }
+    ))
+  }
 
 
   return (
@@ -317,7 +340,7 @@ function EditProduct() {
               <IoIosArrowBack />
               Back to Products
             </span>
-          } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/customers')} />
+          } className="text-[12px] px-4 py-2 bg-orange-dark text-white" onClick={() => navigate('/dashboard/products')} />
         )} />
 
       <div className="flex-1 gap-6 min-h-0 flex flex-col">
@@ -329,7 +352,7 @@ function EditProduct() {
             detail="Enter the product's basic details"
             icon={FaRegUser}
             children={(
-              isPending ? (
+              isLoading && !isFetched ? (
                 <div className="grid gap-4 md:grid-cols-3">
                   {Array.from({ length: 4 }, (_, index) => {
                     return <div className="grid gap-2" key={index}>
@@ -338,15 +361,15 @@ function EditProduct() {
                     </div>
                   })}
                 </div>
-              ) : isError ? (
+              ) : isError || (isFetching && !data) ? (
                 <div className="w-full p-4 glass-card grid place-items-center">
                   <span className="grid gap-2 w-full text-center text-xs">
                     <span>Unable to load product information</span>
                     <span>Something went wrong while fetching data!!</span>
-                    <button onClick={() => getProductData()} disabled={isPending} className={
+                    <button onClick={() => refetch()} disabled={isLoading} className={
                       `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                     }>
-                      {isPending ? 'Refetching...' : 'Try again'}
+                      {isLoading ? 'Refetching...' : 'Try again'}
                     </button>
                   </span>
                 </div>
@@ -359,7 +382,7 @@ function EditProduct() {
                         <label htmlFor={item.name}>{item.label}</label>
                         {item.required && (<p className="text-red-600">*</p>)}
                       </div>
-                      <Input clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData}
+                      <Input id={item.name} clickKey={key} onClick={() => handleFocusInput(key)} ref={(el: HTMLInputElement) => { inputRef.current[key] = el }} icon={false} item={item} onChange={handleFormData}
                         className={`${error[
                           item.name === "price"
                             ? "price"
@@ -407,7 +430,7 @@ function EditProduct() {
             detail="Add sizes and stock for this product"
             icon={FaBorderNone}
             children={(
-              isPending ? (
+              isLoading && !isFetched ? (
                 <div className="grid gap-4">
                   <div className="flex gap-2 rounded-md h-4 w-20 bg-gray-200 animate-pulse" />
                   <div className="grid gap-4 md:grid-cols-3">
@@ -419,15 +442,15 @@ function EditProduct() {
                     })}
                   </div>
                 </div>
-              ) : isError ? (
+              ) : isError || (isFetched && !data) ? (
                 <div className="w-full p-4 glass-card grid place-items-center">
                   <span className="grid gap-2 w-full text-center text-xs">
                     <span>Unable to load product information</span>
                     <span>Something went wrong while fetching data!!</span>
-                    <button onClick={() => getProductData()} disabled={isPending} className={
+                    <button onClick={() => refetch()} disabled={isLoading} className={
                       `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                     }>
-                      {isPending ? 'Refetching...' : 'Try again'}
+                      {isLoading ? 'Refetching...' : 'Try again'}
                     </button>
                   </span>
                 </div>
@@ -436,10 +459,15 @@ function EditProduct() {
                 <div className="grid gap-6 items-start">
                   {variants && variants.map((variant, index) => (
                     <div key={index} className="grid gap-4">
-                      <h3 className="font-semibold text-[14px]">
-                        Variant {index + 1}
-                      </h3>
-                      <div className="flex w-full gap-4">
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold text-[14px]">
+                          Variant {index + 1}
+                        </h3>
+                        <button
+                          onClick={() => handleRemoveVariant(index)}
+                          className={`underline cursor-pointer text-xs text-red-500 ${index === 0 ? 'hidden' : 'block'}`}>Delete</button>
+                      </div>
+                      <div className="grid md:grid-cols-3 w-full gap-4">
                         {
                           variant.map((item) => (
                             <div className="grid gap-4 w-full" key={item.name}>
@@ -450,7 +478,7 @@ function EditProduct() {
                                       <label htmlFor={item.name}>{item.label}</label>
                                       {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <select name={item.name} value={formValue.variants[index].size || ""}
+                                    <select id={item.name} name={item.name} value={formValue.variants[index].size || ""}
                                       onChange={(e) => handleVariantChange(e, index)}
                                       className="border-border w-full border px-2 py-3 rounded-md">
                                       <option value="" disabled>
@@ -467,28 +495,20 @@ function EditProduct() {
                                       <label htmlFor={item.name}>{item.label}</label>
                                       {item.required && (<p className="text-red-600">*</p>)}
                                     </div>
-                                    <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
+                                    <Input id={item.name} onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
                                       value={formValue.variants[index].stock ?? 0} className={`${stockError.includes(index) ? 'border-red-500' : 'border-border'} w-full`} />
                                     <p className={`text-sm ${stockError.includes(index) ? 'block' : 'hidden'} text-red-500`}>Please add stock</p>
                                   </div>
                                 ) :
                                   (
-                                    <div className="grid gap-2 w-full self-start" key={item.name}>
-                                      <div className="flex gap-2">
-                                        <label htmlFor={item.name}>{item.label}</label>
-                                        {item.required && (<p className="text-red-600">*</p>)}
-                                      </div>
-                                      <Input onClick={() => handleFocusVarinatInput(`${index}+${item.name}`)} clickKey={index} ref={(el: HTMLInputElement) => { inputVariantRef.current[`${index}+${item.name}`] = el }} icon={false} item={item} onChange={(e) => handleVariantChange(e, index)}
-                                        value={formValue.variants[index].color || ''} className={'border-border'} />
-                                    </div>
+                                    <AddVariantColorPallete colorOptions={COLOR_OPTIONS}
+                                      selectedColor={selectedColor[index]} onClick={(color: string) => handleVariantColor(color, index)} />
                                   )
                               }
                             </div>
                           ))
                         }
 
-                        <Button children={<FaRegTrashAlt />} onClick={() => handleRemoveVariant(index)}
-                          className={`self-end bg-red-500 text-white px-4 py-4 ${formValue.variants.length === 1 ? "hidden" : "block"}`} />
                       </div>
                     </div>
                   ))}
@@ -501,7 +521,7 @@ function EditProduct() {
 
       <CustomerPagesFooter btn1Text={'Cancel'}
         btn2disabled={editProductPending ||
-          isPending ||
+          isLoading ||
           isError ||
           editProductError ||
           JSON.stringify(formValue) === JSON.stringify(original)

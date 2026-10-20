@@ -58,6 +58,7 @@ function Products() {
         deactiveProduct(productID, {
             onSuccess: () => {
                 toast.success('Product deleted!')
+                setModal(null)
                 queryClient.invalidateQueries({
                     queryKey: ['products']
                 })
@@ -77,9 +78,9 @@ function Products() {
                 main={'Products'} third={'Manage your product catalog, sizes, stock and prices.'}
                 right={(
                     <Button children={<span className="flex gap-2 items-center">
-                                <FaCirclePlus/>
-                                Add Product
-                              </span>} onClick={() => navigate('add-product')}
+                        <FaCirclePlus />
+                        Add Product
+                    </span>} onClick={() => navigate('add-product')}
                         className="text-[12px] px-4 py-2 bg-orange-dark text-white" />
                 )} />
 
@@ -87,8 +88,8 @@ function Products() {
             <div>
                 {productsStatsLoading && !productStatsFetched ? (
                     <div className="grid lg:grid-cols-4 grid-cols-2 gap-4">
-                        {Array.from({ length: 3 }, (_,index) => {
-                            return <SkeletonCard key={index} />
+                        {Array.from({ length: 3 }, (_, index) => {
+                            return <SkeletonCard key={index} />
                         })}
                     </div>
                 ) : productsStatsError || (productStatsIsFetching && !productsStats) ? (
@@ -178,12 +179,12 @@ function Products() {
                             ) :
                                 data.products.map((item: ProductType, key: number) => {
                                     return <tr key={item.productCode} className="py-2 border-b border-border">
-                                        <td className="md:p-4 p-2 py-4">{(page - 1) * limit + key + 1}</td>
-                                        <td className="md:p-4 p-2 py-4">{item.productName}</td>
-                                        <td className="md:p-4 p-2 py-4">{item.productCode}</td>
-                                        <td className="md:p-4 p-2 py-4">{item.category}</td>
-                                        <td className="md:p-4 p-2 py-4">₹{item.price}</td>
-                                        <td className="flex gap-2 items-center p-4">
+                                        <td className="md:p-4 whitespace-nowrap p-2 py-4">{(page - 1) * limit + key + 1}</td>
+                                        <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.productName}</td>
+                                        <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.productCode}</td>
+                                        <td className="md:p-4 whitespace-nowrap p-2 py-4">{item.category}</td>
+                                        <td className="md:p-4 whitespace-nowrap p-2 py-4">₹{item.price}</td>
+                                        <td className="flex gap-2 items-center md:p-4 whitespace-nowrap p-2 py-4">
                                             <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
                                                 onClick={() => handleViewProduct(item._id)}>View</button>
                                             <button type="button" className="bg-red-700 text-white py-1 px-2 disabled:cursor-not-allowed active:scale-95 rounded-md cursor-pointer" disabled={isPending}

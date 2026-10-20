@@ -119,8 +119,8 @@ function AdminPage() {
                     detail="View your personal profile details."
                     icon={FaShieldAlt}
                     children={(
-                        <div className="grid gap-4">
-                            <div className="rounded-lg bg-green-300/30 p-4">
+                        <div className="grid gap-4 h-full">
+                            <div className="rounded-lg bg-green-300/30 p-4 self-start">
                                 <div className="flex items-start gap-2">
                                     <div className="rounded-full w-2 h-2 bg-green-700 mt-1.5"></div>
                                     <div>
@@ -129,7 +129,7 @@ function AdminPage() {
                                     </div>
                                 </div>
                             </div>
-                            <button className="flex text-center justify-center items-center float-end bg-red-700 text-white px-4 py-3 rounded-lg shadow gap-2 cursor-pointer active:scale-95"
+                            <button className="flex self-end text-center justify-center items-center float-end bg-red-700 text-white px-4 py-3 rounded-lg shadow gap-2 cursor-pointer active:scale-95"
                                 onClick={() => setModal({
                                     type: "logout",
                                     data: {

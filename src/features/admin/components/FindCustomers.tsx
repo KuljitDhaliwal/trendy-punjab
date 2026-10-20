@@ -32,7 +32,11 @@ function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, p
                     </div>
                     <div className="flex gap-2 md:w-auto w-full items-center">
                         <div className="grid gap-2 w-full">
-                            <input type="search" placeholder="Enter Phone Number"
+                            <input 
+                            name="search"
+                            id="search"
+                            type="search" 
+                            placeholder="Enter Phone Number"
                                 inputMode="numeric"
                                 maxLength={10}
                                 onChange={onChange}

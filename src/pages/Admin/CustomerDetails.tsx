@@ -10,37 +10,27 @@ import { MdHistory } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
 import Button from "../../components/ui/Button";
 import CustomerPagesFooter from "../../features/admin/components/CustomerPagesFooter";
-import { useGetCustomer } from "../../features/admin/api/admin.mutations";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import type { Customer } from "./Customers";
 import { nameInitials } from "../../utils/NameInitials";
 import { calculateOrderAmount } from "../../utils/CalculateTotal";
 import { FaAddressCard } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
+import { useGetCustomer } from "../../features/admin/api/admin.queries";
+import type { OrderType } from "../../types/Order";
 
 function CustomerDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const { mutate: getCustomer, isPending, error } = useGetCustomer()
-    const [customer, setCustomer] = useState<Customer | null>(null)
+    const {
+        data,
+        isLoading,
+        isError,
+        isFetched,
+        isFetching,
+        refetch
+    } = useGetCustomer(String(id))
 
-    const fetchCustomer = () => {
-        if (id) {
-            getCustomer(id, {
-                onSuccess: (data) => {
-                    setCustomer(data.customer)
-                },
-                onError: (error) => {
-                    toast(error.message)
-                }
-            })
-        }
-    }
 
-    useEffect(() => {
-        fetchCustomer()
-    }, [id])
+
 
 
     const handleEditCustomer = () => {
@@ -72,7 +62,7 @@ function CustomerDetails() {
 
             {/* Customer's Personal Details Banner */}
             <section className="glass-card p-4 flex justify-between items-start">
-                {isPending ? (
+                {isLoading && !isFetched ? (
                     <div className="flex md:flex-row flex-col gap-4 justify-between w-full items-start">
                         <div className="flex gap-2">
                             <div className="rounded-full p-2 w-10 h-10 bg-gray-200 shadow animate-pulse">
@@ -99,15 +89,15 @@ function CustomerDetails() {
                             ''
                         } className="text-[12px] md:w-30 w-full px-4 py-2 h-9 bg-gray-200 text-white" onClick={() => navigate(`/dashboard/orders/create-order/${id}`)} />
                     </div>
-                ) : error ? (
+                ) : isError || (isFetching && !data) ? (
                     <div className="grid place-items-center h-25 w-full">
                         <span className="grid gap-2 w-full text-center text-xs">
                             <span>Unable to load today's stats</span>
                             <span>Something went wrong while fetching data!!</span>
-                            <button onClick={fetchCustomer} disabled={isPending} className={
+                            <button onClick={()=>refetch()} disabled={isLoading} className={
                                 `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                             }>
-                                {isPending ? 'Refetching...' : 'Try again'}
+                                {isLoading ? 'Refetching...' : 'Try again'}
                             </button>
                         </span>
                     </div>
@@ -115,31 +105,31 @@ function CustomerDetails() {
                     <div className="flex md:flex-row gap-4 w-full justify-between flex-col items-start">
 
                         <div className="flex gap-2">
-                            <div className="rounded-full p-2 bg-orange-dark text-white h-fit shadow">
-                                <p className="text-xl">{nameInitials(customer?.fullname ?? '')}</p>
+                            <div className="rounded-full w-10 h-10 grid place-items-center bg-orange-dark text-white shadow">
+                                <p className="text-xl">{nameInitials(data?.customer?.fullname ?? '')}</p>
                             </div>
                             <div className="grid gap-2">
-                                <p>{customer?.fullname}</p>
+                                <p>{data?.customer?.fullname}</p>
                                 <div className="grid gap-2">
                                     <div className="flex gap-1 items-center">
                                         <MdLocalPhone />
                                         <p className="text-[12px] text-secondary-text">
-                                            {customer?.phone}
+                                            {data?.customer?.phone}
                                         </p>
                                     </div>
-                                    {customer && customer.email && (
+                                    {data && data?.customer.email && (
                                         <div className="flex gap-1 items-center">
                                             <BsEnvelope />
                                             <p className="text-[12px] text-secondary-text">
-                                                {customer?.email}
+                                                {data?.customer?.email}
                                             </p>
                                         </div>
                                     )}
-                                    {customer && (
+                                    {data && (
                                         <div className="flex gap-1 items-center">
                                             <MdOutlineHandshake />
                                             <p className="text-[12px] text-secondary-text">
-                                                customer since {new Date(customer.createdAt).toLocaleDateString()}
+                                                customer since {new Date(data?.customer.createdAt).toLocaleDateString()}
                                             </p>
                                         </div>
                                     )}
@@ -161,7 +151,7 @@ function CustomerDetails() {
             </section>
 
             <section className="glass-card p-4">
-                {isPending ? (
+                {isLoading && !isFetched ? (
                     <div className="flex gap-2">
                         <div className="rounded-full p-2 bg-orange-dark h-fit">
                             <FaAddressCard className="text-white text-sm" />
@@ -179,15 +169,15 @@ function CustomerDetails() {
                             </div>
                         </address>
                     </div>
-                ) : error ? (
+                ) : isError || (isFetching && !data) ? (
                     <div className="grid place-items-center h-25 w-full">
                         <span className="grid gap-2 w-full text-center text-xs">
                             <span>Unable to load today's stats</span>
                             <span>Something went wrong while fetching data!!</span>
-                            <button onClick={fetchCustomer} disabled={isPending} className={
+                            <button onClick={()=> refetch()} disabled={isLoading} className={
                                 `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                             }>
-                                {isPending ? 'Refetching...' : 'Try again'}
+                                {isLoading ? 'Refetching...' : 'Try again'}
                             </button>
                         </span>
                     </div>
@@ -201,22 +191,22 @@ function CustomerDetails() {
                             <address className="grid gap-2">
                                 <p>
                                     Address: <span className="text-[12px] text-secondary-text">
-                                        {customer?.address ?? '--'}
+                                        {data?.customer?.address ?? '--'}
                                     </span>
                                 </p>
                                 <p>
                                     City: <span className="text-[12px] text-secondary-text">
-                                        {customer?.city ?? '--'}
+                                        {data?.customer?.city ?? '--'}
                                     </span>
                                 </p>
                                 <p>
                                     Pincode: <span className="text-[12px] text-secondary-text">
-                                        {customer?.pincode ?? '--'}
+                                        {data?.customer?.pincode ?? '--'}
                                     </span>
                                 </p>
                             </address>
                         </div>
-                        {customer && customer.notes && (
+                        {data && data?.customer.notes && (
                             <section className="flex justify-between items-start">
                                 <div className="flex gap-2">
                                     <div className="rounded-full p-2 bg-orange-dark h-fit">
@@ -224,7 +214,7 @@ function CustomerDetails() {
                                     </div>
                                     <div className="grid">
                                         <p>Notes</p>
-                                        <p className="text-[12px] text-secondary-text">{customer?.notes}</p>
+                                        <p className="text-[12px] text-secondary-text">{data?.customer?.notes}</p>
                                     </div>
                                 </div>
                             </section>
@@ -249,36 +239,36 @@ function CustomerDetails() {
                 <div className="grid md:grid-cols-4 grid-cols-2 glass-card justify-between items-center">
                     <div className="card border-r md:border-b-0 border-b border-border p-4 rounded-l-lg grid gap-2">
                         <p className="text-[12px] text-secondary-text">Last Visit</p>
-                        {isPending ? (
+                        {isLoading ? (
                             <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                         ) : (
-                            <p>{customer && customer.lastVisit ? new Date(customer.lastVisit).toLocaleDateString() : '--'}</p>
+                            <p>{data && data?.customer.lastVisit ? new Date(data?.customer.lastVisit).toLocaleDateString() : '--'}</p>
                         )}
                     </div>
                     <div className="card border-r md:border-b-0 border-b border-border p-4 grid gap-2">
                         <p className="text-[12px] text-secondary-text">Total Orders</p>
-                        {isPending ? (
+                        {isLoading ? (
                             <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                         ) : (
-                            <p className="">{customer?.orders?.length ?? '--'}</p>
+                            <p className="">{data?.customer?.orders?.length ?? '--'}</p>
                         )}
 
                     </div>
                     <div className="card border-r border-border p-4 grid gap-2">
                         <p className="text-[12px] text-secondary-text">Total Spent</p>
-                        {isPending ? (
+                        {isLoading ? (
                             <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                         ) : (
-                            <p className="">₹{calculateOrderAmount(customer?.orders) ?? '--'}</p>
+                            <p className="">₹{calculateOrderAmount(data?.customer?.orders) ?? '--'}</p>
                         )}
 
                     </div>
                     <div className="card p-4 rounded-r-lg grid gap-2">
                         <p className="text-[12px] text-secondary-text">Preferred Contact</p>
-                        {isPending ? (
+                        {isLoading ? (
                             <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                         ) : (
-                            <p className="">{customer?.phone ?? '--'}</p>
+                            <p className="">{data?.customer?.phone ?? '--'}</p>
                         )}
 
                     </div>
@@ -296,46 +286,46 @@ function CustomerDetails() {
                     <div className="grid gap-4 lg:grid-cols-5 md:grid-cols-3">
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Shirt Size</p>
-                            {isPending ? (
+                            {isLoading ? (
                                 <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                             ) : (
-                                <p className="font-bold">{customer?.shirtSize ?? '--'}</p>
+                                <p className="font-bold">{data?.customer?.shirtSize ?? '--'}</p>
                             )}
 
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">T-Shirt Size</p>
-                            {isPending ? (
+                            {isLoading ? (
                                 <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                             ) : (
-                                <p className="font-bold">{customer?.tshirtSize ?? '--'}</p>
+                                <p className="font-bold">{data?.customer?.tshirtSize ?? '--'}</p>
                             )}
 
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Jeans Size</p>
-                            {isPending ? (
+                            {isLoading ? (
                                 <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                             ) : (
-                                <p className="font-bold">{customer?.jeansSize ?? '--'}</p>
+                                <p className="font-bold">{data?.customer?.jeansSize ?? '--'}</p>
                             )}
 
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Jacket Size</p>
-                            {isPending ? (
+                            {isLoading ? (
                                 <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                             ) : (
-                                <p className="font-bold">{customer?.jacketSize ?? '--'}</p>
+                                <p className="font-bold">{data?.customer?.jacketSize ?? '--'}</p>
                             )}
 
                         </div>
                         <div className="card glass-card p-4 rounded-md grid gap-2">
                             <p className="text-secondary-text text-[12px]">Shoe Size</p>
-                            {isPending ? (
+                            {isLoading ? (
                                 <div className="bg-gray-200 h-4 mt-0.5 rounded-md w-25 shadow" />
                             ) : (
-                                <p className="font-bold">{customer?.shoeSize ?? '--'}</p>
+                                <p className="font-bold">{data?.customer?.shoeSize ?? '--'}</p>
                             )}
                         </div>
                     </div>
@@ -364,7 +354,7 @@ function CustomerDetails() {
                             <tbody>
 
                                 {
-                                    isPending ? (
+                                    isLoading && !isFetched ? (
                                         Array.from({ length: 5 }, (_, index) => {
                                             return <tr key={index} className="py-4 animate-pulse">
                                                 <td className="py-4" colSpan={6}>
@@ -372,22 +362,22 @@ function CustomerDetails() {
                                                 </td>
                                             </tr>
                                         })
-                                    ) : error ? (
+                                    ) : isError || (isFetching && !data) ? (
                                         <tr>
                                             <td colSpan={6} className="py-10 text-center">
                                                 <span className="grid gap-2 w-full text-center text-xs">
                                                     <span>Unable to load today's stats</span>
                                                     <span>Something went wrong while fetching data!!</span>
-                                                    <button onClick={fetchCustomer} disabled={isPending} className={
+                                                    <button onClick={()=>refetch()} disabled={isLoading} className={
                                                         `px-4 w-full disabled:cursor-not-allowed cursor-pointer rounded-md bg-white active:scale-95 py-3 text-xs border border-border`
                                                     }>
-                                                        {isPending ? 'Refetching...' : 'Try again'}
+                                                        {isLoading ? 'Refetching...' : 'Try again'}
                                                     </button>
                                                 </span>
                                             </td>
                                         </tr>
                                     ) :
-                                        customer && (customer.orders?.length === 0 || !customer?.orders) ?
+                                        data && (data?.customer.orders?.length === 0 || !data?.customer?.orders) ?
                                             (
                                                 <tr>
                                                     <td colSpan={6} className="py-10">
@@ -405,20 +395,20 @@ function CustomerDetails() {
                                                     </td>
                                                 </tr>
                                             ) :
-                                            customer?.orders?.map((item, key) => {
+                                            data?.customer?.orders?.map((item: OrderType, key: number) => {
                                                 return <tr key={item._id} className="text-xs">
-                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{key + 1}</td>
-                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{item.orderNumber}</td>
-                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{new Date(item.createdAt).toLocaleDateString()}</td>
-                                                    <td className="md:p-4 p-2 py-4 border-b border-border">{
+                                                    <td className="md:p-4 p-2 py-4 whitespace-nowrap border-b border-border">{key + 1}</td>
+                                                    <td className="md:p-4 p-2 py-4 whitespace-nowrap border-b border-border">{item.orderNumber}</td>
+                                                    <td className="md:p-4 p-2 py-4 whitespace-nowrap border-b border-border">{new Date(String(item.createdAt)).toLocaleDateString()}</td>
+                                                    <td className="md:p-4 p-2 py-4 whitespace-nowrap border-b border-border">{
                                                         item.items.map((product, index) => {
                                                             return <span key={index}>{product.productName}</span>
                                                         })
                                                     }</td>
-                                                    <td className="md:p-4 p-2 py-4 border-b border-border">₹{item.totalAmount}</td>
-                                                    <td className="flex gap-4 items-center p-4 border-b border-border">
+                                                    <td className="md:p-4 p-2 py-4 whitespace-nowrap border-b border-border">₹{item.totalAmount}</td>
+                                                    <td className="flex gap-4 items-center md:p-4 p-2 py-4 border-b border-border">
                                                         <button type="button" className="bg-orange-dark text-white py-1 px-2 active:scale-95 rounded-md cursor-pointer"
-                                                            onClick={() => handleViewOrder(item._id)}>View</button>
+                                                            onClick={() => handleViewOrder(String(item._id))}>View</button>
                                                     </td>
                                                 </tr>
                                             })
