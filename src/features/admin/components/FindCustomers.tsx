@@ -32,11 +32,11 @@ function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, p
                     </div>
                     <div className="flex gap-2 md:w-auto w-full items-center">
                         <div className="grid gap-2 w-full">
-                            <input 
-                            name="search"
-                            id="search"
-                            type="search" 
-                            placeholder="Enter Phone Number"
+                            <input
+                                name="search"
+                                id="search"
+                                type="search"
+                                placeholder="Enter Phone Number"
                                 inputMode="numeric"
                                 maxLength={10}
                                 onChange={onChange}
@@ -47,8 +47,9 @@ function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, p
                 </div>
             </div>
             {hasSearched && (
-                <div className="absolute p-4 z-10 transition-all duration-300 rounded-lg shadow 
-                    bg-white min-w-100 min-h-30 tracking-wider right-10 grid place-items-center gap-4">
+                <div className="absolute p-4 z-10 transition-all duration-300 rounded-lg shadow-2xl
+                    bg-[#233d4d] text-white md:min-w-100 min-w-full min-h-30 tracking-wider mt-4
+                    md:right-10 grid place-items-center gap-4">
                     {findingCustomer ? (
                         <div className="text-xs absolute w-full grid place-items-center inset-0">
                             Finding....
@@ -59,7 +60,7 @@ function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, p
                                 <div className="grid items-center justify-center text-center gap-2">
                                     Not Found!
                                     <Button children={'+ Add Customer'} onClick={() => navigate('/dashboard/customers/add-customer')}
-                                                        className="text-[12px] px-4 py-2 block w-fit m-auto bg-orange-dark text-white" />
+                                        className="text-[12px] px-4 py-2 block w-fit m-auto bg-orange-dark text-white" />
                                 </div>
                             </div>
                         ) :
@@ -67,21 +68,21 @@ function FindCustomers({ onChange, findCustomer, hasSearched, findingCustomer, p
                                 return <div key={customer._id}
                                     className="grid gap-2 p-2 w-full rounded-lg place-items-center ">
                                     <div className="grid w-full gap-4">
-                                        <div className="text-sm flex gap-2 items-start">
-                                            <div className="rounded-full p-2 bg-orange-dark text-white h-fit shadow">
+                                        <div className="text-sm flex gap-4 items-start">
+                                            <div className="rounded-full p-2 bg-[#fe7f2d] text-white h-fit shadow">
                                                 <p className="text-xl">{nameInitials(customer?.fullname ?? '')}</p>
                                             </div>
-                                            <div>
+                                            <div className="grid gap-2">
                                                 <div className="font-bold">{customer.fullname}</div>
-                                                <div className="text-gray-500 flex items-center gap-2"><MdOutlinePhone /> {customer.phone}</div>
+                                                <div className="flex items-center gap-2"><MdOutlinePhone /> {customer.phone}</div>
                                             </div>
                                         </div>
-                                        <Button children={'View'} className="px-4 py-2 block bg-orange-dark text-xs text-white"
+                                        <Button children={'View'} className="px-4 py-2 block bg-[#fe7f2d] text-xs text-white"
                                             onClick={() => navigate(`/dashboard/customers/${customer._id}`)} />
                                     </div>
                                 </div>
                             }))))}
-                    <div className="absolute bg-white w-5 rotate-45 -top-2.5 h-5"></div>
+                    <div className="absolute bg-[#233d4d] w-5 rotate-45 -top-2.5 h-5"></div>
                 </div>
             )}
         </div>
